@@ -11,6 +11,7 @@ import ScrollToTopButton from "../Components/(home_page)/ScrollBottomToTop/Scrol
 import Contact from "../Components/(home_page)/Contact/Contact";
 import SecuritySection from "./security/page";
 import FAQSection from "../Components/(home_page)/FAQ/FAQSection";
+import TeamMap from "./TeamMap/TeamMap";
 
 // here we'll have the content of the home page
 export default function HomePage() {
@@ -32,6 +33,9 @@ export default function HomePage() {
       <div>
         <FAQSection />
       </div>
+      <div>
+        <TeamMap></TeamMap>
+      </div>
       {/* pricing */}
       <div>
         <Pricing></Pricing>
@@ -48,6 +52,7 @@ export default function HomePage() {
       <div>
         <Testimonials></Testimonials>
       </div>
+      
       {/* contact section  */}
       <div>
         <Contact></Contact>
