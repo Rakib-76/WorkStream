@@ -5,13 +5,13 @@ import contactAnimation from "../../../../assets/contact.json";
 import { MdEmail, MdLocationOn } from "react-icons/md";
 import { FaPhoneVolume } from "react-icons/fa6";
 import { useForm } from "react-hook-form";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import Aos from "aos";
 import "aos/dist/aos.css";
 
 const Contact = () => {
   useEffect(() => {
-    Aos.init({ duration: 1000, once: false }); // once:false --> বারবার animation
+    Aos.init({ duration: 1000, once: false });
   }, []);
 
   const {
@@ -28,7 +28,7 @@ const Contact = () => {
   };
 
   return (
-    <section className="py-20 bg-muted/30 dark:bg-muted/20 transition-colors duration-300">
+    <section className="py-20 bg-muted/30 dark:bg-muted/20 transition-colors duration-300 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Title */}
         <div
@@ -53,14 +53,22 @@ const Contact = () => {
             data-aos-delay="200"
           >
             {/* Animation */}
-            <div className="">
-              <Lottie className=" w-full h-100" animationData={contactAnimation} loop={true} />
+            <div className="w-full h-auto flex justify-center">
+              <Lottie
+                className="max-w-[300px] md:max-w-[400px] lg:max-w-[500px] w-full h-auto"
+                animationData={contactAnimation}
+                loop={true}
+              />
             </div>
 
             {/* Contact Info */}
             <div className="space-y-4 text-foreground relative mb-0">
               {/* Email */}
-              <div className="flex items-center gap-3" data-aos="fade-up" data-aos-delay="300">
+              <div
+                className="flex items-center gap-3"
+                data-aos="fade-up"
+                data-aos-delay="300"
+              >
                 <div className="p-3 bg-primary/20 text-primary rounded-xl">
                   <MdEmail size={22} />
                 </div>
@@ -68,7 +76,11 @@ const Contact = () => {
               </div>
 
               {/* Phone */}
-              <div className="flex items-center gap-3" data-aos="fade-up" data-aos-delay="400">
+              <div
+                className="flex items-center gap-3"
+                data-aos="fade-up"
+                data-aos-delay="400"
+              >
                 <div className="p-3 bg-secondary/20 text-secondary rounded-xl">
                   <FaPhoneVolume size={22} />
                 </div>
@@ -76,7 +88,11 @@ const Contact = () => {
               </div>
 
               {/* Location */}
-              <div className="flex items-center gap-3" data-aos="fade-up" data-aos-delay="500">
+              <div
+                className="flex items-center gap-3"
+                data-aos="fade-up"
+                data-aos-delay="500"
+              >
                 <div className="p-3 bg-accent/20 text-accent rounded-xl">
                   <MdLocationOn size={22} />
                 </div>
@@ -91,7 +107,7 @@ const Contact = () => {
             data-aos="fade-left"
             data-aos-delay="300"
           >
-            <h2 className="text-2xl font-bold  text-foreground">Send a Message</h2>
+            <h2 className="text-2xl font-bold text-foreground">Send a Message</h2>
             <p className="text-sm text-muted-foreground">
               If you would like to discuss anything related to payment, account,
               licensing, partnerships, or have pre-sales questions, you’re at
@@ -169,7 +185,5 @@ const Contact = () => {
     </section>
   );
 };
-
-
 
 export default Contact;
