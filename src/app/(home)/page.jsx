@@ -5,16 +5,11 @@ import { Hero } from "../Components/(home_page)/Hero/Hero";
 import UseCases from "../Components/(home_page)/UseCases/UseCases";
 // import Hero from "../Components/(home_page)/Hero/Hero";
 import NeedToSucceed from "../Components/(home_page)/NeedToSucceed/NeedToSucceed";
-
 import { Pricing } from "../Components/(home_page)/Pricing/Pricing";
 import { Testimonials } from "../Components/(home_page)/Testimonials/Testimonials";
-
 import ScrollToTopButton from "../Components/(home_page)/ScrollBottomToTop/ScrollToTopButton";
-
 import Contact from "../Components/(home_page)/Contact/Contact";
 import SecuritySection from "./security/page";
-import FAQSection from "../Components/(home_page)/FAQ/FaqSection";
-// import FaqSection from "../Components/(home_page)/FAQ/FAQSection";
 import FAQSection from "../Components/(home_page)/FAQ/FAQSection";
 
 // here we'll have the content of the home page
