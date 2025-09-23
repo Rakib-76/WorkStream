@@ -1,34 +1,31 @@
 "use server";
-import bcrypt from "bcrypt"
-import dbConnect, { collectionNameObj } from "../../../lib/dbConnect"
+import bcrypt from "bcrypt";
+import dbConnect, { collectionNameObj } from "../../../lib/dbConnect";
 
-export const registerUser = async (formData) => {
-    const userCollection = dbConnect(collectionNameObj.userCollection)
+export const registerUser = async ({ name, email, password, image }) => {
+  const userCollection = dbConnect(collectionNameObj.userCollection);
 
-    // FormData → object
-    const name = formData.get("name");
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const image = formData.get("image"); // ekhane File object thakbe
+  if (!email || !password) {
+    return { success: false, message: "Email or password missing" };
+  }
 
-    if (!email || !password) {
-        return { success: false, message: "Not found" };
-    }
-
-    const user = await userCollection.findOne({ email });
-    if (!user) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const result = await userCollection.insertOne({
-            name,
-            email,
-            password: hashedPassword,
-            image: image || null,
-        });
-
-        const { acknowledged, insertedId } = result;
-        return { success: true, acknowledged, insertedId: insertedId.toString() };
-    }
-
+  // Check if user exists
+  const user = await userCollection.findOne({ email });
+  if (user) {
     return { success: false, message: "User already exists" };
+  }
+
+  // Hash password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Insert to DB
+  const result = await userCollection.insertOne({
+    name,
+    email,
+    password: hashedPassword,
+    image: image || null, // save uploaded URL
+  });
+
+  const { acknowledged, insertedId } = result;
+  return { success: true, acknowledged, insertedId: insertedId.toString() };
 };
