@@ -2,24 +2,33 @@
 import bcrypt from "bcrypt"
 import dbConnect, { collectionNameObj } from "../../../lib/dbConnect"
 
-export const registerUser = async (payload) =>{
-    console.log(payload)
-
+export const registerUser = async (formData) => {
     const userCollection = dbConnect(collectionNameObj.userCollection)
 
-    // // validition
-    const {email, password} = payload;
-    if(!email || !password) return {success: false, message: "Not found"};
+    // FormData → object
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const image = formData.get("image"); // ekhane File object thakbe
 
-    const user = await userCollection.findOne({email:payload.email})
-    if(!user){
-        const hashedPassword = await bcrypt.hash(password,10);
-        payload.password = hashedPassword;
-        const result = await userCollection.insertOne(payload)
-        const {acknowledged, insertedId} = result
-        return {success:true, acknowledged, insertedId: insertedId.toString()};
+    if (!email || !password) {
+        return { success: false, message: "Not found" };
     }
-    // // return  null;
-    return  { success: false, message: "user already exist" };
 
-}
+    const user = await userCollection.findOne({ email });
+    if (!user) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const result = await userCollection.insertOne({
+            name,
+            email,
+            password: hashedPassword,
+            image: image || null,
+        });
+
+        const { acknowledged, insertedId } = result;
+        return { success: true, acknowledged, insertedId: insertedId.toString() };
+    }
+
+    return { success: false, message: "User already exists" };
+};
