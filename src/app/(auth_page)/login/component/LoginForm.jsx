@@ -86,7 +86,7 @@ export default function LoginForm() {
                         </p>
                     )}
 
-                    <div><a className="link link-hover flex justify-end">Forgot password?</a></div>
+                    <div><a href="/forgot-password" className="link link-hover flex justify-end">Forgot password?</a></div>
 
                     <button
                         className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium text-lg"
