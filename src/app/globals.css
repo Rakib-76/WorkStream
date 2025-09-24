@@ -2,10 +2,11 @@
 @import "react-responsive-carousel/lib/styles/carousel.min.css";
 @plugin "daisyui";
 
-html{
+html, body {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  overflow-y: auto;  
 }
-
 /* Custom dark variant */
 @custom-variant dark (&:is(.dark *));
 
