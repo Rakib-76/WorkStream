@@ -1,4 +1,4 @@
-import { loginUser } from "@/app/actions/auth/loginUser"
+import { loginUser } from "../../../actions/auth/loginUser"
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 
