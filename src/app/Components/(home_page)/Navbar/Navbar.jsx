@@ -5,7 +5,7 @@ import { Dropdown, Menu as AntMenu } from "antd";
 import { ThemeToggle } from "../../../Provider/ThemeToggle";
 import Button from "../UI/Button";
 import Link from "next/link";
-import { useSession , signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -592,19 +592,39 @@ export default function Navbar() {
                     </span>
                     <ThemeToggle />
                   </div>
-                  <Link href="/login">
-                    <Button
-                      variant="ghost"
-                      className="w-full hover:bg-muted/30 rounded-xl transition-all duration-300 font-medium"
-                    >
-                      Login
-                    </Button>
-                  </Link>
-                  <Link href="/register">
-                    <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground rounded-xl shadow-md transition-all duration-300 font-medium">
-                      Sign Up
-                    </Button>
-                  </Link>
+
+                  {
+                    session ? (
+                      <>
+                        <span className="text-sm text-foreground font-medium">
+                          {session.user?.name}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          onClick={() => signOut()}
+                          className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium"
+                        >
+                          Logout
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Link href="/login">
+                          <Button
+                            variant="ghost"
+                            className="text-foreground hover:text-primary hover:bg-muted/50 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+                          >
+                            Login
+                          </Button>
+                        </Link>
+                        <Link href="/register">
+                          <Button className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium">
+                            Sign Up
+                          </Button>
+                        </Link>
+                      </>
+                    )
+                  }
                 </div>
               </div>
             </div>
