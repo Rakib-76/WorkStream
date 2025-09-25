@@ -29,22 +29,22 @@ export default function ForgotPassword() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex items-center justify-center min-h-screen ">
             <div className="w-full max-w-md p-6 bg-white rounded shadow">
-                <h2 className="text-2xl font-bold mb-4 text-center">Forgot Password</h2>
+                <h2 className="text-2xl font-bold mb-4 text-gray-700 text-center">Forgot Password</h2>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <input
                         type="email"
                         placeholder="Enter your email"
                         {...register("email", { required: "Email is required" })}
-                        className="w-full px-3 py-2 border rounded"
+                        className="w-full text-gray-600 px-3 py-2 border rounded"
                     />
                     {errors.email && (
                         <p className="text-sm text-red-500">{errors.email.message}</p>
                     )}
                     <button
                         type="submit"
-                        className="w-full py-2 bg-blue-600 text-white rounded"
+                        className="w-full py-2 cursor-pointer bg-blue-600 text-white rounded"
                     >
                         Send Reset Link
                     </button>
