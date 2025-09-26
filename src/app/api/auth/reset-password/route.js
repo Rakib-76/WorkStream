@@ -8,7 +8,7 @@ export async function POST(req) {
 
         const user = await usersCollection.findOne({ email });
         if (!user || user.resetToken !== token || Date.now() > user.resetTokenExpire) {
-            return Response.json({ message: "Invalid or expired token" }, { status: 400 });
+            return new Response(JSON.stringify({ message: "Invalid or expired token" }), { status: 400 });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -18,9 +18,9 @@ export async function POST(req) {
             { $set: { password: hashedPassword }, $unset: { resetToken: "", resetTokenExpire: "" } }
         );
 
-        return Response.json({ message: "Password reset successful" });
+        return new Response(JSON.stringify({ message: "Password reset successful" }), { status: 200 });
     } catch (error) {
         console.error(error);
-        return Response.json({ message: "Server error" }, { status: 500 });
+        return new Response(JSON.stringify({ message: "Server error" }), { status: 500 });
     }
 }
