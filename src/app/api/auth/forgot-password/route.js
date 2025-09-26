@@ -12,7 +12,7 @@ export async function POST(req) {
         }
 
         const resetToken = crypto.randomBytes(32).toString("hex");
-        const resetTokenExpire = Date.now() + 1000 * 60 * 15; // 15 min
+        const resetTokenExpire = Date.now() + 1000 * 60 * 15;
 
         await usersCollection.updateOne(
             { email },
