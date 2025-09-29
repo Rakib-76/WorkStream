@@ -1,45 +1,105 @@
 "use client";
 
+import Overview from "../Overview/Overview";
+
 export default function DashboardContent({ activeItem }) {
   const renderContent = () => {
     switch (activeItem) {
       case "overview":
         return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold">Overview</h2>
-            <p className="text-muted-foreground">
-              Welcome to your dashboard! Here you can track projects and tasks.
+          <div>
+            <Overview />
+          </div>
+        );
+
+      case "mytask":
+        return (
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Design landing page</li>
+            <li>Fix navigation bugs</li>
+            <li>Submit assignment</li>
+          </ul>
+        );
+
+      case "calendar":
+        return (
+          <div className="p-6 bg-card border border-border rounded-xl shadow">
+            <h3 className="text-lg font-bold">📅 Calendar</h3>
+            <p className="text-muted-foreground mt-2">
+              Here will be your upcoming events and schedules.
             </p>
           </div>
         );
-      case "projects":
+
+      case "todo":
+        return (
+          <div className="p-6 bg-card border border-border rounded-xl shadow">
+            <h3 className="text-lg font-bold">✅ To-do</h3>
+            <ul className="list-disc pl-6 mt-2 space-y-2">
+              <li>Complete homework</li>
+              <li>Prepare presentation</li>
+              <li>Read project docs</li>
+            </ul>
+          </div>
+        );
+
+      case "chat":
+        return (
+          <div className="p-6 bg-card border border-border rounded-xl shadow">
+            <h3 className="text-lg font-bold">💬 Chat</h3>
+            <p className="text-muted-foreground mt-2">
+              Messaging interface will go here.
+            </p>
+          </div>
+        );
+
+      case "callmeet":
+        return (
+          <div className="p-6 bg-card border border-border rounded-xl shadow">
+            <h3 className="text-lg font-bold">📞 Call / Meet</h3>
+            <p className="text-muted-foreground mt-2">
+              Video/voice meeting integration section.
+            </p>
+          </div>
+        );
+
+      case "team":
         return (
           <div className="grid md:grid-cols-2 gap-6">
-            {["Project Alpha", "Project Beta"].map((name, i) => (
+            {["Alice", "Bob", "Charlie"].map((member, i) => (
               <div
                 key={i}
                 className="p-6 bg-card border border-border rounded-xl shadow hover:shadow-lg transition"
               >
-                <h3 className="text-xl font-bold">{name}</h3>
+                <h3 className="text-xl font-bold">{member}</h3>
                 <p className="text-muted-foreground mt-2">
-                  Fake description for {name}.
+                  Role: Developer
                 </p>
               </div>
             ))}
           </div>
         );
-      case "tasks":
+
+      case "notes":
         return (
-          <ul className="list-disc pl-6 space-y-2">
-            <li>Design landing page</li>
-            <li>Implement authentication</li>
-            <li>Integrate API</li>
-          </ul>
+          <div className="p-6 bg-card border border-border rounded-xl shadow">
+            <h3 className="text-lg font-bold">📝 Notes</h3>
+            <p className="text-muted-foreground mt-2">
+              Save your important notes here.
+            </p>
+          </div>
         );
-      case "settings":
-        return <p className="text-muted-foreground">⚙️ Settings panel here.</p>;
-      default:
-        return null;
+
+      case "ideas":
+        return (
+          <div className="p-6 bg-card border border-border rounded-xl shadow">
+            <h3 className="text-lg font-bold">💡 Sharing Ideas</h3>
+            <p className="text-muted-foreground mt-2">
+              Post and discuss innovative ideas with your team.
+            </p>
+          </div>
+        );
+
     }
   };
 
