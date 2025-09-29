@@ -17,8 +17,7 @@ import {
 } from "lucide-react";
 import { useState, useRef } from "react";
 import EmojiPicker from "emoji-picker-react";
-// import { Upload } from "lucide-react";
-// import { useState } from "react";
+
 import { ThemeToggle } from "../../../Provider/ThemeToggle";
 import Button from "../../../Components/(dashboard_page)/UI/Button";
 import Image from "next/image";
@@ -26,6 +25,8 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import Swal from "sweetalert2";
 import { MemberInput } from "./MemberInput";
+
+
 
 export default function DashboardNavbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -74,7 +75,8 @@ export default function DashboardNavbar() {
           </div>
         </Link>
 
-        {/* Middle: Search + Buttons */}
+
+        {/* Middle: Search  */}
         <div className="flex-1 flex justify-center items-center gap-3 max-w-lg">
           {/* Search */}
           <div
