@@ -34,7 +34,7 @@ export default function LoginForm() {
                 showConfirmButton: false
             });
             setLoading(false);
-            setTimeout(() => router.push("/"), 2000);
+            setTimeout(() => router.push("/Dashboard"), 2000);
         } else {
             Swal.fire({
                 title: 'Login Failed',

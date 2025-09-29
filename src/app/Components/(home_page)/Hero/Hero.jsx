@@ -7,8 +7,23 @@ import { ImageWithFallback } from "../../figma/ImageWithFallback";
 import { StarsBackground } from "../Animate-Ui/StarsBackground";
 import { Carousel } from "react-responsive-carousel";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 
 export function Hero() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  // Handle getstarted button protect dashboard protect
+  const handleGetStarted = () => {
+    if (session) {
+      router.push("Dashboard");
+    } else {
+      router.push("/login");
+    }
+  };
+
   const trustCompanies = [
     "TechCorp",
     "StartupXYZ",
@@ -21,6 +36,9 @@ export function Hero() {
     "ByteMasters",
     "CodeCrafters",
   ];
+
+
+  // Dashboard button secure
 
   return (
     <section className="relative w-full flex items-center justify-center overflow-hidden">
@@ -72,16 +90,17 @@ export function Hero() {
             >
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 {/* Get start Button */}
-                <Link href='/Dashboard'>
+                {/* <Link href='/Dashboard'> */}
                 <Button
+                  onClick={handleGetStarted}
                   size="lg"
                   className="bg-primary text-primary-foreground lg:px-8 lg:py-6 text-lg flex items-center justify-center md:px-8 md:py-6 px-4 py-3 "
                 >
                   Get Started Free
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                </Link>
-                
+                {/* </Link> */}
+
               </motion.div>
 
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -204,7 +223,7 @@ export function Hero() {
               transition={{ duration: 2, repeat: Infinity, repeatType: "loop" }}
               className="absolute -bottom-4 -left-4 bg-secondary text-secondary-foreground px-4 py-2 rounded-full text-sm font-medium shadow-lg"
             >
-               Real-time Analytics
+              Real-time Analytics
             </motion.div>
           </div>
         </motion.div>
