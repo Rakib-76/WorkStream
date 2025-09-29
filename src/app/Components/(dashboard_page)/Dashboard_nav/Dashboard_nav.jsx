@@ -5,10 +5,32 @@ import { ThemeToggle } from "../../../Provider/ThemeToggle";
 import Button from "../../../Components/(dashboard_page)/UI/Button";
 import Image from "next/image";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
+import Swal from "sweetalert2";
 
 export default function DashboardNavbar() {
+  // const [loading, setLoading] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // Get user 
+  const { data: session } = useSession();
+
+  const handleLogout = async () => {
+    // setLoading(true);
+    await signOut({ redirect: false });
+    Swal.fire({
+      icon: "success",
+      title: "Logged out!",
+      text: "You have successfully logged out.",
+      timer: 2000,
+      showConfirmButton: false,
+    }).then(() => {
+      // redirect manually if needed
+      window.location.href = "/";
+    });
+    // setLoading(false);
+
+  }
 
   return (
     <header className="w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between shadow-md">
@@ -28,11 +50,10 @@ export default function DashboardNavbar() {
       <div className="flex-1 flex justify-center items-center gap-3 max-w-lg">
         {/* Search */}
         <div
-          className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${
-            isSearchOpen
+          className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
               ? "w-64 border-primary/60 bg-background"
               : "w-10 justify-center border-transparent"
-          }`}
+            }`}
           onMouseEnter={() => setIsSearchOpen(true)}
           onMouseLeave={() => setIsSearchOpen(false)}
         >
@@ -89,7 +110,7 @@ export default function DashboardNavbar() {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
             <Image
-              src="/avatar.png"
+              src={session?.user?.image || "/avatar.png"}
               alt="Profile"
               width={36}
               height={36}
@@ -103,7 +124,7 @@ export default function DashboardNavbar() {
               <div className="flex items-center  bg-gray-300 dark:bg-black gap-3 p-4 border-b border-gray-300 dark:border-gray-700">
                 <div className="w-10 h-10 rounded-full overflow-hidden border border-primary">
                   <Image
-                    src="/avatar.png"
+                    src={session?.user?.image || "/avatar.png"}
                     alt="Profile"
                     width={40}
                     height={40}
@@ -112,13 +133,13 @@ export default function DashboardNavbar() {
                 </div>
                 <div className="flex-1 ">
                   <h4 className="font-semibold text-gray-900 dark:text-white">
-                    Ashfaq Sarker Abid
+                    {session?.user?.name || "Unknown User"}
                   </h4>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    abidsarker213@gmail.com
+                    {session?.user?.email || "No email"}
                   </p>
                 </div>
-                
+
               </div>
 
               {/* Menu Items */}
@@ -132,9 +153,11 @@ export default function DashboardNavbar() {
                 <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                   <SwitchCamera size={18} /> Switch account
                 </li>
-                <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer text-red-600">
-                  <LogOut size={18} /> Log out
-                </li>
+                 <li 
+                   onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer text-red-600">
+                    <LogOut size={18} /> Log out
+                  </li>
               </ul>
             </div>
           )}
