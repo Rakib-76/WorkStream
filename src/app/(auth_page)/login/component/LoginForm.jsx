@@ -1,5 +1,5 @@
 "use client";
-import React from 'react'
+import React, { useState } from 'react'
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { ArrowLeft } from "lucide-react";
@@ -11,9 +11,11 @@ import Swal from "sweetalert2";
 export default function LoginForm() {
     const router = useRouter();
     const { register, handleSubmit, formState: { errors } } = useForm();
+    const [loading, setLoading] = useState(false);
 
     // login handler
     const onSubmit = async (data) => {
+        setLoading(true);
         const { email, password } = data;
 
         const result = await signIn("credentials", {
@@ -31,7 +33,8 @@ export default function LoginForm() {
                 timer: 2000,
                 showConfirmButton: false
             });
-            setTimeout(() => router.push("/"), 2000);
+            setLoading(false);
+            setTimeout(() => router.push("/Dashboard"), 2000);
         } else {
             Swal.fire({
                 title: 'Login Failed',
@@ -92,6 +95,14 @@ export default function LoginForm() {
                     <button
                         className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium text-lg"
                     >
+                        {loading ? (
+                            <>
+                                <span className="loading loading-spinner loading-sm"></span>
+                                Signing in...
+                            </>
+                        ) : (
+                            "SignIn"
+                        )}
                     </button>
                 </fieldset>
 
