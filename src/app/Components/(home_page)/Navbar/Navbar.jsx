@@ -5,10 +5,14 @@ import { Dropdown, Menu as AntMenu } from "antd";
 import { ThemeToggle } from "../../../Provider/ThemeToggle";
 import Button from "../UI/Button";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
+import Swal from "sweetalert2";
 
 export default function Navbar() {
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Mobile dropdown states (kept for mobile accordion style)
   const [mobileProductOpen, setMobileProductOpen] = useState(false);
@@ -21,6 +25,9 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // auth state from next-auth
+  const { data: session } = useSession();
 
   // Ant Design Menu Items with proper theme colors
   const productMenuItems = [
@@ -221,14 +228,31 @@ export default function Navbar() {
     },
   ];
 
+  // handle logout functionality
+  const handleLogout = async () => {
+    setLoading(true);
+    await signOut({ redirect: false });
+    Swal.fire({
+      icon: "success",
+      title: "Logged out!",
+      text: "You have successfully logged out.",
+      timer: 2000,
+      showConfirmButton: false,
+    }).then(() => {
+      // redirect manually if needed
+      window.location.href = "/login";
+    });
+    setLoading(false);
+
+  }
+
   return (
     <>
       <nav
-        className={`fixed max-w-7xl mx-auto top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled
-            ? "bg-card/80 backdrop-blur-xl shadow-lg rounded-2xl mx-4"
-            : "bg-transparent mx-10  "
-        }`}
+        className={`fixed max-w-7xl mx-auto top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
+          ? "bg-card/80 backdrop-blur-xl shadow-lg rounded-2xl mx-4"
+          : "bg-transparent mx-10  "
+          }`}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-10">
           <div className="flex items-center justify-between h-16">
@@ -331,19 +355,40 @@ export default function Navbar() {
             {/* Desktop CTA Buttons */}
             <div className="hidden md:flex items-center space-x-4">
               <ThemeToggle />
-              <Link href="/login">
-                <Button
-                  variant="ghost"
-                  className="text-foreground hover:text-primary hover:bg-muted/50 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
-                >
-                  Login
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium">
-                  Sign Up
-                </Button>
-              </Link>
+
+              {
+                session ? (
+                  <>
+                    <span className="text-sm text-foreground font-medium">
+                      {session.user?.name}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      onClick={() => signOut()}
+                      className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium"
+                    >
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login">
+                      <Button
+                        variant="ghost"
+                        className="text-foreground hover:text-primary hover:bg-muted/50 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+                      >
+                        Login
+                      </Button>
+                    </Link>
+                    <Link href="/register">
+                      <Button className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium">
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </>
+                )
+              }
+
             </div>
 
             {/* Mobile Menu Button */}
@@ -371,9 +416,8 @@ export default function Navbar() {
                   >
                     <span>Product</span>
                     <ChevronRight
-                      className={`w-4 h-4 transition-transform duration-300 ${
-                        mobileProductOpen ? "rotate-90" : ""
-                      }`}
+                      className={`w-4 h-4 transition-transform duration-300 ${mobileProductOpen ? "rotate-90" : ""
+                        }`}
                     />
                   </button>
                   {mobileProductOpen && (
@@ -438,9 +482,8 @@ export default function Navbar() {
                   >
                     <span>Company</span>
                     <ChevronRight
-                      className={`w-4 h-4 transition-transform duration-300 ${
-                        mobileCompanyOpen ? "rotate-90" : ""
-                      }`}
+                      className={`w-4 h-4 transition-transform duration-300 ${mobileCompanyOpen ? "rotate-90" : ""
+                        }`}
                     />
                   </button>
                   {mobileCompanyOpen && (
@@ -505,9 +548,8 @@ export default function Navbar() {
                   >
                     <span>Resources</span>
                     <ChevronRight
-                      className={`w-4 h-4 transition-transform duration-300 ${
-                        mobileResourcesOpen ? "rotate-90" : ""
-                      }`}
+                      className={`w-4 h-4 transition-transform duration-300 ${mobileResourcesOpen ? "rotate-90" : ""
+                        }`}
                     />
                   </button>
                   {mobileResourcesOpen && (
@@ -571,19 +613,46 @@ export default function Navbar() {
                     </span>
                     <ThemeToggle />
                   </div>
-                  <Link href="/login">
-                    <Button
-                      variant="ghost"
-                      className="w-full hover:bg-muted/30 rounded-xl transition-all duration-300 font-medium"
-                    >
-                      Login
-                    </Button>
-                  </Link>
-                  <Link href="/register">
-                    <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground rounded-xl shadow-md transition-all duration-300 font-medium">
-                      Sign Up
-                    </Button>
-                  </Link>
+
+                  {
+                    session ? (
+                      <>
+                        <span className="text-sm text-foreground font-medium">
+                          {session.user?.name}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          onClick={handleLogout}
+                          className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium"
+                        >
+                          {loading ? (
+                            <>
+                              <span className="loading loading-spinner loading-sm"></span>
+                              Logging out...
+                            </>
+                          ) : (
+                            "Logout"
+                          )}
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Link href="/login">
+                          <Button
+                            variant="ghost"
+                            className="text-foreground hover:text-primary hover:bg-muted/50 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+                          >
+                            Login
+                          </Button>
+                        </Link>
+                        <Link href="/register">
+                          <Button className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium">
+                            Sign Up
+                          </Button>
+                        </Link>
+                      </>
+                    )
+                  }
                 </div>
               </div>
             </div>

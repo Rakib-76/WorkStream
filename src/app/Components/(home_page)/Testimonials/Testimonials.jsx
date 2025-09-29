@@ -1,53 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import Button from "../UI/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import CountUp from "react-countup";
-
-const testimonials = [
-    {
-        name: "Sarah Chen",
-        role: "Product Manager",
-        company: "TechCorp",
-        image:
-            "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0",
-        rating: 5,
-        quote:
-            "WorkStream transformed how our team collaborates. We've increased our project delivery speed by 40% and everyone loves the intuitive interface.",
-    },
-    {
-        name: "Michael Rodriguez",
-        role: "Startup Founder",
-        company: "StartupXYZ",
-        image:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        rating: 4,
-        quote:
-            "As a growing startup, we needed something that could scale with us. WorkStream's flexibility and powerful features have been game-changing for our remote team.",
-    },
-    {
-        name: "Emily Johnson",
-        role: "Department Head",
-        company: "UniverCity",
-        image:
-            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-        rating: 5,
-        quote:
-            "Our students and faculty love using WorkStream for collaborative projects. The learning curve is minimal and the results are outstanding.",
-    },
-    {
-        name: "David Kim",
-        role: "Creative Director",
-        company: "AgencyPro",
-        image:
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-        rating: 3,
-        quote:
-            "Managing multiple client projects used to be chaotic. WorkStream brought order to our workflow and our clients love the transparency it provides.",
-    },
-];
 
 const trustLogos = [
     { name: "TechCorp", logo: "🏢" },
@@ -59,18 +17,33 @@ const trustLogos = [
 ];
 
 export function Testimonials() {
+    const [testimonials, setTestimonials] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
+    // Fetch testimonials
     useEffect(() => {
-        if (!isAutoPlaying) return;
+        const fetchTestimonials = async () => {
+            try {
+                const res = await axios.get("/api/testimonials");
+                setTestimonials(res.data);
+            } catch (err) {
+                console.error("Failed to load testimonials", err);
+            }
+        };
+        fetchTestimonials();
+    }, []);
+
+    // Auto-play
+    useEffect(() => {
+        if (!isAutoPlaying || testimonials.length === 0) return;
 
         const interval = setInterval(() => {
             setCurrentIndex((prev) => (prev + 1) % testimonials.length);
         }, 5000);
 
         return () => clearInterval(interval);
-    }, [isAutoPlaying]);
+    }, [isAutoPlaying, testimonials]);
 
     const nextTestimonial = () => {
         setCurrentIndex((prev) => (prev + 1) % testimonials.length);
@@ -112,8 +85,6 @@ export function Testimonials() {
                             exit={{ opacity: 0, x: -50 }}
                             transition={{ duration: 0.5 }}
                             className="border-2 border-border rounded-2xl shadow-lg"
-                            data-aos="fade-up"
-                            data-aos-delay="200"
                         >
                             <div className="p-8 md:p-12 text-center">
                                 {/* Stars */}
@@ -124,14 +95,14 @@ export function Testimonials() {
                                     viewport={{ once: false }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    {[...Array(testimonials[currentIndex].rating)].map((_, i) => (
+                                    {[...Array(testimonials[currentIndex]?.rating || 0)].map((_, i) => (
                                         <Star key={i} className="w-5 h-5 text-accent fill-accent" />
                                     ))}
                                 </motion.div>
 
                                 {/* Quote */}
                                 <blockquote className="text-lg md:text-xl text-foreground mb-8 leading-relaxed">
-                                    "{testimonials[currentIndex].quote}"
+                                    "{testimonials[currentIndex]?.quote}"
                                 </blockquote>
 
                                 {/* Author */}
@@ -143,16 +114,16 @@ export function Testimonials() {
                                     transition={{ duration: 0.5 }}
                                 >
                                     <img
-                                        src={testimonials[currentIndex].image}
-                                        alt={testimonials[currentIndex].name}
+                                        src={testimonials[currentIndex]?.image}
+                                        alt={testimonials[currentIndex]?.name}
                                         className="w-12 h-12 rounded-full object-cover"
                                     />
                                     <div className="text-left">
                                         <div className="font-semibold text-foreground">
-                                            {testimonials[currentIndex].name}
+                                            {testimonials[currentIndex]?.name}
                                         </div>
                                         <div className="text-sm text-muted-foreground">
-                                            {testimonials[currentIndex].role} at {testimonials[currentIndex].company}
+                                            {testimonials[currentIndex]?.role} at {testimonials[currentIndex]?.company}
                                         </div>
                                     </div>
                                 </motion.div>
@@ -183,8 +154,7 @@ export function Testimonials() {
                         {testimonials.map((_, index) => (
                             <button
                                 key={index}
-                                className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex ? "bg-primary scale-125" : "bg-muted"
-                                    }`}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex ? "bg-primary scale-125" : "bg-muted"}`}
                                 onClick={() => {
                                     setCurrentIndex(index);
                                     setIsAutoPlaying(false);
@@ -194,7 +164,7 @@ export function Testimonials() {
                     </div>
                 </div>
 
-                {/* Trust Logos */}
+                {/* Trust Logos (keep this section) */}
                 <motion.div
                     className="border-t border-border pt-12"
                     data-aos="fade-up"
@@ -220,10 +190,7 @@ export function Testimonials() {
                             }}
                         >
                             {trustLogos.map((company, index) => (
-                                <div
-                                    key={index}
-                                    className="flex items-center space-x-2"
-                                >
+                                <div key={index} className="flex items-center space-x-2">
                                     <span className="text-2xl">{company.logo}</span>
                                     <span className="text-lg font-semibold text-foreground">{company.name}</span>
                                 </div>
@@ -242,15 +209,21 @@ export function Testimonials() {
                     transition={{ duration: 0.5 }}
                 >
                     <div>
-                        <div className="text-3xl font-bold text-primary mb-2"><CountUp start={6000} end={10000} duration={5}></CountUp>+</div>
+                        <div className="text-3xl font-bold text-primary mb-2">
+                            <CountUp start={6000} end={10000} duration={5}></CountUp>+
+                        </div>
                         <div className="text-muted-foreground">Active Teams</div>
                     </div>
                     <div>
-                        <div className="text-3xl font-bold text-primary mb-2"><CountUp start={1} end={4} duration={5}></CountUp>/5</div>
+                        <div className="text-3xl font-bold text-primary mb-2">
+                            <CountUp start={1} end={4} duration={5}></CountUp>/5
+                        </div>
                         <div className="text-muted-foreground">User Rating</div>
                     </div>
                     <div>
-                        <div className="text-3xl font-bold text-primary mb-2"><CountUp start={2} end={10} duration={5}></CountUp>%</div>
+                        <div className="text-3xl font-bold text-primary mb-2">
+                            <CountUp start={2} end={10} duration={5}></CountUp>%
+                        </div>
                         <div className="text-muted-foreground">Uptime</div>
                     </div>
                 </motion.div>

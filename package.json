@@ -18,12 +18,14 @@
     "d3": "^7.9.0",
     "d3-geo": "^3.1.1",
     "d3-geo-projection": "^4.0.0",
+    "emoji-picker-react": "^4.13.3",
     "framer-motion": "^12.23.18",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.544.0",
     "mongodb": "^6.20.0",
     "next": "15.5.3",
     "next-auth": "^4.24.11",
+    "nodemailer": "^6.10.1",
     "react": "^18.3.1",
     "react-countup": "^6.5.3",
     "react-dom": "^18.3.1",
@@ -33,10 +35,9 @@
     "react-responsive-carousel": "^3.2.23",
     "react-simple-maps": "^3.0.0",
     "react-svg-worldmap": "^2.0.0-alpha.16",
+    "sweetalert2": "^11.23.0",
     "tailwind-merge": "^3.3.1",
-    "topojson-client": "^3.1.0",
-    "sweetalert2": "^11.23.0"
-
+    "topojson-client": "^3.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -46,6 +47,7 @@
     "daisyui": "^5.1.13",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "typescript": "5.9.2"
   }
 }
