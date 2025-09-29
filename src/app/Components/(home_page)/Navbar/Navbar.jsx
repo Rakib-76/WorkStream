@@ -6,10 +6,13 @@ import { ThemeToggle } from "../../../Provider/ThemeToggle";
 import Button from "../UI/Button";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
+import Swal from "sweetalert2";
 
 export default function Navbar() {
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Mobile dropdown states (kept for mobile accordion style)
   const [mobileProductOpen, setMobileProductOpen] = useState(false);
@@ -224,6 +227,24 @@ export default function Navbar() {
       ),
     },
   ];
+
+  // handle logout functionality
+  const handleLogout = async () => {
+    setLoading(true);
+    await signOut({ redirect: false });
+    Swal.fire({
+      icon: "success",
+      title: "Logged out!",
+      text: "You have successfully logged out.",
+      timer: 2000,
+      showConfirmButton: false,
+    }).then(() => {
+      // redirect manually if needed
+      window.location.href = "/login";
+    });
+    setLoading(false);
+
+  }
 
   return (
     <>
@@ -601,10 +622,17 @@ export default function Navbar() {
                         </span>
                         <Button
                           variant="ghost"
-                          onClick={() => signOut()}
+                          onClick={handleLogout}
                           className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium"
                         >
-                          Logout
+                          {loading ? (
+                            <>
+                              <span className="loading loading-spinner loading-sm"></span>
+                              Logging out...
+                            </>
+                          ) : (
+                            "Logout"
+                          )}
                         </Button>
                       </>
                     ) : (
