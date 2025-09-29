@@ -103,5 +103,6 @@ export default function DashboardContent({ activeItem }) {
     }
   };
 
-  return <div className="animate-fadeIn">{renderContent()}</div>;
+  return <div className="animate-fadeIn">
+    {renderContent()}</div>;
 }

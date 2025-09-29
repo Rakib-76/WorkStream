@@ -18,6 +18,7 @@ export default function DashboardLayout({ children }) {
 
         <main className="flex-1 p-6 bg-gradient-to-br from-background to-muted/40 transition-colors">
           <DashboardContent activeItem={activeItem} />
+          
         </main>
       </div>
     </div>
