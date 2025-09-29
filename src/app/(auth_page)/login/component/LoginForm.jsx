@@ -4,12 +4,14 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { ArrowLeft } from "lucide-react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
 
 
 export default function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl") || "/Dashboard";
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [loading, setLoading] = useState(false);
 
@@ -34,7 +36,7 @@ export default function LoginForm() {
                 showConfirmButton: false
             });
             setLoading(false);
-            setTimeout(() => router.push("/Dashboard"), 2000);
+             setTimeout(() => router.push(callbackUrl), 1500);
         } else {
             Swal.fire({
                 title: 'Login Failed',

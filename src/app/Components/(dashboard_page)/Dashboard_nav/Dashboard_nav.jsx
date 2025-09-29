@@ -5,10 +5,13 @@ import { ThemeToggle } from "../../../Provider/ThemeToggle";
 import Button from "../../../Components/(dashboard_page)/UI/Button";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function DashboardNavbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // Get user 
+   const { data: session } = useSession();
 
   return (
     <header className="w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between shadow-md">
@@ -89,7 +92,7 @@ export default function DashboardNavbar() {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
             <Image
-              src="/avatar.png"
+              src={session?.user?.image || "/avatar.png"}
               alt="Profile"
               width={36}
               height={36}
@@ -103,7 +106,7 @@ export default function DashboardNavbar() {
               <div className="flex items-center  bg-gray-300 dark:bg-black gap-3 p-4 border-b border-gray-300 dark:border-gray-700">
                 <div className="w-10 h-10 rounded-full overflow-hidden border border-primary">
                   <Image
-                    src="/avatar.png"
+                    src={session?.user?.image || "/avatar.png"}
                     alt="Profile"
                     width={40}
                     height={40}
@@ -112,10 +115,10 @@ export default function DashboardNavbar() {
                 </div>
                 <div className="flex-1 ">
                   <h4 className="font-semibold text-gray-900 dark:text-white">
-                    Ashfaq Sarker Abid
+                     {session?.user?.name || "Unknown User"}
                   </h4>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    abidsarker213@gmail.com
+                    {session?.user?.email || "No email"}
                   </p>
                 </div>
                 
