@@ -6,6 +6,7 @@ import { PlayCircle, ArrowRight } from "lucide-react";
 import { ImageWithFallback } from "../../figma/ImageWithFallback";
 import { StarsBackground } from "../Animate-Ui/StarsBackground";
 import { Carousel } from "react-responsive-carousel";
+import Link from "next/link";
 
 export function Hero() {
   const trustCompanies = [
@@ -71,6 +72,7 @@ export function Hero() {
             >
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 {/* Get start Button */}
+                <Link href='/Dashboard'>
                 <Button
                   size="lg"
                   className="bg-primary text-primary-foreground lg:px-8 lg:py-6 text-lg flex items-center justify-center md:px-8 md:py-6 px-4 py-3 "
@@ -78,6 +80,8 @@ export function Hero() {
                   Get Started Free
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
+                </Link>
+                
               </motion.div>
 
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
