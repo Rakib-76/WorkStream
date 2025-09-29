@@ -1,6 +1,7 @@
 "use client";
 
 import Overview from "../Overview/Overview";
+import Team from "../Team/Team";
 
 export default function DashboardContent({ activeItem }) {
   const renderContent = () => {
@@ -65,19 +66,9 @@ export default function DashboardContent({ activeItem }) {
 
       case "team":
         return (
-          <div className="grid md:grid-cols-2 gap-6">
-            {["Alice", "Bob", "Charlie"].map((member, i) => (
-              <div
-                key={i}
-                className="p-6 bg-card border border-border rounded-xl shadow hover:shadow-lg transition"
-              >
-                <h3 className="text-xl font-bold">{member}</h3>
-                <p className="text-muted-foreground mt-2">
-                  Role: Developer
-                </p>
-              </div>
-            ))}
-          </div>
+         <div>
+            <Team></Team>
+         </div>
         );
 
       case "notes":

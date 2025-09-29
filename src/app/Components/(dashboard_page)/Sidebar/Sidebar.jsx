@@ -87,7 +87,8 @@ export default function Sidebar({ activeItem, setActiveItem }) {
               animate={{ rotate: openDropdown === item.name ? 90 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              
+
+!              {/* <IoIosArrowDropdown /> */}
             </motion.span>
           )}
         </li>
