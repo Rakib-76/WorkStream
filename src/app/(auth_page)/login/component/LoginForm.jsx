@@ -98,7 +98,14 @@ export default function LoginForm() {
                     <button
                         className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium text-lg"
                     >
-                        {loading ? "Signing in ...." : "SignIn"}
+                        {loading ? (
+                            <>
+                                <span className="loading loading-spinner loading-sm"></span>
+                                Signing in...
+                            </>
+                        ) : (
+                            "SignIn"
+                        )}
                     </button>
                 </fieldset>
 
@@ -130,11 +137,6 @@ export default function LoginForm() {
                     Login with GitHub
                 </button>
             </form>
-            {loading && (
-                <div className="mt-4">
-                    <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-            )}
         </div>
     )
 }
