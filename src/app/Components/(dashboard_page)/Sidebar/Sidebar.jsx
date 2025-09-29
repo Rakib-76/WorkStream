@@ -76,8 +76,8 @@ export default function Sidebar({ activeItem, setActiveItem }) {
           className={`flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2 transition relative
             ${
               activeItem === item.name
-                ? "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] font-semibold shadow-lg"
-                : "text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+                ? "rounded-tl-4xl bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] font-semibold shadow-lg"
+                : "rounded-tl-4xl text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
             }`}
         >
           {item.icon}
@@ -109,7 +109,7 @@ export default function Sidebar({ activeItem, setActiveItem }) {
                     ${
                       activeItem === child.name
                         ? "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white font-medium"
-                        : "text-gray-400 hover:text-gray-300 hover:bg-white/10"
+                        : "text-gray-400  hover:bg-white/10"
                     }`}
                 >
                   {child.icon}
