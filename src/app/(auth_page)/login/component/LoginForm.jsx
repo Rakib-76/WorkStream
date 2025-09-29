@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react'
+import React from 'react'
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { ArrowLeft } from "lucide-react";
@@ -11,20 +11,16 @@ import Swal from "sweetalert2";
 export default function LoginForm() {
     const router = useRouter();
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const [loading, setLoading] = useState(false);
 
     // login handler
     const onSubmit = async (data) => {
-        setLoading(true);
         const { email, password } = data;
-
 
         const result = await signIn("credentials", {
             redirect: false,
             email,
             password,
         });
-
 
         if (!result.error) {
             router.refresh();
@@ -33,10 +29,8 @@ export default function LoginForm() {
                 text: 'Welcome back!',
                 icon: 'success',
                 timer: 2000,
-                showConfirmButton: false,
-
+                showConfirmButton: false
             });
-            setLoading(false)
             setTimeout(() => router.push("/"), 2000);
         } else {
             Swal.fire({
@@ -98,7 +92,7 @@ export default function LoginForm() {
                     <button
                         className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium text-lg"
                     >
-                        {loading ? "Signing in ...." : "SignIn"}
+                        Sign In
                     </button>
                 </fieldset>
 
@@ -130,11 +124,6 @@ export default function LoginForm() {
                     Login with GitHub
                 </button>
             </form>
-            {loading && (
-                <div className="mt-4">
-                    <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-            )}
         </div>
     )
 }
