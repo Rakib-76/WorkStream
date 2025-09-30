@@ -40,7 +40,7 @@ export default function DashboardNavbar() {
   const [selectedEmoji, setSelectedEmoji] = useState(null);
   const fileInputRef = useRef(null);
 
-    const { register, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm();
 
   // Image upload handler
   const handleImageChange = (e) => {
@@ -63,9 +63,48 @@ export default function DashboardNavbar() {
     });
   };
 
-    const onSubmit = (data) => {
-    console.log("Form Data:", { ...data, logo: selectedImage, emoji: selectedEmoji });
+  // const onSubmit = (data) => {
+  //   console.log("Form Data:", { ...data, logo: selectedImage, emoji: selectedEmoji });
+  // };
+
+
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch("/api/createProject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          collectionName: "projects", // dynamically change kora jaay
+          projectData: {
+            ...data,
+            logo: selectedImage,
+            emoji: selectedEmoji,
+            createdBy: session?.user?.email,
+            createdAt: new Date(),
+          },
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Project Created!",
+          text: "Your project has been saved successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        setIsModalOpen(false);
+      } else {
+        Swal.fire("Error", result.error || "Failed to create project", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Something went wrong", "error");
+    }
   };
+
 
 
   return (
@@ -89,8 +128,8 @@ export default function DashboardNavbar() {
           {/* Search */}
           <div
             className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
-                ? "w-64 border-primary/60 bg-background"
-                : "w-10 justify-center border-transparent"
+              ? "w-64 border-primary/60 bg-background"
+              : "w-10 justify-center border-transparent"
               }`}
             onMouseEnter={() => setIsSearchOpen(true)}
             onMouseLeave={() => setIsSearchOpen(false)}
@@ -240,7 +279,7 @@ export default function DashboardNavbar() {
             </div>
 
             {/* Body */}
-           <form onSubmit={handleSubmit(onSubmit)} className="p-6 w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <form onSubmit={handleSubmit(onSubmit)} className="p-6 w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {/* Left Column */}
               <div className="space-y-5">
                 <div className="transition-all duration-300">
@@ -369,7 +408,7 @@ export default function DashboardNavbar() {
               <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                 Cancel
               </Button>
-             <Button className="bg-primary text-white" onClick={handleSubmit(onSubmit)}>
+              <Button className="bg-primary text-white" onClick={handleSubmit(onSubmit)}>
                 Create
               </Button>
             </div>
