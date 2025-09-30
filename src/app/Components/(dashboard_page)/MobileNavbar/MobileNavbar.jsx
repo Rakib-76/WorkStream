@@ -51,7 +51,7 @@ export default function MobileNavbar({ activeItem, setActiveItem }) {
     <>
       {/* Navbar Top */}
       <header className="md:hidden fixed top-0 left-0 right-0 bg-card border-b border-border flex items-center justify-between px-4 py-3 z-50">
-        <Link href="/" className="group">
+        <Link href="/" className="group ">
           <div className="flex items-center space-x-3">
             <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md">
               <Waves className="w-5 h-5 text-primary-foreground" />
@@ -69,7 +69,7 @@ export default function MobileNavbar({ activeItem, setActiveItem }) {
 
       {/* Drawer Menu */}
       <div
-        className={`absolute top-[52px] left-0 w-full bg-background shadow-lg border-t border-border transition-all duration-500 ease-in-out overflow-hidden ${
+        className={`absolute md:hidden top-[52px] left-0 w-full bg-background shadow-lg border-t border-border transition-all duration-500 ease-in-out overflow-hidden ${
           isOpen ? "max-h-[calc(100vh-52px)]" : "max-h-0"
         }`}
       >
