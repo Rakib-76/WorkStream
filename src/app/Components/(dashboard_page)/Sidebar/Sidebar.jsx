@@ -1,4 +1,6 @@
 "use client";
+import { ChevronDown } from "lucide-react";
+// import { motion, AnimatePresence } from "framer-motion";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 
 export default function Sidebar({ activeItem, setActiveItem }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -66,59 +69,66 @@ export default function Sidebar({ activeItem, setActiveItem }) {
     {menuItems.map((item) => (
       <div key={item.name}>
         <li
-          onClick={() => {
-            if (item.children) {
-              setOpenDropdown(openDropdown === item.name ? false : item.name);
-            } else {
-              setActiveItem(item.name);
-            }
-          }}
+  key={item.name}
+  onClick={() =>
+    item.children
+      ? setOpenDropdown(openDropdown === item.name ? null : item.name)
+      : setActiveItem(item.name)
+  }
+  className={`flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2 transition relative
+    ${
+      activeItem === item.name || openDropdown === item.name
+        ? "rounded-tl-4xl bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] font-semibold shadow-md"
+        : "rounded-tl-4xl text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+    }`}
+>
+  {item.icon}
+  <span>{item.label}</span>
+
+  {/* Dropdown Arrow */}
+  {item.children && !collapsed && (
+    <motion.span
+      animate={{ rotate: openDropdown === item.name ? 180 : 0 }}
+      transition={{ duration: 0.3 }}
+      className="ml-auto"
+    >
+      <ChevronDown className="w-4 h-4 text-[var(--sidebar-foreground)]" />
+    </motion.span>
+  )}
+</li>
+
+{/* Dropdown children */}
+<AnimatePresence>
+  {item.children && openDropdown === item.name && !collapsed && (
+    <motion.ul
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="ml-6 mt-2 space-y-1 relative"
+    >
+      {/* Vertical line */}
+      <span className="absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b from-[var(--primary)] to-[var(--secondary)] rounded-full"></span>
+
+      {item.children.map((child) => (
+        <li
+          key={child.name}
+          onClick={() => setActiveItem(child.name)}
           className={`flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2 transition relative
             ${
-              activeItem === item.name
-                ? "rounded-tl-4xl bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] font-semibold shadow-lg"
-                : "rounded-tl-4xl text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+              activeItem === child.name
+                ? "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] font-semibold shadow-md"
+                : "text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
             }`}
         >
-          {item.icon}
-          {!collapsed && <span className="flex-1">{item.label}</span>}
-          {item.children && !collapsed && (
-            <motion.span
-              animate={{ rotate: openDropdown === item.name ? 90 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              
-            </motion.span>
-          )}
+          {child.icon}
+          <span>{child.label}</span>
         </li>
+      ))}
+    </motion.ul>
+  )}
+</AnimatePresence>
 
-        {/* Dropdown children */}
-        <AnimatePresence>
-          {item.children && openDropdown === item.name && !collapsed && (
-            <motion.ul
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="ml-8 mt-1 space-y-1"
-            >
-              {item.children.map((child) => (
-                <li
-                  key={child.name}
-                  onClick={() => setActiveItem(child.name)}
-                  className={`flex items-center gap-2 px-2 py-1 rounded-md text-sm transition
-                    ${
-                      activeItem === child.name
-                        ? "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white font-medium"
-                        : "text-gray-400  hover:bg-white/10"
-                    }`}
-                >
-                  {child.icon}
-                  {child.label}
-                </li>
-              ))}
-            </motion.ul>
-          )}
-        </AnimatePresence>
       </div>
     ))}
   </ul>
