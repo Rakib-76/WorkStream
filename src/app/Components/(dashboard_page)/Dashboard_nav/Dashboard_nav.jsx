@@ -63,10 +63,6 @@ export default function DashboardNavbar() {
     });
   };
 
-  // const onSubmit = (data) => {
-  //   console.log("Form Data:", { ...data, logo: selectedImage, emoji: selectedEmoji });
-  // };
-
 
   const onSubmit = async (data) => {
     try {
@@ -153,14 +149,15 @@ export default function DashboardNavbar() {
             <PlusCircle className="w-4 h-4" />
             Create
           </Button>
-          <Button
+          <Link
+          href="/projects"
             size="sm"
             variant="outline"
             className="hidden sm:flex gap-2 items-center"
           >
             <FolderKanban className="w-4 h-4" />
             Projects
-          </Button>
+          </Link>
         </div>
 
         {/* Right: Icons + Profile */}
