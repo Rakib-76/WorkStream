@@ -49,13 +49,13 @@ export default function Tasks() {
       {/* Tabs */}
       <div className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 pt-1.5 text-sm font-medium ring-offset-background transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-muted-foreground ">
         <button
-          className={`px-4 pt-2 rounded-t ${activeTab === "all" ? "bg-background font-semibold" : "bg-muted/20"}`}
+          className={`px-4 py-2 rounded-t ${activeTab === "all" ? "bg-background font-semibold" : ""}`}
           onClick={() => setActiveTab("all")}
         >
           All Tasks
         </button>
         <button
-          className={`px-4 pt-2 rounded-t ${activeTab === "my" ? "bg-background font-semibold" : "bg-muted/20"}`}
+          className={`px-4 py-2 rounded-t ${activeTab === "my" ? "bg-background font-semibold" : ""}`}
           onClick={() => setActiveTab("my")}
         >
           My Tasks
