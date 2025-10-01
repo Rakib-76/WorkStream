@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import RegisterForm from "./component/RegisterForm";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const googleSignIn = () => {
