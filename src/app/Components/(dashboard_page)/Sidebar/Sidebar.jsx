@@ -38,7 +38,7 @@ export default function Sidebar({ activeItem, setActiveItem }) {
 
   const menuItems = [
     { name: "overview", label: "Overview", icon: <LayoutDashboard size={20} /> },
-    { name: "mytask", label: "My Task", icon: <CheckSquare size={20} /> },
+    { name: "tasks", label: "Tasks", icon: <CheckSquare size={20} /> },
     { name: "calendar", label: "Calendar", icon: <Calendar size={20} /> },
     {
       name: "applications",
