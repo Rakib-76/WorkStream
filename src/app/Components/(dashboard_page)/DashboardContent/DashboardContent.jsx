@@ -1,5 +1,6 @@
 "use client";
 
+import Attendence from "../Attendence/Attendence";
 import Overview from "../Overview/Overview";
 import Tasks from "../Tasks/Tasks";
 import Team from "../Team/Team";
@@ -18,6 +19,12 @@ export default function DashboardContent({ activeItem }) {
         return (
           <div>
             <Tasks></Tasks>
+          </div>
+        );
+      case "attendence":
+        return (
+          <div>
+           <Attendence></Attendence>
           </div>
         );
 

@@ -1,5 +1,5 @@
 "use client";
-import { ChevronDown, Waves } from "lucide-react";
+import { CalendarCheck2, ChevronDown, Waves } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -40,6 +40,7 @@ export default function Sidebar({ activeItem, setActiveItem }) {
     { name: "overview", label: "Overview", icon: <LayoutDashboard size={20} /> },
     { name: "tasks", label: "Tasks", icon: <CheckSquare size={20} /> },
     { name: "calendar", label: "Calendar", icon: <Calendar size={20} /> },
+    { name: "attendence", label: "Attendence", icon: <CalendarCheck2 size={20} /> },
     {
       name: "applications",
       label: "Applications",
