@@ -29,7 +29,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/app/Components/(home_page)/UI/label.jsx", "src/app/Components/(home_page)/UI/card.jsx", "src/app/Components/(home_page)/UI/dialog.jsx", "src/app/Components/(home_page)/UI/dropdown-menu.jsx"  ],
   "exclude": [
     "node_modules"
   ]
