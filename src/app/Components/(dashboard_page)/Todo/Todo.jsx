@@ -81,7 +81,7 @@ export default function Todo() {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen ">
       <h1 className="text-2xl font-bold mb-4">Kanban Board</h1>
 
       <div className="flex gap-4 flex-wrap">

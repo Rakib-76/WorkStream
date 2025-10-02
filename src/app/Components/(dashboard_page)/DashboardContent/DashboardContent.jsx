@@ -1,6 +1,7 @@
 "use client";
 
 import Attendence from "../Attendence/Attendence";
+import Chat from "../Chat/Chat";
 import Overview from "../Overview/Overview";
 import Tasks from "../Tasks/Tasks";
 import Team from "../Team/Team";
@@ -49,10 +50,7 @@ export default function DashboardContent({ activeItem }) {
       case "chat":
         return (
           <div className="p-6 bg-card border border-border rounded-xl shadow">
-            <h3 className="text-lg font-bold">💬 Chat</h3>
-            <p className="text-muted-foreground mt-2">
-              Messaging interface will go here.
-            </p>
+            <Chat></Chat>
           </div>
         );
 
