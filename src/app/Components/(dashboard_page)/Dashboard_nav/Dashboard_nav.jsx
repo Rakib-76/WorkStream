@@ -284,7 +284,7 @@ export default function DashboardNavbar() {
       {/* Body */}
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="p-6 w-full grid gap-6
+        className="lg:p-6 p-2 w-full grid gap-6
                    sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
       >
         {/* Left Column */}
