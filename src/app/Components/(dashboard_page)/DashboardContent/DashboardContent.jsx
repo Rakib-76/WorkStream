@@ -4,6 +4,7 @@ import Attendence from "../Attendence/Attendence";
 import Overview from "../Overview/Overview";
 import Tasks from "../Tasks/Tasks";
 import Team from "../Team/Team";
+import Todo from "../Todo/Todo";
 
 export default function DashboardContent({ activeItem }) {
   const renderContent = () => {
@@ -40,13 +41,8 @@ export default function DashboardContent({ activeItem }) {
 
       case "todo":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl shadow">
-            <h3 className="text-lg font-bold">✅ To-do</h3>
-            <ul className="list-disc pl-6 mt-2 space-y-2">
-              <li>Complete homework</li>
-              <li>Prepare presentation</li>
-              <li>Read project docs</li>
-            </ul>
+          <div className="">
+           <Todo></Todo>
           </div>
         );
 
