@@ -6,6 +6,7 @@ import DashboardContent from "../Components/(dashboard_page)/DashboardContent/Da
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import MobileNavbar from "../Components/(dashboard_page)/MobileNavbar/MobileNavbar";
 
 export default function DashboardLayout({ children }) {
   // Default to lowercase "overview"
@@ -31,16 +32,22 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
+  {/* Sidebar only for md+ devices */}
+  <div className="hidden md:block">
+    <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
+  </div>
 
-      <div className="flex-1 flex flex-col">
-        <DashboardNavbar />
+  <div className="flex-1 flex flex-col">
+    {/* Mobile Navbar only for small devices */}
+    <MobileNavbar activeItem={activeItem} setActiveItem={setActiveItem} />
 
-        <main className="flex-1 p-6 bg-gradient-to-br from-background to-muted/40 transition-colors">
-          <DashboardContent activeItem={activeItem} />
+    <DashboardNavbar />
 
-        </main>
-      </div>
-    </div>
+    <main className="flex-1 p-6 bg-gradient-to-br from-background to-muted/40 transition-colors">
+      <DashboardContent activeItem={activeItem} />
+    </main>
+  </div>
+</div>
+
   );
 }
