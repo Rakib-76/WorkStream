@@ -1,15 +1,11 @@
 "use client";
 import React from "react";
 import RegisterForm from "./component/RegisterForm";
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
-
-  const { data: session } = useSession()
-  console.log(session);
-
   const googleSignIn = () => {
-    signIn("google", { callbackUrl: "/register" })
+    signIn("google", { callbackUrl: "/" })
   }
 
   return (
