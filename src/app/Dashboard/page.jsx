@@ -33,7 +33,11 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="flex min-h-screen bg-background text-foreground">
   {/* Sidebar only for md+ devices */}
-  <div className="hidden md:block">
+  <div className="hidden md:block hidden md:flex relative min-h-screen bg-gradient-to-b 
+                 from-[var(--sidebar)]/70 to-[var(--card)]/60
+                 dark:from-[var(--sidebar)]/80 dark:to-[var(--card)]/70
+                 backdrop-blur-xl border-r border-[var(--sidebar-border)] 
+                 p-4 flex-col overflow-hidden">
     <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
   </div>
 
