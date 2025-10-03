@@ -43,9 +43,19 @@ export default function DashboardLayout({ children }) {
 
     <DashboardNavbar />
 
-    <main className="flex-1 p-6 bg-gradient-to-br from-background to-muted/40 transition-colors">
-      <DashboardContent activeItem={activeItem} />
-    </main>
+    <main 
+      className="flex-1 p-6 transition-all duration-700 shadow-inner 
+                 
+                 /* Light Mode Gradient (Clean and Soft) */
+                 bg-gradient-to-br from-gray-50 via-white to-sky-50
+                 border-t border-gray-200/50 text-gray-800
+                 
+                 /* Dark Mode Gradient (Gorgous and Deep) */
+                 dark:from-slate-900 dark:via-gray-950 dark:to-indigo-950 
+                 dark:border-t dark:border-indigo-700/50 dark:text-gray-100" 
+    >
+      <DashboardContent activeItem={activeItem} />
+    </main>
   </div>
 </div>
 
