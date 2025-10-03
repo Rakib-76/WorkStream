@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }) {
       className="flex-1 p-6 transition-all duration-700 shadow-inner 
                  
                  /* Light Mode Gradient (Clean and Soft) */
-                 bg-gradient-to-br from-gray-50 via-white to-sky-50
+                 bg-gradient-to-br from-blue-100 via-sky-100 to-sky-50
                  border-t border-gray-200/50 text-gray-800
                  
                  /* Dark Mode Gradient (Gorgous and Deep) */
