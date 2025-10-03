@@ -3,7 +3,7 @@ import { loginUser } from "../../../actions/auth/loginUser"
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google";
-
+import GitHubProvider from "next-auth/providers/github"
 
 export const authOptions = {
     secret: process.env.NEXTAUTH_SECRET,
@@ -41,8 +41,19 @@ export const authOptions = {
                     image: profile.picture,
                 }
             },
-        })
-
+        }),
+        GitHubProvider({
+            clientId: process.env.GITHUB_ID,
+            clientSecret: process.env.GITHUB_SECRET,
+            profile(profile) {
+                return {
+                    id: profile.id,
+                    name: profile.name || profile.login,
+                    email: profile.email,
+                    image: profile.avatar_url,
+                };
+            },
+        }),
     ],
 
 
@@ -60,8 +71,10 @@ export const authOptions = {
                         name: user.name,
                         email: user.email,
                         image: user.image,
+                        role: "Free",
                         provider: account.provider,
                         createdAt: new Date(),
+                        updatedAt: new Date()
                     });
                 }
 
@@ -76,9 +89,6 @@ export const authOptions = {
         signIn: '/logIn',
 
     },
-    // session: {
-    //     strategy: "database",
-    // },
 }
 
 const handler = NextAuth(authOptions)

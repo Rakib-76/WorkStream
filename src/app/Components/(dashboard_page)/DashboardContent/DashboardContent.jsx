@@ -1,6 +1,7 @@
 "use client";
 
 import Overview from "../Overview/Overview";
+import Tasks from "../Tasks/Tasks";
 import Team from "../Team/Team";
 
 export default function DashboardContent({ activeItem }) {
@@ -13,13 +14,11 @@ export default function DashboardContent({ activeItem }) {
           </div>
         );
 
-      case "mytask":
+      case "tasks":
         return (
-          <ul className="list-disc pl-6 space-y-2">
-            <li>Design landing page</li>
-            <li>Fix navigation bugs</li>
-            <li>Submit assignment</li>
-          </ul>
+          <div>
+            <Tasks></Tasks>
+          </div>
         );
 
       case "calendar":
@@ -54,7 +53,7 @@ export default function DashboardContent({ activeItem }) {
           </div>
         );
 
-      case "callmeet":
+      case "call meet":
         return (
           <div className="p-6 bg-card border border-border rounded-xl shadow">
             <h3 className="text-lg font-bold">📞 Call / Meet</h3>
