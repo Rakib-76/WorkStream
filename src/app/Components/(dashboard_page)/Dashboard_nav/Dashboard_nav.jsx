@@ -325,6 +325,73 @@ export default function DashboardNavbar() {
               >
                 <X size={20} />
               </button>
+      {/* Body */}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="lg:p-6 p-2 w-full grid gap-6
+                   sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+      >
+        {/* Left Column */}
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium mb-1">Project Name *</label>
+            <input
+              {...register("projectName")}
+              type="text"
+              className="w-full rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none"
+              placeholder="Enter project name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Company Name</label>
+            <input
+              {...register("companyName")}
+              type="text"
+              className="w-full rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none"
+              placeholder="Enter company name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Description</label>
+            <textarea
+              {...register("description")}
+              rows="3"
+              className="w-full rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none resize-none"
+              placeholder="Write project details..."
+            />
+          </div>
+        </div>
+
+        {/* Middle Column */}
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium mb-1">Team Role</label>
+            <select
+              {...register("teamRole")}
+              className="w-full rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none cursor-pointer"
+            >
+              <option>Leader</option>
+              <option>Member</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Add Members</label>
+            <MemberInput {...register("members")} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Date Range</label>
+            <div className=" items-center gap-2">
+              <input
+                {...register("startDate")}
+                type="date"
+                className="flex-1 rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none"
+              />
+              <span className="hidden sm:block">to</span>
+              <input
+                {...register("endDate")}
+                type="date"
+                className="flex-1 rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none"
+              />
             </div>
 
             {/* Modal Body */}
