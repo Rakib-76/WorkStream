@@ -1,8 +1,12 @@
 "use client";
 
+import Attendence from "../Attendence/Attendence";
+import Chat from "../Chat/Chat";
 import Overview from "../Overview/Overview";
+import Reports from "../Reports/Reports";
 import Tasks from "../Tasks/Tasks";
 import Team from "../Team/Team";
+import Todo from "../Todo/Todo";
 
 export default function DashboardContent({ activeItem }) {
   const renderContent = () => {
@@ -20,6 +24,12 @@ export default function DashboardContent({ activeItem }) {
             <Tasks></Tasks>
           </div>
         );
+      case "attendence":
+        return (
+          <div>
+           <Attendence></Attendence>
+          </div>
+        );
 
       case "calendar":
         return (
@@ -33,23 +43,15 @@ export default function DashboardContent({ activeItem }) {
 
       case "todo":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl shadow">
-            <h3 className="text-lg font-bold">✅ To-do</h3>
-            <ul className="list-disc pl-6 mt-2 space-y-2">
-              <li>Complete homework</li>
-              <li>Prepare presentation</li>
-              <li>Read project docs</li>
-            </ul>
+          <div className="">
+           <Todo></Todo>
           </div>
         );
 
       case "chat":
         return (
           <div className="p-6 bg-card border border-border rounded-xl shadow">
-            <h3 className="text-lg font-bold">💬 Chat</h3>
-            <p className="text-muted-foreground mt-2">
-              Messaging interface will go here.
-            </p>
+            <Chat></Chat>
           </div>
         );
 
@@ -80,13 +82,10 @@ export default function DashboardContent({ activeItem }) {
           </div>
         );
 
-      case "ideas":
+      case "reports":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl shadow">
-            <h3 className="text-lg font-bold">💡 Sharing Ideas</h3>
-            <p className="text-muted-foreground mt-2">
-              Post and discuss innovative ideas with your team.
-            </p>
+          <div className="p-6 bg-card border border-border rounded-xl  shadow">
+           <Reports></Reports>
           </div>
         );
 

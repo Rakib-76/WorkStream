@@ -15,8 +15,9 @@ import {
   UserPlus,
   X,
 } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import EmojiPicker from "emoji-picker-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { ThemeToggle } from "../../../Provider/ThemeToggle";
 import Button from "../../../Components/(dashboard_page)/UI/Button";
@@ -27,27 +28,53 @@ import Swal from "sweetalert2";
 import { MemberInput } from "./MemberInput";
 import { useForm } from "react-hook-form";
 
-
-
 export default function DashboardNavbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showMemberSearch, setShowMemberSearch] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
+  const [userProjects, setUserProjects] = useState([]);
+
   const { data: session } = useSession();
   const [selectedImage, setSelectedImage] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState(null);
   const fileInputRef = useRef(null);
+  const projectsDropdownRef = useRef(null);
 
   const { register, handleSubmit } = useForm();
+
+  // Fetch user-specific projects
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (!session?.user?.email) return;
+      try {
+        const res = await fetch(`/api/getUserProjects?email=${session.user.email}`);
+        const data = await res.json();
+        setUserProjects(data.projects || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchProjects();
+  }, [session?.user?.email]);
+
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (projectsDropdownRef.current && !projectsDropdownRef.current.contains(e.target)) {
+        setProjectsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Image upload handler
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setSelectedImage(URL.createObjectURL(file));
-    }
+    if (file) setSelectedImage(URL.createObjectURL(file));
   };
 
   const handleLogout = async () => {
@@ -58,11 +85,8 @@ export default function DashboardNavbar() {
       text: "You have successfully logged out.",
       timer: 2000,
       showConfirmButton: false,
-    }).then(() => {
-      window.location.href = "/";
-    });
+    }).then(() => (window.location.href = "/"));
   };
-
 
   const onSubmit = async (data) => {
     try {
@@ -101,10 +125,9 @@ export default function DashboardNavbar() {
     }
   };
 
-
-
   return (
     <>
+      {/* Navbar */}
       <header className="w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between shadow-md">
         {/* Left: Logo */}
         <Link href="/" className="group lg:block md:hidden">
@@ -118,15 +141,15 @@ export default function DashboardNavbar() {
           </div>
         </Link>
 
-
-        {/* Middle: Search  */}
+        {/* Middle: Search + Buttons */}
         <div className="flex-1 flex justify-center items-center gap-3 max-w-lg">
           {/* Search */}
           <div
-            className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
-              ? "w-64 border-primary/60 bg-background"
-              : "w-10 justify-center border-transparent"
-              }`}
+            className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${
+              isSearchOpen
+                ? "w-64 border-primary/60 bg-background"
+                : "w-10 justify-center border-transparent"
+            }`}
             onMouseEnter={() => setIsSearchOpen(true)}
             onMouseLeave={() => setIsSearchOpen(false)}
           >
@@ -140,7 +163,7 @@ export default function DashboardNavbar() {
             )}
           </div>
 
-          {/* Buttons */}
+          {/* Create Button */}
           <Button
             size="sm"
             className="hidden sm:flex gap-2 items-center bg-primary text-primary-foreground"
@@ -161,6 +184,46 @@ export default function DashboardNavbar() {
             </button>
 
           </Link>
+
+          {/* Projects Dropdown */}
+          <div className="relative" ref={projectsDropdownRef}>
+            <button
+              onClick={() => setProjectsDropdownOpen(!projectsDropdownOpen)}
+              className="bg-accent text-black hover:bg-accent/90 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all outline-none h-8 px-4 py-1"
+            >
+              <FolderKanban className="w-4 h-4" />
+              Projects
+            </button>
+
+            <AnimatePresence>
+              {projectsDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden z-50"
+                >
+                  {userProjects.length === 0 ? (
+                    <div className="p-3 text-sm text-gray-500">No projects found</div>
+                  ) : (
+                    <ul>
+                      {userProjects.map((project) => (
+                        <li key={project._id}>
+                          <Link
+                            href={`/projects/${project._id}`}
+                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
+                            onClick={() => setProjectsDropdownOpen(false)}
+                          >
+                            {project.projectName}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Right: Icons + Profile */}
@@ -181,7 +244,7 @@ export default function DashboardNavbar() {
           </Button>
           <ThemeToggle />
 
-          {/* Profile Avatar with Dropdown */}
+          {/* Profile Avatar Dropdown */}
           <div className="relative">
             <div
               className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary cursor-pointer"
@@ -198,7 +261,6 @@ export default function DashboardNavbar() {
 
             {isDropdownOpen && (
               <div className="absolute right-0 mt-3 w-72 bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
-                {/* Header */}
                 <div className="flex items-center bg-gray-300 dark:bg-black gap-3 p-4 border-b border-gray-300 dark:border-gray-700">
                   <div className="w-10 h-10 rounded-full overflow-hidden border border-primary">
                     <Image
@@ -219,9 +281,6 @@ export default function DashboardNavbar() {
                   </div>
                 </div>
 
-
-
-                {/* Menu Items */}
                 <ul className="p-2 text-gray-700 dark:text-gray-200">
                   <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                     <User size={18} /> Profile
@@ -269,6 +328,7 @@ export default function DashboardNavbar() {
                     max-h-[90vh] overflow-y-auto">
 
             {/* Header */}
+            {/* Modal Header */}
             <div className="flex justify-between items-center p-5 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Create New Project
@@ -285,7 +345,7 @@ export default function DashboardNavbar() {
             <form
               onSubmit={handleSubmit(onSubmit)}
               className="lg:p-6 p-2 w-full grid gap-6
-                   sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
             >
               {/* Left Column */}
               <div className="space-y-5">
@@ -422,9 +482,7 @@ export default function DashboardNavbar() {
           </div>
         </div>
       )}
-
-
-
+  
     </>
   );
 }
