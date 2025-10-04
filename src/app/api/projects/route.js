@@ -1,4 +1,5 @@
 // src/app/api/projects/route.js
+import { NextResponse } from "next/server";
 import dbConnect from "../../../lib/dbConnect";
 
 export async function GET() {
@@ -6,8 +7,11 @@ export async function GET() {
     const db = await dbConnect("projects");
     const projects = await db.find({}).toArray();
 
-    return Response.json({ success: true, data: projects });
+    return NextResponse.json({ success: true, data: projects }); // ✅ Fixed
   } catch (error) {
-    return Response.json({ success: false, message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: error.message },
+      { status: 500 }
+    ); // ✅ Fixed
   }
 }
