@@ -6,6 +6,7 @@ import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import Button from "../UI/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import CountUp from "react-countup";
+import useAxiosSecure from "../../../../lib/useAxiosSecure";
 
 const trustLogos = [
     { name: "TechCorp", logo: "🏢" },
@@ -20,12 +21,13 @@ export function Testimonials() {
     const [testimonials, setTestimonials] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+    const axiosSecure = useAxiosSecure();
 
     // Fetch testimonials
     useEffect(() => {
         const fetchTestimonials = async () => {
             try {
-                const res = await axios.get("/api/testimonials");
+                const res = await axiosSecure.get("/api/testimonials");
                 setTestimonials(res.data);
             } catch (err) {
                 console.error("Failed to load testimonials", err);

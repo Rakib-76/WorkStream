@@ -26,7 +26,8 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import Swal from "sweetalert2";
 import { MemberInput } from "./MemberInput";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import useAxiosSecure from "../../../../lib/useAxiosSecure";
 
 export default function DashboardNavbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -42,8 +43,9 @@ export default function DashboardNavbar() {
   const [selectedEmoji, setSelectedEmoji] = useState(null);
   const fileInputRef = useRef(null);
   const projectsDropdownRef = useRef(null);
+  const axiosSecure = useAxiosSecure();
 
-  const { register, handleSubmit } = useForm();
+  const { control, register, handleSubmit } = useForm();
 
   // Fetch user-specific projects
   useEffect(() => {
@@ -89,23 +91,20 @@ export default function DashboardNavbar() {
   };
 
   const onSubmit = async (data) => {
+    console.log("🧾 Form submitted data:", data);
     try {
-      const response = await fetch("/api/createProject", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          collectionName: "projects",
-          projectData: {
-            ...data,
-            logo: selectedImage,
-            emoji: selectedEmoji,
-            createdBy: session?.user?.email,
-            createdAt: new Date(),
-          },
-        }),
+      const response = await axiosSecure.post("/api/createProject", {
+        collectionName: "projects",
+        projectData: {
+          ...data,
+          logo: selectedImage,
+          emoji: selectedEmoji,
+          createdBy: session?.user?.email,
+          createdAt: new Date(),
+        },
       });
 
-      const result = await response.json();
+      const result = response.data;
 
       if (result.success) {
         Swal.fire({
@@ -145,11 +144,10 @@ export default function DashboardNavbar() {
         <div className="flex-1 flex justify-center items-center gap-3 max-w-lg">
           {/* Search */}
           <div
-            className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${
-              isSearchOpen
-                ? "w-64 border-primary/60 bg-background"
-                : "w-10 justify-center border-transparent"
-            }`}
+            className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
+              ? "w-64 border-primary/60 bg-background"
+              : "w-10 justify-center border-transparent"
+              }`}
             onMouseEnter={() => setIsSearchOpen(true)}
             onMouseLeave={() => setIsSearchOpen(false)}
           >
@@ -392,7 +390,14 @@ export default function DashboardNavbar() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Add Members</label>
-                  <MemberInput {...register("members")} />
+                  <Controller
+                    name="members"
+                    control={control}
+                    defaultValue={[]}
+                    render={({ field }) => (
+                      <MemberInput value={field.value} onChange={field.onChange} />
+                    )}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Date Range</label>
@@ -482,7 +487,7 @@ export default function DashboardNavbar() {
           </div>
         </div>
       )}
-  
+
     </>
   );
 }
