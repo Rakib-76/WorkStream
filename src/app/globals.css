@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "react-responsive-carousel/lib/styles/carousel.min.css";
-/* @plugin "daisyui"; */
 
 html, body {
   scroll-behavior: smooth;
