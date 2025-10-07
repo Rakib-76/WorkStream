@@ -6,13 +6,17 @@ const nextConfig = {
                 protocol: "https",
                 hostname: "images.unsplash.com"
             },
-            
+
             {
                 protocol: "https",
-                hostname: "i.ibb.co", // Added this to allow your avatar image
+                hostname: "i.ibb.co",
+            },
+            {
+                protocol: "https",
+                hostname: "avatars.githubusercontent.com",
             },
         ],
-        domains: ['i.ibb.co']
+        domains: ['i.ibb.co', 'avatars.githubusercontent.com']
     },
 };
 
