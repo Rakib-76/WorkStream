@@ -37,8 +37,21 @@ export default function DashboardLayout({ children }) {
                  from-[var(--sidebar)]/70 to-[var(--card)]/60
                  dark:from-[var(--sidebar)]/80 dark:to-[var(--card)]/70
                  backdrop-blur-xl border-r border-[var(--sidebar-border)] 
-                 p-4 flex-col overflow-hidden">
+                  flex-col overflow-hidden">
     <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
+    <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br 
+                        from-indigo-50 via-white to-teal-50 
+                        dark:from-indigo-900 dark:via-gray-900 dark:to-teal-900" />
+        <div className="absolute top-0 left-0 right-0 bottom-0">
+          <div className="absolute -top-24 -left-24 w-72 h-72 
+                          bg-indigo-200/30 dark:bg-indigo-700/30 
+                          rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-72 h-72 
+                          bg-teal-200/30 dark:bg-teal-500/30 
+                          rounded-full blur-3xl" />
+        </div>
+      </div>
   </div>
 
   <div className="flex-1 flex flex-col">
