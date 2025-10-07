@@ -46,20 +46,30 @@ export default function DashboardNavbar() {
   const axiosSecure = useAxiosSecure();
   const { control, register, handleSubmit } = useForm();
   const [manager, setManager] = useState(null);
+
   // Fetch user-specific projects
-  // useEffect(() => {
-  //   const fetchProjects = async () => {
-  //     if (!session?.user?.email) return;
-  //     try {
-  //       const res = await fetch(`/api/getUserProjects?email=${session.user.email}`);
-  //       const data = await res.json();
-  //       setUserProjects(data.projects || []);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
-  //   fetchProjects();
-  // }, [session?.user?.email]);
+  useEffect(() => {
+    const fetchUserProjects = async () => {
+      if (!session?.user?.email) return;
+
+      try {
+        const res = await axiosSecure.get(`/api/projects?email=${session.user.email}`);
+        if (res.data.success) {
+          // latest -> oldest
+          const sortedProjects = res.data.data.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setUserProjects(sortedProjects);
+        }
+      } catch (err) {
+        console.error("Error fetching user projects:", err);
+      }
+    };
+
+    fetchUserProjects();
+  }, [session?.user?.email, axiosSecure]);
+
+  console.log("User Projects (useState):", userProjects);
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -78,6 +88,7 @@ export default function DashboardNavbar() {
     if (file) setSelectedImage(URL.createObjectURL(file));
   };
 
+  // Logout handler
   const handleLogout = async () => {
     await signOut({ redirect: false });
     Swal.fire({
