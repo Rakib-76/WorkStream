@@ -6,11 +6,14 @@ import { ArrowLeft } from "lucide-react";
 import { registerUser } from "../../../actions/auth/registerUser";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [profilePic, setProfilePic] = useState(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   // 🔥 Image upload to Imgbb
   const handleImageUpload = async (e) => {
@@ -47,46 +50,46 @@ export default function RegisterForm() {
 
   // 🔥 Submit form
   const onSubmit = async (data) => {
-    try {
-      if (!profilePic) {
-        Swal.fire({
-          icon: "error",
-          title: "Photo Required",
-          text: "Please upload your photo before registering",
-        });
-        return;
-      }
+    // 1️⃣ register user
+    const result = await registerUser({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      image: profilePic,
+    });
 
-      const result = await registerUser({
-        name: data.name,
+    if (result?.success) {
+      // 2️⃣ auto login after registration
+      const loginResult = await signIn("credentials", {
+        redirect: false, // handle manually
         email: data.email,
         password: data.password,
-        image: profilePic, // only url save
       });
 
-      if (result?.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Registered Successfully!",
-          text: "Welcome to WorkStream 🚀",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-        reset();
-        setProfilePic(null);
-      } else {
+      if (loginResult?.error) {
         Swal.fire({
           icon: "error",
           title: "Registration Failed",
-          text: result?.message || "Something went wrong. Please try again.",
+          text: loginResult.error,
         });
+      } else {
+        Swal.fire({
+          icon: "success",
+          title: "Registered Successfully!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        router.refresh();
+        setTimeout(() => router.push("/"), 1500);
       }
-    } catch (error) {
-      console.error(error);
+
+      reset();
+      setProfilePic(null);
+    } else {
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "Server error. Please try again later.",
+        title: "Registration Failed",
+        text: result?.message || "Something went wrong",
       });
     }
   };

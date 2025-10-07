@@ -4,7 +4,7 @@ import dbConnect, { collectionNameObj } from "../../../lib/dbConnect";
 
 export async function GET() {
     try {
-        const collection = dbConnect(collectionNameObj.testimonialsCollection);
+        const collection = await dbConnect(collectionNameObj.testimonialsCollection);
         const testimonials = await collection.find().toArray();
 
         return NextResponse.json(testimonials, { status: 200 });

@@ -1,44 +1,48 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-export function MemberInput() {
-  const fakeUsers = [
-    { email: "alice@example.com" },
-    { email: "bob@example.com" },
-    { email: "charlie@example.com" },
-    { email: "david@example.com" },
-    { email: "eva@example.com" },
-  ];
+import useAxiosSecure from "../../../../lib/useAxiosSecure";
 
+export function MemberInput({ value = [], onChange }) {
+  const [users, setUsers] = useState([]);
   const [query, setQuery] = useState("");
-  const [members, setMembers] = useState([]);
+  const axiosSecure = useAxiosSecure();
 
-  const filtered = fakeUsers.filter((u) =>
-    u.email.toLowerCase().includes(query.toLowerCase())
+  // Fetch user list once
+  useEffect(() => {
+    axiosSecure
+      .get("/api/users")
+      .then((res) => setUsers(res.data))
+      .catch((err) => console.log(err));
+  }, [axiosSecure]);
+
+  const filtered = users.filter(
+    (u) => u?.email && u.email.toLowerCase().includes(query.toLowerCase())
   );
 
   const addMember = (email) => {
-    if (!members.includes(email)) {
-      setMembers([...members, email]);
+    if (!value.includes(email)) {
+      onChange([...value, email]); // ✅ Inform React Hook Form
       setQuery("");
     }
   };
 
   const removeMember = (email) => {
-    setMembers(members.filter((m) => m !== email));
+    onChange(value.filter((m) => m !== email)); // ✅ Inform React Hook Form
   };
 
   return (
     <div className="relative">
       {/* Selected Members */}
       <div className="flex flex-wrap gap-2 mb-2">
-        {members.map((m) => (
+        {value.map((m) => (
           <span
             key={m}
             className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm animate-fadeIn"
           >
             {m}
             <button
+              type="button"
               onClick={() => removeMember(m)}
               className="ml-1 text-red-500 hover:text-red-700"
             >

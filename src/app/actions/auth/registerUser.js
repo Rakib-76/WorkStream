@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import dbConnect, { collectionNameObj } from "../../../lib/dbConnect";
 
 export const registerUser = async ({ name, email, password, image }) => {
-  const userCollection = dbConnect(collectionNameObj.userCollection);
+  const userCollection = await dbConnect(collectionNameObj.userCollection);
 
   if (!email || !password) {
     return { success: false, message: "Email or password missing" };
@@ -20,10 +20,19 @@ export const registerUser = async ({ name, email, password, image }) => {
 
   // Insert to DB
   const result = await userCollection.insertOne({
-    name,
+    name: name || "Unnamed User",
     email,
     password: hashedPassword,
-    image: image || null, // save uploaded URL
+    image: image || "https://ibb.co.com/WRgDfq0",
+    role: "user", // default role
+    membership: "basic",
+    provider: "credentials",
+    isVerified: false,
+    status: "active",
+    failedLoginAttempts: 0,
+    lastLogin: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
 
   const { acknowledged, insertedId } = result;

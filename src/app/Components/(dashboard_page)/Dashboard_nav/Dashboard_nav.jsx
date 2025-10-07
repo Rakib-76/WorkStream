@@ -26,7 +26,8 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import Swal from "sweetalert2";
 import { MemberInput } from "./MemberInput";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import useAxiosSecure from "../../../../lib/useAxiosSecure";
 
 export default function DashboardNavbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -42,23 +43,33 @@ export default function DashboardNavbar() {
   const [selectedEmoji, setSelectedEmoji] = useState(null);
   const fileInputRef = useRef(null);
   const projectsDropdownRef = useRef(null);
-
-  const { register, handleSubmit } = useForm();
+  const axiosSecure = useAxiosSecure();
+  const { control, register, handleSubmit } = useForm();
+  const [manager, setManager] = useState(null);
 
   // Fetch user-specific projects
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchUserProjects = async () => {
       if (!session?.user?.email) return;
+
       try {
-        const res = await fetch(`/api/getUserProjects?email=${session.user.email}`);
-        const data = await res.json();
-        setUserProjects(data.projects || []);
+        const res = await axiosSecure.get(`/api/projects?email=${session.user.email}`);
+        if (res.data.success) {
+          // latest -> oldest
+          const sortedProjects = res.data.data.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setUserProjects(sortedProjects);
+        }
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching user projects:", err);
       }
     };
-    fetchProjects();
-  }, [session?.user?.email]);
+
+    fetchUserProjects();
+  }, [session?.user?.email, axiosSecure]);
+
+  console.log("User Projects (useState):", userProjects);
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -77,6 +88,7 @@ export default function DashboardNavbar() {
     if (file) setSelectedImage(URL.createObjectURL(file));
   };
 
+  // Logout handler
   const handleLogout = async () => {
     await signOut({ redirect: false });
     Swal.fire({
@@ -88,26 +100,63 @@ export default function DashboardNavbar() {
     }).then(() => (window.location.href = "/"));
   };
 
+  // creator info
+  useEffect(() => {
+    const fetchCreatorInfo = async () => {
+      if (!session?.user?.email) return;
+
+      try {
+        const { data: creatorInfo } = await axiosSecure.get(`/api/users?email=${session.user.email}`);
+
+        const managerData = {
+          id: creatorInfo?._id,
+          name: creatorInfo?.name || session?.user?.name,
+          email: creatorInfo?.email || session?.user?.email,
+        };
+
+        setManager(managerData); // ✅ set state with creator info
+      } catch (error) {
+        console.error("Error fetching creator info:", error);
+      }
+    };
+
+    fetchCreatorInfo();
+  }, [session?.user?.email]);
+
+
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("/api/createProject", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          collectionName: "projects",
-          projectData: {
-            ...data,
-            logo: selectedImage,
-            emoji: selectedEmoji,
-            createdBy: session?.user?.email,
-            createdAt: new Date(),
-          },
-        }),
+      const payload = {
+        projectName: data.projectName,
+        companyName: data.companyName || "",
+        description: data.description,
+        priority: data.priority || "Medium",
+        teamRole: data.teamRole || "Member",
+        status: data.status || "Active",
+        startDate: data.startDate,
+        endDate: data.endDate,
+        manager: manager,
+        teamMembers: data.members || [],
+        milestones: [],
+        tasks: {
+          total: 0,
+          completed: 0,
+          pending: 0,
+        },
+        files: [], // initially empty
+        lastUpdated: new Date().toISOString(),
+        logo: selectedImage || null,
+        emoji: selectedEmoji || null,
+        createdBy: session?.user?.email,
+        createdAt: new Date().toISOString(),
+      };
+
+      const response = await axiosSecure.post("/api/createProject", {
+        collectionName: "projects",
+        projectData: payload,
       });
 
-      const result = await response.json();
-
-      if (result.success) {
+      if (response.data.success) {
         Swal.fire({
           icon: "success",
           title: "Project Created!",
@@ -117,13 +166,14 @@ export default function DashboardNavbar() {
         });
         setIsModalOpen(false);
       } else {
-        Swal.fire("Error", result.error || "Failed to create project", "error");
+        Swal.fire("Error", response.data.error || "Failed to create project", "error");
       }
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "Something went wrong", "error");
     }
   };
+
 
   return (
     <>
@@ -145,11 +195,10 @@ export default function DashboardNavbar() {
         <div className="flex-1 flex justify-center items-center gap-3 max-w-lg">
           {/* Search */}
           <div
-            className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${
-              isSearchOpen
-                ? "w-64 border-primary/60 bg-background"
-                : "w-10 justify-center border-transparent"
-            }`}
+            className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
+              ? "w-64 border-primary/60 bg-background"
+              : "w-10 justify-center border-transparent"
+              }`}
             onMouseEnter={() => setIsSearchOpen(true)}
             onMouseLeave={() => setIsSearchOpen(false)}
           >
@@ -172,7 +221,8 @@ export default function DashboardNavbar() {
             <PlusCircle className="w-4 h-4" />
             Create
           </Button>
-          <Link
+          
+          {/* <Link
             href="/projects"
 
             variant="outline"
@@ -183,7 +233,7 @@ export default function DashboardNavbar() {
               Projects
             </button>
 
-          </Link>
+          </Link> */}
 
           {/* Projects Dropdown */}
           <div className="relative" ref={projectsDropdownRef}>
@@ -320,7 +370,6 @@ export default function DashboardNavbar() {
       </header>
 
       {/* Create Modal */}
-      {/* Create Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full
@@ -392,7 +441,14 @@ export default function DashboardNavbar() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Add Members</label>
-                  <MemberInput {...register("members")} />
+                  <Controller
+                    name="members"
+                    control={control}
+                    defaultValue={[]}
+                    render={({ field }) => (
+                      <MemberInput value={field.value} onChange={field.onChange} />
+                    )}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Date Range</label>
@@ -482,7 +538,7 @@ export default function DashboardNavbar() {
           </div>
         </div>
       )}
-  
+
     </>
   );
 }

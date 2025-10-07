@@ -3,7 +3,7 @@ import { loginUser } from "../../../actions/auth/loginUser"
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google";
-
+import GitHubProvider from "next-auth/providers/github";
 
 export const authOptions = {
     secret: process.env.NEXTAUTH_SECRET,
@@ -41,8 +41,20 @@ export const authOptions = {
                     image: profile.picture,
                 }
             },
-        })
-
+        }),
+        // 🆕 GitHub Provider
+        GitHubProvider({
+            clientId: process.env.GITHUB_ID,
+            clientSecret: process.env.GITHUB_SECRET,
+            profile(profile) {
+                return {
+                    id: profile.id,
+                    name: profile.name || profile.login,
+                    email: profile.email,
+                    image: profile.avatar_url,
+                };
+            },
+        }),
     ],
 
 
@@ -57,11 +69,19 @@ export const authOptions = {
                 if (!existingUser) {
                     // Register new user
                     await userCollection.insertOne({
-                        name: user.name,
+                        name: user.name || profile?.name || "Unnamed User",
                         email: user.email,
-                        image: user.image,
+                        password: null, // Google users don't have password
+                        image: user?.image || profile?.picture || "https://ibb.co.com/n8jHT5Fh",
+                        role: "user", // default role
+                        membership: "basic",
                         provider: account.provider,
+                        isVerified: account.provider !== "credentials", // Google = verified
+                        status: "active",
+                        failedLoginAttempts: 0,
+                        lastLogin: new Date(),
                         createdAt: new Date(),
+                        updatedAt: new Date(),
                     });
                 }
 
