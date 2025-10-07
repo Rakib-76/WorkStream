@@ -221,7 +221,8 @@ export default function DashboardNavbar() {
             <PlusCircle className="w-4 h-4" />
             Create
           </Button>
-          <Link
+          
+          {/* <Link
             href="/projects"
 
             variant="outline"
@@ -232,7 +233,7 @@ export default function DashboardNavbar() {
               Projects
             </button>
 
-          </Link>
+          </Link> */}
 
           {/* Projects Dropdown */}
           <div className="relative" ref={projectsDropdownRef}>
