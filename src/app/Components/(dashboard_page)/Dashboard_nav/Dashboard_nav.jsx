@@ -44,23 +44,22 @@ export default function DashboardNavbar() {
   const fileInputRef = useRef(null);
   const projectsDropdownRef = useRef(null);
   const axiosSecure = useAxiosSecure();
-
   const { control, register, handleSubmit } = useForm();
-
+  const [manager, setManager] = useState(null);
   // Fetch user-specific projects
-  useEffect(() => {
-    const fetchProjects = async () => {
-      if (!session?.user?.email) return;
-      try {
-        const res = await fetch(`/api/getUserProjects?email=${session.user.email}`);
-        const data = await res.json();
-        setUserProjects(data.projects || []);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchProjects();
-  }, [session?.user?.email]);
+  // useEffect(() => {
+  //   const fetchProjects = async () => {
+  //     if (!session?.user?.email) return;
+  //     try {
+  //       const res = await fetch(`/api/getUserProjects?email=${session.user.email}`);
+  //       const data = await res.json();
+  //       setUserProjects(data.projects || []);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+  //   fetchProjects();
+  // }, [session?.user?.email]);
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -90,23 +89,63 @@ export default function DashboardNavbar() {
     }).then(() => (window.location.href = "/"));
   };
 
+  // creator info
+  useEffect(() => {
+    const fetchCreatorInfo = async () => {
+      if (!session?.user?.email) return;
+
+      try {
+        const { data: creatorInfo } = await axiosSecure.get(`/api/users?email=${session.user.email}`);
+
+        const managerData = {
+          id: creatorInfo?._id,
+          name: creatorInfo?.name || session?.user?.name,
+          email: creatorInfo?.email || session?.user?.email,
+        };
+
+        setManager(managerData); // ✅ set state with creator info
+      } catch (error) {
+        console.error("Error fetching creator info:", error);
+      }
+    };
+
+    fetchCreatorInfo();
+  }, [session?.user?.email]);
+
+
   const onSubmit = async (data) => {
-    console.log("🧾 Form submitted data:", data);
     try {
+      const payload = {
+        projectName: data.projectName,
+        companyName: data.companyName || "",
+        description: data.description,
+        priority: data.priority || "Medium",
+        teamRole: data.teamRole || "Member",
+        status: data.status || "Active",
+        startDate: data.startDate,
+        endDate: data.endDate,
+        manager: manager,
+        teamMembers: data.members || [],
+        milestones: [],
+        tasks: {
+          total: 0,
+          completed: 0,
+          pending: 0,
+        },
+        files: [], // initially empty
+        lastUpdated: new Date().toISOString(),
+        logo: selectedImage || null,
+        emoji: selectedEmoji || null,
+        createdBy: session?.user?.email,
+        createdAt: new Date().toISOString(),
+      };
+
       const response = await axiosSecure.post("/api/createProject", {
         collectionName: "projects",
-        projectData: {
-          ...data,
-          logo: selectedImage,
-          emoji: selectedEmoji,
-          createdBy: session?.user?.email,
-          createdAt: new Date(),
-        },
+        projectData: payload,
       });
 
-      const result = response.data;
-
-      if (result.success) {
+      if (response.data.success) {
         Swal.fire({
           icon: "success",
           title: "Project Created!",
@@ -116,13 +155,14 @@ export default function DashboardNavbar() {
         });
         setIsModalOpen(false);
       } else {
-        Swal.fire("Error", result.error || "Failed to create project", "error");
+        Swal.fire("Error", response.data.error || "Failed to create project", "error");
       }
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "Something went wrong", "error");
     }
   };
+
 
   return (
     <>
@@ -317,7 +357,6 @@ export default function DashboardNavbar() {
         </div>
       </header>
 
-      {/* Create Modal */}
       {/* Create Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
