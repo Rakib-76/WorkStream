@@ -1,8 +1,17 @@
 "use client";
-import React from "react";
-import { X, User, Paperclip, MessageSquare, Calendar, Clock, Edit3 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import {
+  X,
+  User,
+  Paperclip,
+  MessageSquare,
+  Calendar,
+  Clock,
+  Edit3,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Swal from "sweetalert2";
+import dayjs from "dayjs"; // npm i dayjs
 
 export default function TaskDetailModal({
   isOpen,
@@ -13,7 +22,39 @@ export default function TaskDetailModal({
 }) {
   if (!task) return null;
 
-  // Handle Status Change with SweetAlert
+  const [attendance, setAttendance] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState(task.comments || []);
+
+  // Generate attendance days between startDate and endDate
+  useEffect(() => {
+    if (task.startDate && task.endDate) {
+      const start = dayjs(task.startDate);
+      const end = dayjs(task.endDate);
+      const temp = [];
+      for (let d = start; d.isBefore(end) || d.isSame(end, "day"); d = d.add(1, "day")) {
+        temp.push({
+          date: d.format("YYYY-MM-DD"),
+          status: "Pending",
+        });
+      }
+      setAttendance(temp);
+    }
+  }, [task]);
+
+  // Auto mark absent if date expired
+  useEffect(() => {
+    const today = dayjs().format("YYYY-MM-DD");
+    setAttendance((prev) =>
+      prev.map((a) => {
+        if (dayjs(a.date).isBefore(today) && a.status === "Pending") {
+          return { ...a, status: "Absent" };
+        }
+        return a;
+      })
+    );
+  }, []);
+
   const handleStatus = (status) => {
     if (status === "Completed") {
       Swal.fire({
@@ -31,6 +72,57 @@ export default function TaskDetailModal({
       });
     }
     onStatusChange(status);
+  };
+
+  const markAttendance = (date) => {
+    const now = dayjs();
+    const currentDate = now.format("YYYY-MM-DD");
+    const currentHour = now.hour();
+
+    setAttendance((prev) =>
+      prev.map((a) => {
+        if (a.date === date) {
+          if (date !== currentDate) {
+            Swal.fire({
+              icon: "error",
+              title: "Date Expired!",
+              text: "You can't mark attendance for past or future dates.",
+            });
+            return a;
+          }
+          if (a.status !== "Pending") return a;
+
+          if (currentHour >= 10) {
+            Swal.fire({
+              icon: "info",
+              title: "Late Attendance",
+              text: "Marked as late since it's after 10 AM.",
+            });
+            return { ...a, status: "Late" };
+          } else {
+            Swal.fire({
+              icon: "success",
+              title: "Present!",
+              text: "Attendance marked as Present.",
+            });
+            return { ...a, status: "Present" };
+          }
+        }
+        return a;
+      })
+    );
+  };
+
+  const handleAddComment = () => {
+    if (!newComment.trim()) return;
+    const commentObj = {
+      id: Date.now(),
+      text: newComment,
+      author: "You",
+      time: dayjs().format("YYYY-MM-DD HH:mm"),
+    };
+    setComments([...comments, commentObj]);
+    setNewComment("");
   };
 
   return (
@@ -85,19 +177,20 @@ export default function TaskDetailModal({
 
               {/* Dates */}
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Calendar size={16} /> Created: {task.createdDate}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar size={16} /> Due: {task.dueDate}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={16} /> From: {task.startDate}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={16} /> To: {task.endDate}
-                </div>
-              </div>
+  <div className="flex items-center gap-2">
+    <Calendar size={16} /> Created: {task.createdDate || "Not available"}
+  </div>
+  <div className="flex items-center gap-2">
+    <Calendar size={16} /> Due: {task.endDate || "Not available"}
+  </div>
+  <div className="flex items-center gap-2">
+    <Clock size={16} /> From: {task.startDate || "-"}
+  </div>
+  <div className="flex items-center gap-2">
+    <Clock size={16} /> To: {task.endDate || "-"}
+  </div>
+</div>
+
 
               {/* Assignees */}
               <div>
@@ -120,25 +213,81 @@ export default function TaskDetailModal({
                   <Paperclip size={14} /> {task.files?.length || 0} attachments
                 </div>
                 <div className="flex items-center gap-1">
-                  <MessageSquare size={14} /> {task.comments?.length || 0} comments
+                  <MessageSquare size={14} /> {comments.length} comments
                 </div>
               </div>
 
               {/* Attendance */}
               <div>
-                <h3 className="font-semibold mb-1">Attendance</h3>
-                <select className="border rounded px-3 py-2 bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 transition">
-                  <option>Present</option>
-                  <option>Absent</option>
-                  <option>Late</option>
-                </select>
+                <h3 className="font-semibold mb-2">Attendance</h3>
+                <div className="space-y-2">
+                  {attendance.map((a) => (
+                    <div
+                      key={a.date}
+                      className="flex items-center justify-between border dark:border-gray-700 rounded-lg px-4 py-2"
+                    >
+                      <span>{a.date}</span>
+                      <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => markAttendance(a.date)}
+                        className={`px-3 py-1 rounded text-white ${
+                          a.status === "Present"
+                            ? "bg-green-500"
+                            : a.status === "Late"
+                            ? "bg-yellow-500"
+                            : a.status === "Absent"
+                            ? "bg-red-500"
+                            : "bg-blue-500"
+                        }`}
+                      >
+                        {a.status}
+                      </motion.button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Comments Section */}
+              <div className="mt-6">
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <MessageSquare size={16} /> Comments
+                </h3>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {comments.map((c) => (
+                    <div
+                      key={c.id}
+                      className="bg-gray-100 dark:bg-gray-700 rounded-lg p-2"
+                    >
+                      <p className="text-sm">{c.text}</p>
+                      <span className="text-xs text-gray-500">
+                        — {c.author}, {c.time}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 mt-3">
+                  <input
+                    type="text"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Add a comment..."
+                    className="flex-1 border rounded-lg px-3 py-2 bg-white dark:bg-gray-700 dark:border-gray-600"
+                  />
+                  <button
+                    onClick={handleAddComment}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Post
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Footer Buttons */}
             <div className="flex justify-between items-center p-4 border-t dark:border-gray-700">
               <button
-                onClick={() => onEdit(task)} // Pass task info to edit modal
+                onClick={() => onEdit(task)}
                 className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-2"
               >
                 <Edit3 size={16} /> Edit

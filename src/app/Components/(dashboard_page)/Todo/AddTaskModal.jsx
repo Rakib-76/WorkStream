@@ -20,6 +20,11 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
   const [comment, setComment] = useState("");
   const [description, setDescription] = useState("");
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+
   const handleSelectMember = (member) => {
     if (!selectedMembers.find((m) => m.id === member.id)) {
       setSelectedMembers([...selectedMembers, member]);
@@ -42,16 +47,28 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
       title,
       priority,
       description,
-      date: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      }),
+      createdDate: new Date().toLocaleDateString("en-GB"),
+      startDate: startDate || "-",
+      endDate: endDate || "-", // acts as due date
+      startTime,
+      endTime,
       assignees: selectedMembers,
       files,
-      comment,
+      comments: comment
+        ? [
+            {
+              id: Date.now(),
+              text: comment,
+              author: "You",
+              time: new Date().toLocaleString(),
+            },
+          ]
+        : [],
+      status: "Pending",
     };
     onSubmit(newTask);
     onClose();
+
     // reset
     setTitle("");
     setPriority("Low");
@@ -59,6 +76,10 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
     setFiles([]);
     setComment("");
     setDescription("");
+    setStartDate("");
+    setEndDate("");
+    setStartTime("");
+    setEndTime("");
   };
 
   return (
@@ -192,11 +213,15 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                     <Calendar size={18} />
                     <input
                       type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
                       className="border px-2 py-1 rounded w-full"
                     />
                     <Clock size={18} />
                     <input
                       type="time"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
                       className="border px-2 py-1 rounded w-full"
                     />
                   </div>
@@ -204,11 +229,15 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                     <Calendar size={18} />
                     <input
                       type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
                       className="border px-2 py-1 rounded w-full"
                     />
                     <Clock size={18} />
                     <input
                       type="time"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
                       className="border px-2 py-1 rounded w-full"
                     />
                   </div>
