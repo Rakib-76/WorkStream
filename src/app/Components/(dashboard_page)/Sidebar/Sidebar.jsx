@@ -22,14 +22,10 @@ export default function Sidebar({ activeItem, setActiveItem }) {
   const [collapsed, setCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
 
-  // ✅ Detect screen size and set default collapsed state
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setCollapsed(true); // mobile/tablet collapsed
-      } else {
-        setCollapsed(false); // md+ expanded
-      }
+      if (window.innerWidth < 768) setCollapsed(true);
+      else setCollapsed(false);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -60,35 +56,40 @@ export default function Sidebar({ activeItem, setActiveItem }) {
     <motion.aside
       animate={{ width: collapsed ? "80px" : "260px" }}
       transition={{ duration: 0.3 }}
-      className="hidden md:flex relative min-h-screen bg-gradient-to-b 
-                 from-[var(--sidebar)]/70 to-[var(--card)]/60
-                 dark:from-[var(--sidebar)]/80 dark:to-[var(--card)]/70
-                 backdrop-blur-xl border-r border-[var(--sidebar-border)] 
-                 p-4 flex-col overflow-hidden"
+      className="hidden md:flex relative   
+                 pl-4 py-4 flex-col "
     >
-      {/* Floating Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-teal-50 
-                      dark:from-indigo-900 dark:via-gray-900 dark:to-teal-900" />
-      <div className="absolute -top-24 -left-24 w-72 h-72 bg-indigo-200/30 dark:bg-indigo-700/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-0 w-72 h-72 bg-teal-200/30 dark:bg-teal-500/30 rounded-full blur-3xl" />
+      {/* ✅ Full-height Floating Background */}
+      {/* <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br 
+                        from-indigo-50 via-white to-teal-50 
+                        dark:from-indigo-900 dark:via-gray-900 dark:to-teal-900" />
+        <div className="absolute top-0 left-0 right-0 bottom-0">
+          <div className="absolute -top-24 -left-24 w-72 h-72 
+                          bg-indigo-200/30 dark:bg-indigo-700/30 
+                          rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-72 h-72 
+                          bg-teal-200/30 dark:bg-teal-500/30 
+                          rounded-full blur-3xl" />
+        </div>
+      </div> */}
 
-      {/* Collapse Button */}
-      <div className="z-10 block flex  justify-between">
-<Link href="/" className="group md:block lg:hidden">
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md">
-                    <Waves className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                </div>
-              </Link>
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="self-end mb-6 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition relative z-10"
-      >
-        {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-      </button>
+      {/* Collapse Button + Logo */}
+      <div className="z-10 flex justify-between mb-4">
+        <Link href="/" className="group md:block lg:hidden">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md">
+              <Waves className="w-5 h-5 text-primary-foreground" />
+            </div>
+          </div>
+        </Link>
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition relative z-10"
+        >
+          {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+        </button>
       </div>
-      
 
       {/* Menu Items */}
       <ul className="space-y-2 relative z-10">
@@ -100,7 +101,7 @@ export default function Sidebar({ activeItem, setActiveItem }) {
                   ? setOpenDropdown(openDropdown === item.name ? null : item.name)
                   : setActiveItem(item.name)
               }
-              className={`flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2 transition relative
+              className={`flex items-center gap-3 cursor-pointer px-6 py-2 rounded-l-full px-3 py-2 transition relative
                 ${
                   activeItem === item.name || openDropdown === item.name
                     ? "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] font-semibold shadow-md"
@@ -150,7 +151,6 @@ export default function Sidebar({ activeItem, setActiveItem }) {
                   ))}
                 </motion.ul>
               )}
-              
             </AnimatePresence>
           </div>
         ))}
