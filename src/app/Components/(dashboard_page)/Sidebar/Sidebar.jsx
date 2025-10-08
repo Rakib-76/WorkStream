@@ -1,3 +1,5 @@
+// Sidebar.js
+
 "use client";
 import { CalendarCheck2, ChevronDown, Waves } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -18,7 +20,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export default function Sidebar({ activeItem, setActiveItem }) {
+// 💡 New prop: currentProjectName
+export default function Sidebar({ activeItem, setActiveItem, currentProjectName }) {
   const [collapsed, setCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
 
@@ -52,29 +55,31 @@ export default function Sidebar({ activeItem, setActiveItem }) {
     },
   ];
 
+  // 💡 Framer Motion Variants for Animation
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1, // Stagger the animation of children by 0.1 seconds
+        delayChildren: currentProjectName ? 0.3 : 0, // Delay the start if a project is selected
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    show: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 100 } },
+  };
+
+
   return (
     <motion.aside
       animate={{ width: collapsed ? "80px" : "260px" }}
       transition={{ duration: 0.3 }}
-      className="hidden md:flex relative   
-                 pl-4 py-4 flex-col "
+      className="hidden md:flex relative pl-4 py-4 flex-col"
     >
-      {/* ✅ Full-height Floating Background */}
-      {/* <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br 
-                        from-indigo-50 via-white to-teal-50 
-                        dark:from-indigo-900 dark:via-gray-900 dark:to-teal-900" />
-        <div className="absolute top-0 left-0 right-0 bottom-0">
-          <div className="absolute -top-24 -left-24 w-72 h-72 
-                          bg-indigo-200/30 dark:bg-indigo-700/30 
-                          rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-72 h-72 
-                          bg-teal-200/30 dark:bg-teal-500/30 
-                          rounded-full blur-3xl" />
-        </div>
-      </div> */}
-
-      {/* Collapse Button + Logo */}
+      {/* ... (Existing Logo/Collapse Button structure) ... */}
       <div className="z-10 flex justify-between mb-4">
         <Link href="/" className="group md:block lg:hidden">
           <div className="flex items-center space-x-3">
@@ -91,10 +96,24 @@ export default function Sidebar({ activeItem, setActiveItem }) {
         </button>
       </div>
 
-      {/* Menu Items */}
-      <ul className="space-y-2 relative z-10">
+      {/* 💡 Project Name Display */}
+      <div className={`mt-2 mb-6 transition-opacity duration-300 ${collapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto"}`}>
+        <h1 className="text-lg font-bold text-foreground truncate">
+          {/* Display the project name or a default message */}
+          {currentProjectName || ""}
+        </h1>
+      </div>
+
+
+      {/* 💡 Menu Items with Stagger Animation */}
+      <motion.ul
+        className="space-y-2 relative z-10"
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+      >
         {menuItems.map((item) => (
-          <div key={item.name}>
+          <motion.div key={item.name} variants={itemVariants}>
             <li
               onClick={() =>
                 item.children
@@ -152,9 +171,9 @@ export default function Sidebar({ activeItem, setActiveItem }) {
                 </motion.ul>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
         ))}
-      </ul>
+      </motion.ul>
     </motion.aside>
   );
 }

@@ -2,7 +2,6 @@
 import {
   Upload,
   Smile,
-  Calendar,
   Waves,
   Bell,
   Settings,
@@ -18,7 +17,6 @@ import {
 import { useState, useRef, useEffect } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { motion, AnimatePresence } from "framer-motion";
-
 import { ThemeToggle } from "../../../Provider/ThemeToggle";
 import Button from "../../../Components/(dashboard_page)/UI/Button";
 import Image from "next/image";
@@ -29,7 +27,7 @@ import { MemberInput } from "./MemberInput";
 import { Controller, useForm } from "react-hook-form";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 
-export default function DashboardNavbar() {
+export default function DashboardNavbar({ setSelectedProject }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showMemberSearch, setShowMemberSearch] = useState(false);
@@ -55,7 +53,6 @@ export default function DashboardNavbar() {
       try {
         const res = await axiosSecure.get(`/api/projects?email=${session.user.email}`);
         if (res.data.success) {
-          // latest -> oldest
           const sortedProjects = res.data.data.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
@@ -68,8 +65,6 @@ export default function DashboardNavbar() {
 
     fetchUserProjects();
   }, [session?.user?.email, axiosSecure]);
-
-  console.log("User Projects (useState):", userProjects);
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -100,30 +95,26 @@ export default function DashboardNavbar() {
     }).then(() => (window.location.href = "/"));
   };
 
-  // creator info
+  // Fetch creator info
   useEffect(() => {
     const fetchCreatorInfo = async () => {
       if (!session?.user?.email) return;
-
       try {
         const { data: creatorInfo } = await axiosSecure.get(`/api/users?email=${session.user.email}`);
-
         const managerData = {
           id: creatorInfo?._id,
           name: creatorInfo?.name || session?.user?.name,
           email: creatorInfo?.email || session?.user?.email,
         };
-
-        setManager(managerData); // ✅ set state with creator info
+        setManager(managerData);
       } catch (error) {
         console.error("Error fetching creator info:", error);
       }
     };
-
     fetchCreatorInfo();
   }, [session?.user?.email]);
 
-
+  // Create project
   const onSubmit = async (data) => {
     try {
       const payload = {
@@ -143,7 +134,7 @@ export default function DashboardNavbar() {
           completed: 0,
           pending: 0,
         },
-        files: [], // initially empty
+        files: [],
         lastUpdated: new Date().toISOString(),
         logo: selectedImage || null,
         emoji: selectedEmoji || null,
@@ -174,7 +165,6 @@ export default function DashboardNavbar() {
     }
   };
 
-
   return (
     <>
       {/* Navbar */}
@@ -191,14 +181,15 @@ export default function DashboardNavbar() {
           </div>
         </Link>
 
-        {/* Middle: Search + Buttons */}
+        {/* Middle Section */}
         <div className="flex-1 flex justify-center items-center gap-3 max-w-lg">
           {/* Search */}
           <div
-            className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
-              ? "w-64 border-primary/60 bg-background"
-              : "w-10 justify-center border-transparent"
-              }`}
+            className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${
+              isSearchOpen
+                ? "w-64 border-primary/60 bg-background"
+                : "w-10 justify-center border-transparent"
+            }`}
             onMouseEnter={() => setIsSearchOpen(true)}
             onMouseLeave={() => setIsSearchOpen(false)}
           >
@@ -221,7 +212,7 @@ export default function DashboardNavbar() {
             <PlusCircle className="w-4 h-4" />
             Create
           </Button>
-          
+
           {/* Projects Dropdown */}
           <div className="relative" ref={projectsDropdownRef}>
             <button
@@ -246,13 +237,15 @@ export default function DashboardNavbar() {
                     <ul>
                       {userProjects.map((project) => (
                         <li key={project._id}>
-                          <Link
-                            href={`/projects/${project._id}`}
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
-                            onClick={() => setProjectsDropdownOpen(false)}
+                          <button
+                            onClick={() => {
+                              setSelectedProject(project);
+                              setProjectsDropdownOpen(false);
+                            }}
+                            className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
                           >
                             {project.projectName}
-                          </Link>
+                          </button>
                         </li>
                       ))}
                     </ul>
@@ -263,25 +256,17 @@ export default function DashboardNavbar() {
           </div>
         </div>
 
-        {/* Right: Icons + Profile */}
+        {/* Right Section */}
         <div className="flex items-center gap-3 relative">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="rounded-full border-2 border-transparent hover:border-border transition-all duration-300"
-          >
+          <Button size="icon" variant="ghost">
             <Bell className="w-5 h-5" />
           </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="rounded-full border-2 border-transparent hover:border-border transition-all duration-300"
-          >
+          <Button size="icon" variant="ghost">
             <Settings className="w-5 h-5" />
           </Button>
           <ThemeToggle />
 
-          {/* Profile Avatar Dropdown */}
+          {/* Profile Avatar */}
           <div className="relative">
             <div
               className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary cursor-pointer"
@@ -356,32 +341,20 @@ export default function DashboardNavbar() {
         </div>
       </header>
 
-      {/* Create Modal */}
+      {/* Create Project Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full
-                    sm:max-w-md md:max-w-2xl lg:max-w-4xl mx-auto animate-fadeIn
-                    max-h-[90vh] overflow-y-auto">
-
-            {/* Header */}
-            {/* Modal Header */}
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full sm:max-w-4xl mx-auto max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-5 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Create New Project
-              </h2>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-500 hover:text-gray-800 dark:hover:text-white"
-              >
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Create New Project</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-gray-800 dark:hover:text-white">
                 <X size={20} />
               </button>
             </div>
 
-            {/* Body */}
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="lg:p-6 p-2 w-full grid gap-6
-                sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              className="lg:p-6 p-2 w-full grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
             >
               {/* Left Column */}
               <div className="space-y-5">
@@ -432,14 +405,12 @@ export default function DashboardNavbar() {
                     name="members"
                     control={control}
                     defaultValue={[]}
-                    render={({ field }) => (
-                      <MemberInput value={field.value} onChange={field.onChange} />
-                    )}
+                    render={({ field }) => <MemberInput value={field.value} onChange={field.onChange} />}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Date Range</label>
-                  <div className=" items-center gap-2">
+                  <div className="items-center gap-2">
                     <input
                       {...register("startDate")}
                       type="date"
@@ -491,41 +462,31 @@ export default function DashboardNavbar() {
                   ) : selectedEmoji ? (
                     <span className="text-6xl">{selectedEmoji}</span>
                   ) : (
-                    <>
-                      <Upload size={24} />
-                      <p className="mt-2 text-sm">Upload project logo</p>
-                      <span className="text-xs">Min 600×600 PNG or JPEG</span>
-                    </>
+                    "Preview"
                   )}
+                </div>
 
-                  {showEmojiPicker && (
-                    <div className="absolute z-50 top-16 w-80 p-3 bg-white dark:bg-gray-800 shadow-lg rounded-xl">
-                      <EmojiPicker
-                        onEmojiClick={(emojiData) => {
-                          setSelectedEmoji(emojiData.emoji);
-                          setSelectedImage(null);
-                          setShowEmojiPicker(false);
-                        }}
-                      />
-                    </div>
-                  )}
+                {showEmojiPicker && (
+                  <div className="absolute bottom-[-250px] right-0 z-50">
+                    <EmojiPicker
+                      onEmojiClick={(e) => {
+                        setSelectedEmoji(e.emoji);
+                        setShowEmojiPicker(false);
+                      }}
+                    />
+                  </div>
+                )}
+
+                <div className="flex justify-end pt-5">
+                  <Button type="submit" size="sm" className="px-6 py-3">
+                    Create Project
+                  </Button>
                 </div>
               </div>
             </form>
-
-            {/* Footer */}
-            <div className="flex justify-end gap-3 p-5 border-t border-gray-200 dark:border-gray-700">
-              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button className="bg-primary text-white" onClick={handleSubmit(onSubmit)}>
-                Create
-              </Button>
-            </div>
           </div>
         </div>
       )}
-
     </>
   );
 }

@@ -9,11 +9,12 @@ import { useRouter } from "next/navigation";
 import MobileNavbar from "../Components/(dashboard_page)/MobileNavbar/MobileNavbar";
 
 export default function DashboardLayout({ children }) {
-  // Default to lowercase "overview"
   const [activeItem, setActiveItem] = useState("overview");
   const { data: session, status } = useSession();
+  const [selectedProject, setSelectedProject] = useState(null); // ✅ corrected name
   const router = useRouter();
 
+  // Redirect if not logged in
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
@@ -32,49 +33,61 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-  {/* Sidebar only for md+ devices */}
-  <div className="hidden md:block hidden md:flex relative min-h-screen bg-gradient-to-b 
-                 from-[var(--sidebar)]/70 to-[var(--card)]/60
-                 dark:from-[var(--sidebar)]/80 dark:to-[var(--card)]/70
-                 backdrop-blur-xl border-r border-[var(--sidebar-border)] 
-                  flex-col overflow-hidden">
-    <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
-    <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br 
+      {/* Sidebar (visible only on md and up) */}
+      <div
+        className="hidden md:flex relative min-h-screen bg-gradient-to-b 
+                   from-[var(--sidebar)]/70 to-[var(--card)]/60
+                   dark:from-[var(--sidebar)]/80 dark:to-[var(--card)]/70
+                   backdrop-blur-xl border-r border-[var(--sidebar-border)] 
+                   flex-col overflow-hidden"
+      >
+        <Sidebar
+          activeItem={activeItem}
+          setActiveItem={setActiveItem}
+          selectedProject={selectedProject} // ✅ send selected project
+        />
+
+        {/* Background gradient */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div
+            className="absolute inset-0 bg-gradient-to-br 
                         from-indigo-50 via-white to-teal-50 
-                        dark:from-indigo-900 dark:via-gray-900 dark:to-teal-900" />
-        <div className="absolute top-0 left-0 right-0 bottom-0">
-          <div className="absolute -top-24 -left-24 w-72 h-72 
+                        dark:from-indigo-900 dark:via-gray-900 dark:to-teal-900"
+          />
+          <div className="absolute top-0 left-0 right-0 bottom-0">
+            <div
+              className="absolute -top-24 -left-24 w-72 h-72 
                           bg-indigo-200/30 dark:bg-indigo-700/30 
-                          rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-72 h-72 
+                          rounded-full blur-3xl"
+            />
+            <div
+              className="absolute bottom-0 right-0 w-72 h-72 
                           bg-teal-200/30 dark:bg-teal-500/30 
-                          rounded-full blur-3xl" />
+                          rounded-full blur-3xl"
+            />
+          </div>
         </div>
       </div>
-  </div>
 
-  <div className="flex-1 flex flex-col">
-    {/* Mobile Navbar only for small devices */}
-    <MobileNavbar activeItem={activeItem} setActiveItem={setActiveItem} />
+      {/* Main content */}
+      <div className="flex-1 flex flex-col">
+        {/* Mobile Navbar */}
+        <MobileNavbar activeItem={activeItem} setActiveItem={setActiveItem} />
 
-    <DashboardNavbar />
+        {/* Dashboard Navbar */}
+        <DashboardNavbar setSelectedProject={setSelectedProject} /> {/* ✅ pass setter */}
 
-    <main 
-      className="flex-1 p-6 transition-all duration-700 shadow-inner 
-                 
-                 /* Light Mode Gradient (Clean and Soft) */
-                 bg-gradient-to-br from-blue-100 via-sky-100 to-sky-50
-                 border-t border-gray-200/50 text-gray-800
-                 
-                 /* Dark Mode Gradient (Gorgous and Deep) */
-                 dark:from-slate-900 dark:via-gray-950 dark:to-indigo-950 
-                 dark:border-t dark:border-indigo-700/50 dark:text-gray-100" 
-    >
-      <DashboardContent activeItem={activeItem} />
-    </main>
-  </div>
-</div>
-
+        {/* Dashboard Main Content */}
+        <main
+          className="flex-1 p-6 transition-all duration-700 shadow-inner 
+                     bg-gradient-to-br from-blue-100 via-sky-100 to-sky-50
+                     border-t border-gray-200/50 text-gray-800
+                     dark:from-slate-900 dark:via-gray-950 dark:to-indigo-950 
+                     dark:border-t dark:border-indigo-700/50 dark:text-gray-100"
+        >
+          <DashboardContent activeItem={activeItem} />
+        </main>
+      </div>
+    </div>
   );
 }
