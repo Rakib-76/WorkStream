@@ -9,7 +9,7 @@ const attendanceRecords = [
   { id: 2, name: "Jane Smith", date: "2025-10-15", checkIn: "09:15 AM", checkOut: "05:45 PM", status: "Present" },
   { id: 3, name: "Mike Johnson", date: "2025-10-15", checkIn: "09:05 AM", checkOut: "05:20 PM", status: "Present" },
   { id: 4, name: "Sarah Williams", date: "2025-10-15", checkIn: "-", checkOut: "-", status: "Absent" },
-  { id: 5, name: "Emily Brown", date: "2025-10-15", checkIn: "10:00 AM", checkOut: "04:00 PM", status: "Half Day" },
+  { id: 5, name: "Emily Brown", date: "2025-10-15", checkIn: "10:00 AM", checkOut: "04:00 PM", status: "Late" },
 ];
 
 // ✅ Function to return Badge variant based on status
@@ -19,7 +19,7 @@ const getStatusVariant = (status) => {
       return "default"; // Blue
     case "Absent":
       return "destructive"; // Red
-    case "Half Day":
+    case "Late":
       return "secondary"; // Gray
     default:
       return "outline";
@@ -38,7 +38,7 @@ export default function Attendance() {
       {/* Attendance Table */}
       <Card className="glass-card shadow-lg border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
         <CardHeader>
-          <CardTitle className="text-lg md:text-xl">Attendance Records</CardTitle>
+          {/* <CardTitle className="text-lg md:text-xl">Attendance Records</CardTitle> */}
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
