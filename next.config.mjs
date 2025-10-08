@@ -4,9 +4,8 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: "https",
-                hostname: "images.unsplash.com"
+                hostname: "images.unsplash.com",
             },
-
             {
                 protocol: "https",
                 hostname: "i.ibb.co",
@@ -15,8 +14,16 @@ const nextConfig = {
                 protocol: "https",
                 hostname: "avatars.githubusercontent.com",
             },
+            {
+                protocol: "https",
+                hostname: "lh3.googleusercontent.com", // ✅ Google profile images allowed
+            },
         ],
-        domains: ['i.ibb.co', 'avatars.githubusercontent.com']
+        domains: [
+            "i.ibb.co",
+            "avatars.githubusercontent.com",
+            "lh3.googleusercontent.com", // ✅ Add this domain too
+        ],
     },
 };
 
