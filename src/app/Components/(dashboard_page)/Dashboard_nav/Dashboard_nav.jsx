@@ -222,19 +222,6 @@ export default function DashboardNavbar() {
             Create
           </Button>
           
-          {/* <Link
-            href="/projects"
-
-            variant="outline"
-            className="hidden  sm:flex gap-2 items-center"
-          >
-            <button className="bg-accent text-black hover:bg-accent/90  inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none h-8 px-4 py-1 ">
-              <FolderKanban className="w-4  h-4" />
-              Projects
-            </button>
-
-          </Link> */}
-
           {/* Projects Dropdown */}
           <div className="relative" ref={projectsDropdownRef}>
             <button
@@ -435,8 +422,8 @@ export default function DashboardNavbar() {
                     {...register("teamRole")}
                     className="w-full rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none cursor-pointer"
                   >
-                    <option>Leader</option>
                     <option>Member</option>
+                    <option>Leader</option>
                   </select>
                 </div>
                 <div>

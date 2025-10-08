@@ -5,17 +5,24 @@ import dbConnect from "../../../lib/dbConnect";
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const email = searchParams.get("email"); // query থেকে email নাও
+    const email = searchParams.get("email");
 
     const db = await dbConnect("projects");
 
     let query = {};
     if (email) {
-      query = { "createdBy": email }; // শুধু ওই user এর projects
+      query = {
+        $or: [
+          { createdBy: email },          // user নিজে project তৈরি করেছে
+          { "manager.email": email },    // user manager হিসেবে আছে
+          { teamMembers: email }         // user team member হিসেবে আছে
+        ]
+      };
     }
 
+
     // sort by createdAt descending (latest first)
-    const projects = await db.find(query).sort({ createdAt: -1 }).toArray();
+    const projects = await db.find(query, { sort: { createdAt: -1 } }).toArray();
 
     return NextResponse.json({ success: true, data: projects });
   } catch (error) {
