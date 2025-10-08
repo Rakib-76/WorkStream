@@ -1,5 +1,6 @@
 "use client";
 
+import CalendarSection from "../../Calender/CalenderSection";
 import Attendence from "../Attendence/Attendence";
 import Chat from "../Chat/Chat";
 import Overview from "../Overview/Overview";
@@ -34,10 +35,7 @@ export default function DashboardContent({ activeItem }) {
       case "calendar":
         return (
           <div className="p-6 bg-card border border-border rounded-xl shadow">
-            <h3 className="text-lg font-bold">📅 Calendar</h3>
-            <p className="text-muted-foreground mt-2">
-              Here will be your upcoming events and schedules.
-            </p>
+           <CalendarSection/>
           </div>
         );
 
