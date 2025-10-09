@@ -14,6 +14,8 @@ export default function DashboardLayout({ children }) {
   const [selectedProject, setSelectedProject] = useState(null); // ✅ corrected name
   const router = useRouter();
 
+  console.log(selectedProject);
+
   // Redirect if not logged in
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -85,7 +87,10 @@ export default function DashboardLayout({ children }) {
                      dark:from-slate-900 dark:via-gray-950 dark:to-indigo-950 
                      dark:border-t dark:border-indigo-700/50 dark:text-gray-100"
         >
-          <DashboardContent activeItem={activeItem} />
+          <DashboardContent
+            activeItem={activeItem}
+            selectedProject={selectedProject} // ✅ send selected project
+          />
         </main>
       </div>
     </div>
