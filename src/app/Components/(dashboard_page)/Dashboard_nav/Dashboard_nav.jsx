@@ -33,6 +33,7 @@ export default function DashboardNavbar({ setSelectedProject }) {
   const [showMemberSearch, setShowMemberSearch] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
+  const projectsDropdownRef = useRef(null);
   const [userProjects, setUserProjects] = useState([]);
 
   const { data: session } = useSession();
@@ -40,7 +41,7 @@ export default function DashboardNavbar({ setSelectedProject }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState(null);
   const fileInputRef = useRef(null);
-  const projectsDropdownRef = useRef(null);
+  
   const axiosSecure = useAxiosSecure();
   const { control, register, handleSubmit } = useForm();
   const [manager, setManager] = useState(null);

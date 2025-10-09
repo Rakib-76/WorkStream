@@ -1,38 +1,130 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Menu, PlusCircle, Waves, X, Upload, Smile } from "lucide-react";
-import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
+import {
+  Menu,
+  PlusCircle,
+  Waves,
+  X,
+  Upload,
+  Smile,
+  FolderKanban,
+} from "lucide-react";
 import { ThemeToggle } from "../../../Provider/ThemeToggle";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
+import Swal from "sweetalert2";
 import Button from "../../../Components/(dashboard_page)/UI/Button";
 import EmojiPicker from "emoji-picker-react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { MemberInput } from "../Dashboard_nav/MemberInput";
+import useAxiosSecure from "../../../../lib/useAxiosSecure";
 
-export default function MobileNavbar({ activeItem, setActiveItem }) {
+export default function MobileNavbar({ activeItem, setActiveItem, setSelectedProject }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [selectedImage, setSelectedImage] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState(null);
+  const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
+  const [userProjects, setUserProjects] = useState([]);
+
+  const projectsDropdownRef = useRef(null);
   const fileInputRef = useRef(null);
+  const { data: session } = useSession();
+  const axiosSecure = useAxiosSecure();
+  const { control, register, handleSubmit, reset } = useForm();
 
-  const { register, handleSubmit } = useForm();
+  // Fetch user-specific projects
+  useEffect(() => {
+    const fetchUserProjects = async () => {
+      if (!session?.user?.email) return;
+      try {
+        const res = await axiosSecure.get(`/api/projects?email=${session.user.email}`);
+        if (res.data.success) {
+          const sortedProjects = res.data.data.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setUserProjects(sortedProjects);
+        }
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+      }
+    };
+    fetchUserProjects();
+  }, [session?.user?.email, axiosSecure]);
 
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (projectsDropdownRef.current && !projectsDropdownRef.current.contains(e.target)) {
+        setProjectsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Image upload handler
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) setSelectedImage(URL.createObjectURL(file));
   };
 
-  const onSubmit = (data) => {
-    console.log("Submitted Data:", {
-      ...data,
-      logo: selectedImage,
-      emoji: selectedEmoji,
-    });
-    setIsModalOpen(false);
+  // Logout
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    Swal.fire({
+      icon: "success",
+      title: "Logged out!",
+      timer: 2000,
+      showConfirmButton: false,
+    }).then(() => (window.location.href = "/"));
+  };
+
+  // Create project
+  const onSubmit = async (data) => {
+    try {
+      const payload = {
+        projectName: data.projectName,
+        companyName: data.companyName || "",
+        description: data.description || "",
+        teamRole: data.teamRole || "Member",
+        startDate: data.startDate,
+        endDate: data.endDate,
+        teamMembers: data.members || [],
+        emoji: selectedEmoji || null,
+        logo: selectedImage || null,
+        createdBy: session?.user?.email,
+        createdAt: new Date().toISOString(),
+      };
+
+      const response = await axiosSecure.post("/api/createProject", {
+        collectionName: "projects",
+        projectData: payload,
+      });
+
+      if (response.data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Project Created!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        setUserProjects((prev) => [...prev, payload]);
+        setIsModalOpen(false);
+        reset();
+        setSelectedImage(null);
+        setSelectedEmoji(null);
+      } else {
+        Swal.fire("Error", response.data.error || "Failed to create project", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Something went wrong", "error");
+    }
   };
 
   const menuItems = [
@@ -44,16 +136,16 @@ export default function MobileNavbar({ activeItem, setActiveItem }) {
     { name: "callmeet", label: "Call/Meet" },
     { name: "team", label: "Team" },
     { name: "notes", label: "Notes" },
-    { name: "ideas", label: "Sharing Ideas" },
+    { name: "reports", label: "Reports" },
   ];
 
   return (
     <>
-      {/* Navbar Top */}
+      {/* Mobile Header */}
       <header className="md:hidden fixed top-0 left-0 right-0 bg-card border-b border-border flex items-center justify-between px-4 py-3 z-50">
-        <Link href="/" className="group ">
+        <Link href="/" className="group">
           <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md">
+            <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl shadow-md">
               <Waves className="w-5 h-5 text-primary-foreground" />
             </div>
           </div>
@@ -78,19 +170,19 @@ export default function MobileNavbar({ activeItem, setActiveItem }) {
           <div className="flex items-center justify-between p-4 border-b border-border">
             <div className="flex items-center gap-2">
               <Image
-                src="/avatar.png"
+                src={session?.user?.image || "/avatar.png"}
                 alt="Profile"
                 width={36}
                 height={36}
                 className="rounded-full"
               />
-              <span className="font-medium">User Name</span>
+              <span className="font-medium">{session?.user?.name || "User"}</span>
             </div>
             <ThemeToggle />
           </div>
 
           {/* Create + Projects */}
-          <div className="p-4 border-b border-border flex gap-3">
+          <div className="p-4 border-b border-border flex gap-3 relative">
             <Button
               size="sm"
               className="flex gap-2 items-center bg-primary text-primary-foreground"
@@ -99,9 +191,50 @@ export default function MobileNavbar({ activeItem, setActiveItem }) {
               <PlusCircle className="w-4 h-4" />
               Create
             </Button>
-            <button className="border px-4 py-2 rounded-lg flex-1 hover:bg-muted transition">
-              Projects
-            </button>
+
+            {/* Project Dropdown */}
+            <div className="relative" ref={projectsDropdownRef}>
+              <button
+                onClick={() => setProjectsDropdownOpen(!projectsDropdownOpen)}
+                className="bg-accent text-black hover:bg-accent/90 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all outline-none h-8 px-4 py-1"
+              >
+                <FolderKanban className="w-4 h-4" />
+                Projects
+              </button>
+
+            <AnimatePresence>
+  {projectsDropdownOpen && (
+    <motion.div
+  initial={{ opacity: 0, y: -10 }}
+  animate={{ opacity: 1, y: 0 }}
+  exit={{ opacity: 0, y: -10 }}
+  className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden z-50"
+>
+
+      {userProjects.length === 0 ? (
+        <div className="p-3 text-sm text-gray-500">No projects found</div>
+      ) : (
+        <ul>
+          {userProjects.map((project, i) => (
+            <li key={i}>
+              <button
+                onClick={() => {
+                  setSelectedProject(project);
+                  setProjectsDropdownOpen(false);
+                }}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
+              >
+                {project.projectName}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </motion.div>
+  )}
+</AnimatePresence>
+
+            </div>
           </div>
 
           {/* Menu Items */}
@@ -122,15 +255,22 @@ export default function MobileNavbar({ activeItem, setActiveItem }) {
                 {item.label}
               </li>
             ))}
+
+            {/* Logout */}
+            <li
+              onClick={handleLogout}
+              className="px-3 py-2 text-red-500 hover:bg-muted rounded-lg cursor-pointer mt-3"
+            >
+              Logout
+            </li>
           </ul>
         </div>
       </div>
 
-      {/* Create Modal */}
+      {/* Create Project Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-4xl mx-4 animate-fadeIn max-h-[90vh] overflow-y-auto">
-            {/* Header */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full sm:max-w-4xl mx-auto max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-5 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Create New Project
@@ -143,158 +283,108 @@ export default function MobileNavbar({ activeItem, setActiveItem }) {
               </button>
             </div>
 
-            {/* Form Body */}
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="p-6 w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+              className="lg:p-6 p-2 w-full grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
             >
-              {/* Left */}
+              {/* Left Column */}
               <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Project Name *
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Project Name *</label>
                   <input
                     {...register("projectName")}
                     type="text"
+                    required
                     className="w-full rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none"
-                    placeholder="Enter project name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Company Name
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Company Name</label>
                   <input
                     {...register("companyName")}
                     type="text"
                     className="w-full rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none"
-                    placeholder="Enter company name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Description
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Description</label>
                   <textarea
                     {...register("description")}
                     rows="3"
                     className="w-full rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none resize-none"
-                    placeholder="Write project details..."
                   />
                 </div>
               </div>
 
-              {/* Middle */}
+              {/* Middle Column */}
               <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Team Role
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Team Role</label>
                   <select
                     {...register("teamRole")}
                     className="w-full rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none"
                   >
-                    <option>Leader</option>
                     <option>Member</option>
+                    <option>Leader</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Add Members
-                  </label>
-                  <MemberInput {...register("members")} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Date Range
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      {...register("startDate")}
-                      type="date"
-                      className="flex-1 rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none"
-                    />
-                    <span>to</span>
-                    <input
-                      {...register("endDate")}
-                      type="date"
-                      className="flex-1 rounded-xl border px-4 py-3 text-sm dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Right */}
-              <div className="space-y-5 relative">
-                <div className="flex gap-3">
+                <Controller
+                  name="members"
+                  control={control}
+                  render={({ field }) => <MemberInput {...field} />}
+                />
+                <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => fileInputRef.current.click()}
-                    className="px-4 py-3 border rounded-xl text-sm flex items-center gap-2"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className="p-2 border rounded-xl"
                   >
-                    <Upload size={16} /> Upload Logo
+                    <Smile />
                   </button>
+                  {showEmojiPicker && (
+                    <div className="absolute z-50">
+                      <EmojiPicker
+                        onEmojiClick={(emoji) => {
+                          setSelectedEmoji(emoji.emoji);
+                          setSelectedImage(null);
+                          setShowEmojiPicker(false);
+                        }}
+                      />
+                    </div>
+                  )}
                   <input
                     type="file"
-                    accept="image/*"
                     ref={fileInputRef}
                     onChange={handleImageChange}
                     className="hidden"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    className="px-4 py-3 border rounded-xl text-sm flex items-center gap-2"
+                    onClick={() => fileInputRef.current.click()}
+                    className="p-2 border rounded-xl"
                   >
-                    <Smile size={16} /> Emoji
+                    <Upload />
                   </button>
                 </div>
-
-                <div className="border-2 border-dashed rounded-xl flex flex-col items-center justify-center h-48 text-center text-gray-500 dark:text-gray-400">
-                  {selectedImage ? (
-                    <img
-                      src={selectedImage}
-                      alt="Uploaded Preview"
-                      className="h-full object-contain rounded-xl"
-                    />
-                  ) : selectedEmoji ? (
-                    <span className="text-6xl">{selectedEmoji}</span>
-                  ) : (
-                    <>
-                      <Upload size={24} />
-                      <p className="mt-2 text-sm">Upload project logo</p>
-                      <span className="text-xs">Min 600×600 PNG/JPEG</span>
-                    </>
-                  )}
-                </div>
-
-                {showEmojiPicker && (
-                  <div className="absolute z-50 top-20 left-0 w-80 p-3 bg-white dark:bg-gray-800 shadow-lg rounded-xl">
-                    <EmojiPicker
-                      onEmojiClick={(emojiData) => {
-                        setSelectedEmoji(emojiData.emoji);
-                        setSelectedImage(null);
-                        setShowEmojiPicker(false);
-                      }}
-                    />
-                  </div>
+                {(selectedImage || selectedEmoji) && (
+                  <div className="mt-2 text-lg">{selectedImage ? <Image src={selectedImage} alt="logo" width={60} height={60} /> : selectedEmoji}</div>
                 )}
               </div>
-            </form>
 
-            {/* Footer */}
-            <div className="flex justify-end gap-3 p-5 border-t border-gray-200 dark:border-gray-700">
-              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                className="bg-primary text-white"
-                onClick={handleSubmit(onSubmit)}
-              >
-                Create
-              </Button>
-            </div>
+              {/* Bottom */}
+              <div className="lg:col-span-3 flex justify-end gap-3 mt-4">
+                <Button type="submit" className="bg-primary text-white flex gap-2 items-center">
+                  <PlusCircle className="w-4 h-4" /> Create
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-muted text-black flex gap-2 items-center"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       )}
