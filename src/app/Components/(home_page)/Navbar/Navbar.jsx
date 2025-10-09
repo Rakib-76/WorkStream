@@ -28,7 +28,6 @@ export default function Navbar() {
 
   // auth state from next-auth
   const { data: session } = useSession();
-  console.log("Session data:", session);
 
   // Ant Design Menu Items with proper theme colors
   const productMenuItems = [

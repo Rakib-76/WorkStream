@@ -1,10 +1,8 @@
-// Sidebar.js
-
 "use client";
-import { CalendarCheck2, ChevronDown, Waves } from "lucide-react";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
+  CalendarCheck2,
+  ChevronDown,
+  Waves,
   LayoutDashboard,
   CheckSquare,
   Calendar,
@@ -18,13 +16,15 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-// 💡 New prop: currentProjectName
-export default function Sidebar({ activeItem, setActiveItem, currentProjectName }) {
+export default function Sidebar({ activeItem, setActiveItem, selectedProject }) {
   const [collapsed, setCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
 
+  // Handle responsive collapse
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) setCollapsed(true);
@@ -35,6 +35,7 @@ export default function Sidebar({ activeItem, setActiveItem, currentProjectName 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Sidebar Menu Items
   const menuItems = [
     { name: "overview", label: "Overview", icon: <LayoutDashboard size={20} /> },
     { name: "tasks", label: "Tasks", icon: <CheckSquare size={20} /> },
@@ -55,14 +56,14 @@ export default function Sidebar({ activeItem, setActiveItem, currentProjectName 
     },
   ];
 
-  // 💡 Framer Motion Variants for Animation
+  // Framer Motion Animations
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1, // Stagger the animation of children by 0.1 seconds
-        delayChildren: currentProjectName ? 0.3 : 0, // Delay the start if a project is selected
+        staggerChildren: 0.1,
+        delayChildren: selectedProject ? 0.3 : 0,
       },
     },
   };
@@ -72,14 +73,13 @@ export default function Sidebar({ activeItem, setActiveItem, currentProjectName 
     show: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 100 } },
   };
 
-
   return (
     <motion.aside
       animate={{ width: collapsed ? "80px" : "260px" }}
       transition={{ duration: 0.3 }}
-      className="hidden md:flex relative pl-4 py-4 flex-col"
+      className="hidden md:flex relative pl-4 py-4 flex-col bg-[var(--sidebar-bg)] text-[var(--sidebar-foreground)]"
     >
-      {/* ... (Existing Logo/Collapse Button structure) ... */}
+      {/* Logo + Collapse Button */}
       <div className="z-10 flex justify-between mb-4">
         <Link href="/" className="group md:block lg:hidden">
           <div className="flex items-center space-x-3">
@@ -96,16 +96,18 @@ export default function Sidebar({ activeItem, setActiveItem, currentProjectName 
         </button>
       </div>
 
-      {/* 💡 Project Name Display */}
-      <div className={`mt-2 mb-6 transition-opacity duration-300 ${collapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto"}`}>
+      {/* 🧩 Project Name Display */}
+      <div
+        className={`mt-2 mb-6 transition-opacity duration-300 ${
+          collapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto"
+        }`}
+      >
         <h1 className="text-lg font-bold text-foreground truncate">
-          {/* Display the project name or a default message */}
-          {currentProjectName || ""}
+          {selectedProject ? selectedProject.projectName : "No Project Selected"}
         </h1>
       </div>
 
-
-      {/* 💡 Menu Items with Stagger Animation */}
+      {/* Menu Items with Animation */}
       <motion.ul
         className="space-y-2 relative z-10"
         variants={containerVariants}
@@ -120,11 +122,11 @@ export default function Sidebar({ activeItem, setActiveItem, currentProjectName 
                   ? setOpenDropdown(openDropdown === item.name ? null : item.name)
                   : setActiveItem(item.name)
               }
-              className={`flex items-center gap-3 cursor-pointer px-6 py-2 rounded-l-full px-3 py-2 transition relative
+              className={`flex items-center gap-3 cursor-pointer px-3 py-2 rounded-l-full transition relative
                 ${
                   activeItem === item.name || openDropdown === item.name
                     ? "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] font-semibold shadow-md"
-                    : "text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+                    : "hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
                 }`}
             >
               {item.icon}
@@ -141,7 +143,7 @@ export default function Sidebar({ activeItem, setActiveItem, currentProjectName 
               )}
             </li>
 
-            {/* Dropdown */}
+            {/* Dropdown Menu */}
             <AnimatePresence>
               {item.children && openDropdown === item.name && !collapsed && (
                 <motion.ul
@@ -161,7 +163,7 @@ export default function Sidebar({ activeItem, setActiveItem, currentProjectName 
                         ${
                           activeItem === child.name
                             ? "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] font-semibold shadow-md"
-                            : "text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+                            : "hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
                         }`}
                     >
                       {child.icon}
