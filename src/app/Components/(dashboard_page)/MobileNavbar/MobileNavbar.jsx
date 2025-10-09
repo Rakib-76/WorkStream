@@ -129,8 +129,9 @@ export default function MobileNavbar({ activeItem, setActiveItem, setSelectedPro
 
   const menuItems = [
     { name: "overview", label: "Overview" },
-    { name: "mytask", label: "My Task" },
+    {  name: "tasks", label: "Tasks"  },
     { name: "calendar", label: "Calendar" },
+     { name: "attendence", label: "Attendence" },
     { name: "todo", label: "To-do" },
     { name: "chat", label: "Chat" },
     { name: "callmeet", label: "Call/Meet" },
