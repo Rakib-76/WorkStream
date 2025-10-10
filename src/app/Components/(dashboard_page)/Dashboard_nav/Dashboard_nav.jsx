@@ -44,8 +44,8 @@ export default function DashboardNavbar() {
   const axiosSecure = useAxiosSecure();
   const { control, register, handleSubmit } = useForm();
   const [manager, setManager] = useState(null);
-  const {setSelectedProject} = useContext(DataContext);
-  
+  const { setSelectedProject } = useContext(DataContext);
+
   // Fetch user-specific projects
   useEffect(() => {
     const fetchUserProjects = async () => {
@@ -87,6 +87,8 @@ export default function DashboardNavbar() {
   // Logout handler
   const handleLogout = async () => {
     await signOut({ redirect: false });
+    // ✅  remove selectedProject from localStorage
+    localStorage.removeItem("selectedProject");
     Swal.fire({
       icon: "success",
       title: "Logged out!",
@@ -186,11 +188,10 @@ export default function DashboardNavbar() {
         <div className="flex-1 flex justify-center items-center gap-3 max-w-lg">
           {/* Search */}
           <div
-            className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${
-              isSearchOpen
-                ? "w-64 border-primary/60 bg-background"
-                : "w-10 justify-center border-transparent"
-            }`}
+            className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
+              ? "w-64 border-primary/60 bg-background"
+              : "w-10 justify-center border-transparent"
+              }`}
             onMouseEnter={() => setIsSearchOpen(true)}
             onMouseLeave={() => setIsSearchOpen(false)}
           >
