@@ -237,8 +237,9 @@ export default function DashboardNavbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 shadow-2xl rounded-2xl overflow-hidden z-50 border border-gray-100 dark:border-gray-700"
+                  className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 shadow-2xl rounded-2xl overflow-hidden z-50 border border-gray-100 dark:border-gray-700"
                 >
+                  {/* Header */}
                   <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
                       Your Projects
@@ -251,7 +252,8 @@ export default function DashboardNavbar() {
                     </button>
                   </div>
 
-                  <div className="max-h-64 overflow-y-auto p-2">
+                  {/* Content */}
+                  <div className="max-h-80 overflow-y-auto p-3 space-y-3">
                     {loading ? (
                       <div className="flex justify-center items-center py-6">
                         <div className="w-10 h-10 border-4 border-dashed rounded-full animate-spin border-primary dark:border-default-600"></div>
@@ -261,28 +263,65 @@ export default function DashboardNavbar() {
                         No projects found
                       </div>
                     ) : (
-                      <ul className="space-y-1">
-                        {userProjects.map((project) => (
-                          <motion.li
-                            key={project._id}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                      userProjects.map((project) => (
+                        <motion.div
+                          key={project._id}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <button
+                            onClick={() => {
+                              setSelectedProject(project);
+                              setProjectsDropdownOpen(false);
+                            }}
+                            className={`w-full text-left p-3 rounded-xl border transition-all ${selectedProject?._id === project._id
+                                ? "border-primary bg-primary/10 shadow-sm"
+                                : "border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                              }`}
                           >
-                            <button
-                              onClick={() => {
-                                setSelectedProject(project);
-                                setProjectsDropdownOpen(false);
-                              }}
-                              className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-all ${selectedProject?._id === project._id
-                                  ? "bg-primary text-white shadow-sm"
-                                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-                                }`}
-                            >
-                              {project.projectName}
-                            </button>
-                          </motion.li>
-                        ))}
-                      </ul>
+                            {/* Project Header */}
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className="font-medium text-gray-800 dark:text-gray-100 text-sm">
+                                {project.projectName}
+                              </h3>
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded-full ${project.priority === "High"
+                                    ? "bg-red-100 text-red-700 dark:bg-red-800/40 dark:text-red-300"
+                                    : project.priority === "Medium"
+                                      ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800/40 dark:text-yellow-300"
+                                      : "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
+                                  }`}
+                              >
+                                {project.priority}
+                              </span>
+                            </div>
+
+                            {/* Company + Manager */}
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              🏢 {project.companyName}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              👤 Manager: {project.manager?.name || "N/A"}
+                            </p>
+
+                            {/* Status & Dates */}
+                            <div className="flex justify-between items-center mt-2">
+                              <span
+                                className={`text-xs font-medium px-2 py-0.5 rounded-full ${project.status === "Active"
+                                    ? "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
+                                    : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                                  }`}
+                              >
+                                {project.status}
+                              </span>
+                              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                                📅 {new Date(project.startDate).getFullYear()} -{" "}
+                                {new Date(project.endDate).getFullYear()}
+                              </span>
+                            </div>
+                          </button>
+                        </motion.div>
+                      ))
                     )}
                   </div>
 
@@ -290,7 +329,7 @@ export default function DashboardNavbar() {
                   <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
                   {/* ✅ Unselect Button */}
-                  <div className="p-3 flex justify-center">
+                  <div className="p-3">
                     <button
                       onClick={() => {
                         setSelectedProject(null);
@@ -304,6 +343,7 @@ export default function DashboardNavbar() {
                 </motion.div>
               )}
             </AnimatePresence>
+
 
 
           </div>
