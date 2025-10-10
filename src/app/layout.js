@@ -5,6 +5,7 @@ import { ThemeProvider } from "./Provider/ThemeProvider";
 import { Toaster } from "react-hot-toast";
 
 import Session from "./Provider/Session";
+import DataProvider from "../context/DataProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,10 +55,12 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Session>
+          <DataProvider>
           <ThemeProvider>
             {children}
             <Toaster position="top-right" reverseOrder={false} />
           </ThemeProvider>
+          </DataProvider>
         </Session>
       </body>
     </html>

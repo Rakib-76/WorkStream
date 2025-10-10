@@ -232,6 +232,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     setLoading(true);
     await signOut({ redirect: false });
+    
     Swal.fire({
       icon: "success",
       title: "Logged out!",

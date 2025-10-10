@@ -14,7 +14,7 @@ import {
   UserPlus,
   X,
 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "../../../Provider/ThemeToggle";
@@ -26,15 +26,15 @@ import Swal from "sweetalert2";
 import { MemberInput } from "./MemberInput";
 import { Controller, useForm } from "react-hook-form";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
+import { DataContext } from "../../../../context/DataContext";
 
-export default function DashboardNavbar({ setSelectedProject }) {
+export default function DashboardNavbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showMemberSearch, setShowMemberSearch] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
   const [userProjects, setUserProjects] = useState([]);
-
   const { data: session } = useSession();
   const [selectedImage, setSelectedImage] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -44,7 +44,8 @@ export default function DashboardNavbar({ setSelectedProject }) {
   const axiosSecure = useAxiosSecure();
   const { control, register, handleSubmit } = useForm();
   const [manager, setManager] = useState(null);
-
+  const {setSelectedProject} = useContext(DataContext);
+  
   // Fetch user-specific projects
   useEffect(() => {
     const fetchUserProjects = async () => {
