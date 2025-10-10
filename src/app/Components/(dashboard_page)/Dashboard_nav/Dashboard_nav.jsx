@@ -44,14 +44,16 @@ export default function DashboardNavbar() {
   const axiosSecure = useAxiosSecure();
   const { control, register, handleSubmit } = useForm();
   const [manager, setManager] = useState(null);
-  const { setSelectedProject } = useContext(DataContext);
-
+  const [loading, setLoading] = useState(false);
+  // data from Context
+  const { setSelectedProject, selectedProject } = useContext(DataContext);
   // Fetch user-specific projects
   useEffect(() => {
     const fetchUserProjects = async () => {
       if (!session?.user?.email) return;
 
       try {
+        setLoading(true);
         const res = await axiosSecure.get(`/api/projects?email=${session.user.email}`);
         if (res.data.success) {
           const sortedProjects = res.data.data.sort(
@@ -59,8 +61,11 @@ export default function DashboardNavbar() {
           );
           setUserProjects(sortedProjects);
         }
-      } catch (err) {
+      }
+      catch (err) {
         console.error("Error fetching user projects:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -231,30 +236,76 @@ export default function DashboardNavbar() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden z-50"
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 shadow-2xl rounded-2xl overflow-hidden z-50 border border-gray-100 dark:border-gray-700"
                 >
-                  {userProjects.length === 0 ? (
-                    <div className="p-3 text-sm text-gray-500">No projects found</div>
-                  ) : (
-                    <ul>
-                      {userProjects.map((project) => (
-                        <li key={project._id}>
-                          <button
-                            onClick={() => {
-                              setSelectedProject(project);
-                              setProjectsDropdownOpen(false);
-                            }}
-                            className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
+                  <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                      Your Projects
+                    </h4>
+                    <button
+                      onClick={() => setProjectsDropdownOpen(false)}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="max-h-64 overflow-y-auto p-2">
+                    {loading ? (
+                      <div className="flex justify-center items-center py-6">
+                        <div className="w-10 h-10 border-4 border-dashed rounded-full animate-spin border-primary dark:border-default-600"></div>
+                      </div>
+                    ) : userProjects.length === 0 ? (
+                      <div className="text-center text-sm text-gray-500 py-4">
+                        No projects found
+                      </div>
+                    ) : (
+                      <ul className="space-y-1">
+                        {userProjects.map((project) => (
+                          <motion.li
+                            key={project._id}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                           >
-                            {project.projectName}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                            <button
+                              onClick={() => {
+                                setSelectedProject(project);
+                                setProjectsDropdownOpen(false);
+                              }}
+                              className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-all ${selectedProject?._id === project._id
+                                  ? "bg-primary text-white shadow-sm"
+                                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                }`}
+                            >
+                              {project.projectName}
+                            </button>
+                          </motion.li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-200 dark:border-gray-700"></div>
+
+                  {/* ✅ Unselect Button */}
+                  <div className="p-3 flex justify-center">
+                    <button
+                      onClick={() => {
+                        setSelectedProject(null);
+                        setProjectsDropdownOpen(false);
+                      }}
+                      className="w-full text-center px-4 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-all"
+                    >
+                      Unselect Project
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
+
+
           </div>
         </div>
 
