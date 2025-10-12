@@ -1,5 +1,6 @@
 "use client";
 
+import { useContext } from "react";
 import CalendarSection from "../../Calender/CalenderSection";
 import ChatSection from"../../Chat/ChatSection";
 import Attendence from "../Attendence/Attendence";
@@ -8,8 +9,12 @@ import Reports from "../Reports/Reports";
 import Tasks from "../Tasks/Tasks";
 import Team from "../Team/Team";
 import Todo from "../Todo/Todo";
+import { DataContext } from "../../../../context/DataContext";
 
-export default function DashboardContent({ activeItem, selectedProject  }) {
+export default function DashboardContent({ activeItem }) {
+
+  const { selectedProject } = useContext(DataContext);
+
   if (!selectedProject) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center p-6">

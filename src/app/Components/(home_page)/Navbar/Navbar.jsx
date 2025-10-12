@@ -232,6 +232,8 @@ export default function Navbar() {
   const handleLogout = async () => {
     setLoading(true);
     await signOut({ redirect: false });
+    // ✅  remove selectedProject from localStorage
+    localStorage.removeItem("selectedProject");
     Swal.fire({
       icon: "success",
       title: "Logged out!",
