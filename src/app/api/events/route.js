@@ -1,5 +1,6 @@
+
 import { NextResponse } from "next/server";
-import { dbConnect } from "../../../lib/dbConnect"; // adjust path when you copy
+import dbConnect  from "../../../lib/dbConnect";
 
 
 export async function GET(request) {
