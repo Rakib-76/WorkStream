@@ -41,11 +41,12 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     // Determine the name and value based on the chart type
     const dataItem = payload[0].payload.name ? payload[0].payload : payload[0];
-    
+
     return (
-      <div className="p-2 bg-white/90 dark:bg-gray-800/90] border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl text-sm backdrop-blur-sm">
-        <p className="font-bold text-gray-900 dark:text-gray-900">{dataItem.name}</p>
-        <p className="text-gray-900 dark:text-gray-900">Value: {dataItem.value}</p>
+      <div className="p-2 bg-white/90 dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl text-sm backdrop-blur-sm">
+        <p className="font-bold text-gray-900 dark:text-gray-100">{dataItem.name}</p>
+        <p className="text-gray-700 dark:text-gray-300">Value: {dataItem.value}</p>
+
       </div>
     );
   }
@@ -95,13 +96,13 @@ const totalHoursBudget = 689;
 
 // Projects Data
 const projectData = [
-    { id: "PRO-001", name: "Office Management App", team: ["J", "S", "M"], deadline: "12 Sep 2024", priority: "High" },
-    { id: "PRO-002", name: "Clinic Management", team: ["K", "B", "R", "+1"], deadline: "24 Oct 2024", priority: "Low" },
-    { id: "PRO-003", name: "Educational Platform", team: ["E", "F", "G"], deadline: "18 Feb 2025", priority: "Medium" },
-    { id: "PRO-004", name: "Chat & Call Mobile App", team: ["O", "P"], deadline: "19 Feb 2025", priority: "High" },
-    { id: "PRO-005", name: "Travel Planning Website", team: ["Q", "R", "S"], deadline: "18 Feb 2025", priority: "Medium" },
-    { id: "PRO-006", name: "Service Booking Software", team: ["U", "V", "W"], deadline: "20 Feb 2025", priority: "Low" },
-    { id: "PRO-008", name: "Financial Dashboard", team: ["Y", "Z", "+2"],  deadline: "17 Oct 2024", priority: "Medium" },
+  { id: "PRO-001", name: "Office Management App", team: ["J", "S", "M"], deadline: "12 Sep 2024", priority: "High" },
+  { id: "PRO-002", name: "Clinic Management", team: ["K", "B", "R", "+1"], deadline: "24 Oct 2024", priority: "Low" },
+  { id: "PRO-003", name: "Educational Platform", team: ["E", "F", "G"], deadline: "18 Feb 2025", priority: "Medium" },
+  { id: "PRO-004", name: "Chat & Call Mobile App", team: ["O", "P"], deadline: "19 Feb 2025", priority: "High" },
+  { id: "PRO-005", name: "Travel Planning Website", team: ["Q", "R", "S"], deadline: "18 Feb 2025", priority: "Medium" },
+  { id: "PRO-006", name: "Service Booking Software", team: ["U", "V", "W"], deadline: "20 Feb 2025", priority: "Low" },
+  { id: "PRO-008", name: "Financial Dashboard", team: ["Y", "Z", "+2"], deadline: "17 Oct 2024", priority: "Medium" },
 ];
 
 // ====================================================================
@@ -110,242 +111,243 @@ const projectData = [
 
 // --- Priority Badge ---
 const PriorityBadge = ({ priority }) => {
-    let colorClass = "";
-    switch (priority) {
-        case "High":
-            colorClass = "bg-red-500 text-white";
-            break;
-        case "Medium":
-            colorClass = "bg-pink-500 text-white";
-            break;
-        case "Low":
-            colorClass = "bg-green-500 text-white";
-            break;
-        default:
-            colorClass = "bg-gray-400 text-white";
-    }
-    return (
-        <span className={`badge badge-sm rounded-lg py-1 px-3 ${colorClass} font-semibold text-xs`}>
-            {priority}
-        </span>
-    );
+  let colorClass = "";
+  switch (priority) {
+    case "High":
+      colorClass = "bg-red-500 text-white";
+      break;
+    case "Medium":
+      colorClass = "bg-pink-500 text-white";
+      break;
+    case "Low":
+      colorClass = "bg-green-500 text-white";
+      break;
+    default:
+      colorClass = "bg-gray-400 text-white";
+  }
+  return (
+    <span className={`badge badge-sm rounded-lg py-1 px-3 ${colorClass} font-semibold text-xs`}>
+      {priority}
+    </span>
+  );
 };
 
 // --- Team Avatar Stack ---
 const ProjectAvatarStack = ({ teamMembers }) => {
-    // Generate distinct background colors for avatars based on the character
-    const getBgColor = (char) => {
-        const hash = char.charCodeAt(0) + char.charCodeAt(char.length - 1);
-        const colors = ['#FBBF24', '#34D399', '#60A5FA', '#F472B6', '#93C5FD'];
-        return colors[hash % colors.length];
-    };
+  // Generate distinct background colors for avatars based on the character
+  const getBgColor = (char) => {
+    const hash = char.charCodeAt(0) + char.charCodeAt(char.length - 1);
+    const colors = ['#FBBF24', '#34D399', '#60A5FA', '#F472B6', '#93C5FD'];
+    return colors[hash % colors.length];
+  };
 
-    return (
-        <div className="flex -space-x-2 rtl:space-x-reverse justify-center md:justify-start">
-            {teamMembers.slice(0, 3).map((member, index) => (
-                <div 
-                    key={index} 
-                    className="w-7 h-7 rounded-full text-xs text-white flex items-center justify-center ring-2 ring-white dark:ring-[#1E1E2E] font-medium transition-transform hover:scale-110" 
-                    style={{ backgroundColor: getBgColor(member) }}
-                >
-                    {member.startsWith('+') ? member : member.charAt(0)}
-                </div>
-            ))}
-            {teamMembers.length > 3 && (
-                <div 
-                    className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-600 text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center ring-2 ring-white dark:ring-[#1E1E2E] font-medium transition-transform hover:scale-110"
-                >
-                    +{teamMembers.length - 3}
-                </div>
-            )}
+  return (
+    <div className="flex -space-x-2 rtl:space-x-reverse justify-center md:justify-start">
+      {teamMembers.slice(0, 3).map((member, index) => (
+        <div
+          key={index}
+          className="w-7 h-7 rounded-full text-xs text-white flex items-center justify-center ring-2 ring-white dark:ring-[#1E1E2E] font-medium transition-transform hover:scale-110"
+          style={{ backgroundColor: getBgColor(member) }}
+        >
+          {member.startsWith('+') ? member : member.charAt(0)}
         </div>
-    );
+      ))}
+      {teamMembers.length > 3 && (
+        <div
+          className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-600 text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center ring-2 ring-white dark:ring-[#1E1E2E] font-medium transition-transform hover:scale-110"
+        >
+          +{teamMembers.length - 3}
+        </div>
+      )}
+    </div>
+  );
 };
 
 // --- Project Progress Bar ---
 const ProjectProgressBar = ({ current, total }) => {
-    const progress = (current / total) * 100;
-    const color = progress > 75 ? 'bg-green-500' : progress > 30 ? 'bg-yellow-500' : 'bg-red-500';
+  const progress = (current / total) * 100;
+  const color = progress > 75 ? 'bg-green-500' : progress > 30 ? 'bg-yellow-500' : 'bg-red-500';
 
-    return (
-        <div className="flex flex-col space-y-1 w-full min-w-[100px]">
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                {current}/{total} hrs
-            </span>
-            <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <motion.div
-                    className={`h-full rounded-full ${color}`}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: 1 }}
-                />
-            </div>
-        </div>
-    );
+  return (
+    <div className="flex flex-col space-y-1 w-full min-w-[100px]">
+      <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+        {current}/{total} hrs
+      </span>
+      <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <motion.div
+          className={`h-full rounded-full ${color}`}
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 1 }}
+        />
+      </div>
+    </div>
+  );
 };
 
 // --- Projects Table Component ---
 const ProjectsTable = () => {
-    const headers = ["ID", "Name", "Team", "Deadline", "Priority"];
-    
-    // Function to handle the calendar icon click (placeholder)
-    const handleCalendarClick = () => {
-        console.log("Showing this week's projects");
-    };
+  const headers = ["ID", "Name", "Team", "Deadline", "Priority"];
 
-    return (
-        <motion.div 
-            className="bg-white dark:bg-[#1E1E2E] border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-xl col-span-1"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+  // Function to handle the calendar icon click (placeholder)
+  const handleCalendarClick = () => {
+    console.log("Showing this week's projects");
+  };
+
+  return (
+    <motion.div
+      className="bg-white dark:bg-[#1E1E2E] border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-xl col-span-1"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.3 }}
+    >
+      <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100 dark:border-gray-800">
+        <h3 className="text-xl font-semibold">Projects</h3>
+        <button
+          className="btn btn-sm text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 flex items-center"
+          onClick={handleCalendarClick}
         >
-            <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100 dark:border-gray-800">
-                <h3 className="text-xl font-semibold">Projects</h3>
-                <button 
-                    className="btn btn-sm text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 flex items-center"
-                    onClick={handleCalendarClick}
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    This Week
-                </button>
-            </div>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          This Week
+        </button>
+      </div>
 
-            <div className="overflow-x-auto">
-                {/* Use a proper table structure */}
-                <table className="table w-full text-sm">
-                    <thead className="text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
-                        <tr>
-                            {headers.map(header => (
-                                <th key={header} className="p-2 border-b dark:border-gray-700 min-w-[70px]">{header}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                        {projectData.map((project, index) => (
-                            <motion.tr
-                                key={project.id}
-                                className="hover:bg-gray-50 dark:hover:bg-[#252535] transition duration-150"
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.4, delay: 0.1 * index }}
-                            >
-                                <td className="p-2 font-mono text-xs text-gray-500 dark:text-gray-400">{project.id}</td>
-                                <td className="p-2 font-medium text-gray-900 dark:text-gray-100">{project.name}</td>
-                                <td className="p-2"><ProjectAvatarStack teamMembers={project.team} /></td>
-                                {/* <td className="p-2"><ProjectProgressBar current={project.hours} total={project.totalHours} /></td> */}
-                                <td className="p-2 text-gray-600 dark:text-gray-300 min-w-[100px]">{project.deadline}</td>
-                                <td className="p-2"><PriorityBadge priority={project.priority} /></td>
-                            </motion.tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </motion.div>
-    );
+      <div className="overflow-x-auto">
+        {/* Use a proper table structure */}
+        <table className="table w-full text-sm">
+          <thead className="text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+            <tr>
+              {headers.map(header => (
+                <th key={header} className="p-2 border-b dark:border-gray-700 min-w-[70px]">{header}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+            {projectData.map((project, index) => (
+              <motion.tr
+                key={project.id}
+                className="hover:bg-gray-50 dark:hover:bg-[#252535] transition duration-150"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 * index }}
+              >
+                <td className="p-2 font-mono text-xs text-gray-500 dark:text-gray-400">{project.id}</td>
+                <td className="p-2 font-medium text-gray-900 dark:text-gray-100">{project.name}</td>
+                <td className="p-2"><ProjectAvatarStack teamMembers={project.team} /></td>
+                {/* <td className="p-2"><ProjectProgressBar current={project.hours} total={project.totalHours} /></td> */}
+                <td className="p-2 text-gray-600 dark:text-gray-300 min-w-[100px]">{project.deadline}</td>
+                <td className="p-2"><PriorityBadge priority={project.priority} /></td>
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </motion.div>
+  );
 };
 
 // --- Tasks Statistics Component ---
 const TasksStatisticsChart = () => {
-    // Total percentage for visualization (sum of values in taskStatsChartData)
-    const chartHeight = 250;
-    const innerRadius = 90;
-    const outerRadius = 130;
-    
-    // Function to handle the calendar icon click (placeholder)
-    const handleCalendarClick = () => {
-        console.log("Showing this week's tasks");
-    };
+  // Total percentage for visualization (sum of values in taskStatsChartData)
+  const chartHeight = 250;
+  const innerRadius = 90;
+  const outerRadius = 130;
 
-    return (
-        <motion.div 
-            className="bg-white dark:bg-[#1E1E2E] border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-xl col-span-1 flex flex-col"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+  // Function to handle the calendar icon click (placeholder)
+  const handleCalendarClick = () => {
+    console.log("Showing this week's tasks");
+  };
+
+  return (
+    <motion.div
+      className="bg-white dark:bg-[#1E1E2E] border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-xl col-span-1 flex flex-col"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.4 }}
+    >
+      <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100 dark:border-gray-800">
+        <h3 className="text-xl font-semibold">Tasks Statistics</h3>
+        <button
+          className="btn btn-sm text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 flex items-center"
+          onClick={handleCalendarClick}
         >
-            <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100 dark:border-gray-800">
-                <h3 className="text-xl font-semibold">Tasks Statistics</h3>
-                <button 
-                    className="btn btn-sm text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 flex items-center"
-                    onClick={handleCalendarClick}
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    This Week
-                </button>
-            </div>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          This Week
+        </button>
+      </div>
 
-            {/* Chart Area */}
-            <div className="relative flex-grow">
-                <ResponsiveContainer width="100%" height={chartHeight}>
-                    <PieChart>
-                        <Pie
-                            data={taskStatsChartData}
-                            dataKey="value"
-                            nameKey="name"
-                            cx="50%"
-                            cy="100%"
-                            startAngle={180}
-                            endAngle={0}
-                            innerRadius={innerRadius} 
-                            outerRadius={outerRadius}
-                            paddingAngle={3}
-                            cornerRadius={15} // Rounded corners
-                            isAnimationActive={true}
-                        >
-                            {taskStatsChartData.map((entry, index) => (
-                                <Cell key={`task-cell-${index}`} fill={entry.color} stroke={entry.color} />
-                            ))}
-                        </Pie>
-                        <Tooltip content={<CustomTooltip />} />
-                    </PieChart>
-                </ResponsiveContainer>
-                
-                {/* Center Text Overlay for Tasks */}
-                <div className="absolute top-[calc(50%_-_25px)] left-1/2 -translate-x-1/2 -translate-y-1/2 transform text-center pb-20 pointer-events-none">
-                    <p className="text-xl text-gray-500 dark:text-gray-400 font-medium">Total Tasks</p>
-                    <p className="text-3xl font-extrabold text-gray-800 dark:text-gray-100 mt-1">
-                        {completedTasks}/{totalTasks}
-                    </p>
-                </div>
-            </div>
+      {/* Chart Area */}
+      <div className="relative flex-grow">
+        <ResponsiveContainer width="100%" height={chartHeight}>
+          <PieChart>
+            <Pie
+              data={taskStatsChartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="100%"
+              startAngle={180}
+              endAngle={0}
+              innerRadius={innerRadius}
+              outerRadius={outerRadius}
+              paddingAngle={3}
+              cornerRadius={15} // Rounded corners
+              isAnimationActive
 
-            {/* Task Legend/Percentage Grid */}
-            <div className="grid grid-cols-2 gap-4 text-center text-sm mt-4">
-                {/* Percentages based on image layout */}
-                {[
-                    { name: "Ongoing", color: taskStatsChartData[0].color, percentage: 40 },
-                    { name: "On Hold", color: taskStatsChartData[3].color, percentage: 10 },
-                    { name: "Overdue", color: taskStatsChartData[2].color, percentage: 16 },
-                    { name: "In Progress", color: taskStatsChartData[1].color, percentage: 24 }
-                ].map((stat, index) => (
-                    <div key={index} className="flex flex-col items-center">
-                        <span className="font-bold text-lg" style={{ color: stat.color }}>{stat.percentage}%</span>
-                        <span className="text-gray-500 dark:text-gray-400">{stat.name}</span>
-                    </div>
-                ))}
-            </div>
-
-            {/* Hours Spent Card (Dark Footer) */}
-            <motion.div 
-                className="mt-6 p-4 rounded-xl flex justify-between items-center bg-gray-800 text-white dark:bg-gray-900 dark:text-white"
-                whileHover={{ scale: 1.03, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)" }}
-                transition={{ type: "spring", stiffness: 300 }}
             >
-                <div>
-                    <p className="text-3xl font-extrabold">{totalHoursSpent}/{totalHoursBudget} hrs</p>
-                    <p className="text-sm font-medium opacity-80">Spent on Overall Tasks This Week</p>
-                </div>
-                <button className="btn btn-sm bg-white text-gray-800 hover:bg-gray-200 border-none rounded-lg font-semibold">
-                    View All
-                </button>
-            </motion.div>
-        </motion.div>
-    );
+              {taskStatsChartData.map((entry, index) => (
+                <Cell key={`task-cell-${index}`} fill={entry.color} stroke={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+          </PieChart>
+        </ResponsiveContainer>
+
+        {/* Center Text Overlay for Tasks */}
+        <div className="absolute top-[calc(50%_-_25px)] left-1/2 -translate-x-1/2 -translate-y-1/2 transform text-center pb-20 pointer-events-none">
+          <p className="text-xl text-gray-500 dark:text-gray-400 font-medium">Total Tasks</p>
+          <p className="text-3xl font-extrabold text-gray-800 dark:text-gray-100 mt-1">
+            {completedTasks}/{totalTasks}
+          </p>
+        </div>
+      </div>
+
+      {/* Task Legend/Percentage Grid */}
+      <div className="grid grid-cols-2 gap-4 text-center text-sm mt-4">
+        {/* Percentages based on image layout */}
+        {[
+          { name: "Ongoing", color: taskStatsChartData[0].color, percentage: 40 },
+          { name: "On Hold", color: taskStatsChartData[3].color, percentage: 10 },
+          { name: "Overdue", color: taskStatsChartData[2].color, percentage: 16 },
+          { name: "In Progress", color: taskStatsChartData[1].color, percentage: 24 }
+        ].map((stat, index) => (
+          <div key={index} className="flex flex-col items-center">
+            <span className="font-bold text-lg" style={{ color: stat.color }}>{stat.percentage}%</span>
+            <span className="text-gray-500 dark:text-gray-400">{stat.name}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Hours Spent Card (Dark Footer) */}
+      <motion.div
+        className="mt-6 p-4 rounded-xl flex justify-between items-center bg-gray-800 text-white dark:bg-gray-900 dark:text-white"
+        whileHover={{ scale: 1.03, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)" }}
+        transition={{ type: "spring", stiffness: 300 }}
+      >
+        <div>
+          <p className="text-3xl font-extrabold">{totalHoursSpent}/{totalHoursBudget} hrs</p>
+          <p className="text-sm font-medium opacity-80">Spent on Overall Tasks This Week</p>
+        </div>
+        <button className="btn btn-sm bg-white text-gray-800 hover:bg-gray-200 border-none rounded-lg font-semibold">
+          View All
+        </button>
+      </motion.div>
+    </motion.div>
+  );
 };
 
 
@@ -357,7 +359,7 @@ export default function Overview() {
   return (
     // Added base styling for a clean dark/light mode background
     <div className="space-y-6 p-4 md:p-8 min-h-screen  text-gray-800 dark:text-gray-200">
-      
+
       {/* Title */}
       <h2 className="text-3xl font-bold">Dashboard Overview</h2>
 
@@ -377,7 +379,7 @@ export default function Overview() {
 
       {/* --- First Row: Charts Section (3 Columns on desktop) --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
+
         {/* ==== 1. Total Employees (Pie Chart with Custom Legend) ==== */}
         <motion.div
           className="bg-white dark:bg-[#1E1E2E] border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-xl flex flex-col items-center"
@@ -427,31 +429,31 @@ export default function Overview() {
           </div>
 
           <div className="relative h-[180px]"> {/* fixed height */}
-  <ResponsiveContainer width="100%" height="100%">
-    <PieChart>
-      <Pie
-        data={attendanceData}
-        dataKey="value"
-        nameKey="name"
-        cx="50%"
-        cy="100%"
-        startAngle={180}
-        endAngle={0}
-        innerRadius={70}
-        outerRadius={105}
-        paddingAngle={3}
-        cornerRadius={10}
-        isAnimationActive={true}
-      >
-        {attendanceData.map((entry, index) => (
-          <Cell key={`att-cell-${index}`} fill={entry.color} stroke={entry.color} />
-        ))}
-      </Pie>
-      <Tooltip content={<CustomTooltip />} />
-    </PieChart>
-  </ResponsiveContainer>
-  <TotalAttendanceOverlay value={totalAttendance} label="Total Attendance" />
-</div>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={attendanceData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="100%"
+                  startAngle={180}
+                  endAngle={0}
+                  innerRadius={70}
+                  outerRadius={105}
+                  paddingAngle={3}
+                  cornerRadius={10}
+                  isAnimationActive={true}
+                >
+                  {attendanceData.map((entry, index) => (
+                    <Cell key={`att-cell-${index}`} fill={entry.color} stroke={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+            <TotalAttendanceOverlay value={totalAttendance} label="Total Attendance" />
+          </div>
 
 
           {/* Status and Details Legend (Styled to match the image's layout) */}
@@ -465,11 +467,11 @@ export default function Overview() {
                     <span className="text-gray-600 dark:text-gray-300">{entry.name}</span>
                   </div>
                   {/* Calculation based on totalAttendance */}
-                  <span className="font-semibold">{Math.round((entry.value / totalAttendance) * 100)}%</span> 
+                  <span className="font-semibold">{Math.round((entry.value / totalAttendance) * 100)}%</span>
                 </div>
               ))}
             </div>
-            
+
             <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Absentees</p>
               <div className="flex items-center space-x-2">
@@ -495,10 +497,10 @@ export default function Overview() {
           transition={{ type: "spring", stiffness: 300 }}
         >
           <h3 className="text-xl font-semibold mb-4 w-full">Employee Structure</h3>
-          
+
           {/* Vertical alignment for the two rings to match the image */}
           <div className="flex flex-col space-y-8 w-full items-center py-4">
-            
+
             {/* Male Structure (60%) */}
             <div className="flex flex-col items-center w-full relative">
               <ResponsiveContainer width={150} height={150}>
@@ -507,23 +509,23 @@ export default function Overview() {
                   outerRadius="100%"
                   barSize={15}
                   data={[{ name: "Male", value: 60, fill: maleFemaleData[0].fill }]} // Single data point for single ring
-                  startAngle={90} 
+                  startAngle={90}
                   endAngle={-270} // Full circle progress track
                 >
-                  <RadialBar 
-                    minAngle={10} 
+                  <RadialBar
+                    minAngle={10}
                     background={{ fill: '#fde6d8' }} // Light orange track
-                    clockWise 
-                    dataKey="value" 
-                    cornerRadius={10} 
+                    clockWise
+                    dataKey="value"
+                    cornerRadius={10}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  <text 
-                    x={75} 
-                    y={75} 
-                    textAnchor="middle" 
-                    dominantBaseline="middle" 
-                    className="text-2xl font-bold" 
+                  <text
+                    x={75}
+                    y={75}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    style={{ fontSize: "20px", fontWeight: "bold" }}
                     fill={maleFemaleData[0].fill}
                   >
                     60%
@@ -544,20 +546,20 @@ export default function Overview() {
                   startAngle={90}
                   endAngle={-270}
                 >
-                  <RadialBar 
-                    minAngle={10} 
+                  <RadialBar
+                    minAngle={10}
                     background={{ fill: '#edd5fe' }} // Light purple track
-                    clockWise 
-                    dataKey="value" 
-                    cornerRadius={10} 
+                    clockWise
+                    dataKey="value"
+                    cornerRadius={10}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  <text 
-                    x={75} 
-                    y={75} 
-                    textAnchor="middle" 
-                    dominantBaseline="middle" 
-                    className="text-2xl font-bold" 
+                  <text
+                    x={75}
+                    y={75}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    className="text-2xl font-bold"
                     fill={maleFemaleData[1].fill}
                   >
                     40%
@@ -571,13 +573,12 @@ export default function Overview() {
 
         </motion.div>
       </div>
-      
+
       {/* --- Second Row: Projects & Tasks Section (2 Columns on desktop) --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ProjectsTable />
-          <TasksStatisticsChart />
+        <ProjectsTable />
+        <TasksStatisticsChart />
       </div>
-
-    </div>
+    </div >
   );
 }

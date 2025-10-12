@@ -176,7 +176,7 @@ export default function DashboardNavbar() {
   return (
     <>
       {/* Navbar */}
-      <header className="w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between shadow-md">
+      <header className=" fixed top-0 z-50 w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between shadow-md">
         {/* Left: Logo */}
         <Link href="/" className="group lg:block md:hidden">
           <div className="flex items-center space-x-3">
