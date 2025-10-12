@@ -2,8 +2,8 @@
 
 import { useContext } from "react";
 import CalendarSection from "../../Calender/CalenderSection";
+import ChatSection from"../../Chat/ChatSection";
 import Attendence from "../Attendence/Attendence";
-import Chat from "../Chat/Chat";
 import Overview from "../Overview/Overview";
 import Reports from "../Reports/Reports";
 import Tasks from "../Tasks/Tasks";
@@ -65,7 +65,7 @@ export default function DashboardContent({ activeItem }) {
       case "chat":
         return (
           <div className="p-6 bg-card border border-border rounded-xl shadow">
-            <Chat></Chat>
+         <ChatSection/>
           </div>
         );
 
