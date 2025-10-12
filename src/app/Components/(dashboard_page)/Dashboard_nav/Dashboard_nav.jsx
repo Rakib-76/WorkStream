@@ -2,7 +2,6 @@
 import {
   Upload,
   Smile,
-  Calendar,
   Waves,
   Bell,
   Settings,
@@ -15,10 +14,9 @@ import {
   UserPlus,
   X,
 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { motion, AnimatePresence } from "framer-motion";
-
 import { ThemeToggle } from "../../../Provider/ThemeToggle";
 import Button from "../../../Components/(dashboard_page)/UI/Button";
 import Image from "next/image";
@@ -28,6 +26,7 @@ import Swal from "sweetalert2";
 import { MemberInput } from "./MemberInput";
 import { Controller, useForm } from "react-hook-form";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
+import { DataContext } from "../../../../context/DataContext";
 
 export default function DashboardNavbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -36,7 +35,6 @@ export default function DashboardNavbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
   const [userProjects, setUserProjects] = useState([]);
-
   const { data: session } = useSession();
   const [selectedImage, setSelectedImage] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -46,30 +44,33 @@ export default function DashboardNavbar() {
   const axiosSecure = useAxiosSecure();
   const { control, register, handleSubmit } = useForm();
   const [manager, setManager] = useState(null);
-
+  const [loading, setLoading] = useState(false);
+  // data from Context
+  const { setSelectedProject, selectedProject } = useContext(DataContext);
   // Fetch user-specific projects
   useEffect(() => {
     const fetchUserProjects = async () => {
       if (!session?.user?.email) return;
 
       try {
+        setLoading(true);
         const res = await axiosSecure.get(`/api/projects?email=${session.user.email}`);
         if (res.data.success) {
-          // latest -> oldest
           const sortedProjects = res.data.data.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
           setUserProjects(sortedProjects);
         }
-      } catch (err) {
+      }
+      catch (err) {
         console.error("Error fetching user projects:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserProjects();
   }, [session?.user?.email, axiosSecure]);
-
-  console.log("User Projects (useState):", userProjects);
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -91,6 +92,8 @@ export default function DashboardNavbar() {
   // Logout handler
   const handleLogout = async () => {
     await signOut({ redirect: false });
+    // ✅  remove selectedProject from localStorage
+    localStorage.removeItem("selectedProject");
     Swal.fire({
       icon: "success",
       title: "Logged out!",
@@ -100,30 +103,26 @@ export default function DashboardNavbar() {
     }).then(() => (window.location.href = "/"));
   };
 
-  // creator info
+  // Fetch creator info
   useEffect(() => {
     const fetchCreatorInfo = async () => {
       if (!session?.user?.email) return;
-
       try {
         const { data: creatorInfo } = await axiosSecure.get(`/api/users?email=${session.user.email}`);
-
         const managerData = {
           id: creatorInfo?._id,
           name: creatorInfo?.name || session?.user?.name,
           email: creatorInfo?.email || session?.user?.email,
         };
-
-        setManager(managerData); // ✅ set state with creator info
+        setManager(managerData);
       } catch (error) {
         console.error("Error fetching creator info:", error);
       }
     };
-
     fetchCreatorInfo();
   }, [session?.user?.email]);
 
-
+  // Create project
   const onSubmit = async (data) => {
     try {
       const payload = {
@@ -143,7 +142,7 @@ export default function DashboardNavbar() {
           completed: 0,
           pending: 0,
         },
-        files: [], // initially empty
+        files: [],
         lastUpdated: new Date().toISOString(),
         logo: selectedImage || null,
         emoji: selectedEmoji || null,
@@ -174,7 +173,6 @@ export default function DashboardNavbar() {
     }
   };
 
-
   return (
     <>
       {/* Navbar */}
@@ -191,7 +189,7 @@ export default function DashboardNavbar() {
           </div>
         </Link>
 
-        {/* Middle: Search + Buttons */}
+        {/* Middle Section */}
         <div className="flex-1 flex justify-center items-center gap-3 max-w-lg">
           {/* Search */}
           <div
@@ -221,7 +219,7 @@ export default function DashboardNavbar() {
             <PlusCircle className="w-4 h-4" />
             Create
           </Button>
-          
+
           {/* Projects Dropdown */}
           <div className="relative" ref={projectsDropdownRef}>
             <button
@@ -238,50 +236,130 @@ export default function DashboardNavbar() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden z-50"
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 shadow-2xl rounded-2xl overflow-hidden z-50 border border-gray-100 dark:border-gray-700"
                 >
-                  {userProjects.length === 0 ? (
-                    <div className="p-3 text-sm text-gray-500">No projects found</div>
-                  ) : (
-                    <ul>
-                      {userProjects.map((project) => (
-                        <li key={project._id}>
-                          <Link
-                            href={`/projects/${project._id}`}
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
-                            onClick={() => setProjectsDropdownOpen(false)}
+                  {/* Header */}
+                  <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                      Your Projects
+                    </h4>
+                    <button
+                      onClick={() => setProjectsDropdownOpen(false)}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Content */}
+                  <div className="max-h-80 overflow-y-auto p-3 space-y-3">
+                    {loading ? (
+                      <div className="flex justify-center items-center py-6">
+                        <div className="w-10 h-10 border-4 border-dashed rounded-full animate-spin border-primary dark:border-default-600"></div>
+                      </div>
+                    ) : userProjects.length === 0 ? (
+                      <div className="text-center text-sm text-gray-500 py-4">
+                        No projects found
+                      </div>
+                    ) : (
+                      userProjects.map((project) => (
+                        <motion.div
+                          key={project._id}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <button
+                            onClick={() => {
+                              setSelectedProject(project);
+                              setProjectsDropdownOpen(false);
+                            }}
+                            className={`w-full text-left p-3 rounded-xl border transition-all ${selectedProject?._id === project._id
+                                ? "border-primary bg-primary/10 shadow-sm"
+                                : "border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                              }`}
                           >
-                            {project.projectName}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                            {/* Project Header */}
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className="font-medium text-gray-800 dark:text-gray-100 text-sm">
+                                {project.projectName}
+                              </h3>
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded-full ${project.priority === "High"
+                                    ? "bg-red-100 text-red-700 dark:bg-red-800/40 dark:text-red-300"
+                                    : project.priority === "Medium"
+                                      ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800/40 dark:text-yellow-300"
+                                      : "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
+                                  }`}
+                              >
+                                {project.priority}
+                              </span>
+                            </div>
+
+                            {/* Company + Manager */}
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              🏢 {project.companyName}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              👤 Manager: {project.manager?.name || "N/A"}
+                            </p>
+
+                            {/* Status & Dates */}
+                            <div className="flex justify-between items-center mt-2">
+                              <span
+                                className={`text-xs font-medium px-2 py-0.5 rounded-full ${project.status === "Active"
+                                    ? "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
+                                    : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                                  }`}
+                              >
+                                {project.status}
+                              </span>
+                              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                                📅 {new Date(project.startDate).getFullYear()} -{" "}
+                                {new Date(project.endDate).getFullYear()}
+                              </span>
+                            </div>
+                          </button>
+                        </motion.div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-200 dark:border-gray-700"></div>
+
+                  {/* ✅ Unselect Button */}
+                  <div className="p-3">
+                    <button
+                      onClick={() => {
+                        setSelectedProject(null);
+                        setProjectsDropdownOpen(false);
+                      }}
+                      className="w-full text-center px-4 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-all"
+                    >
+                      Unselect Project
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
+
+
+
           </div>
         </div>
 
-        {/* Right: Icons + Profile */}
+        {/* Right Section */}
         <div className="flex items-center gap-3 relative">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="rounded-full border-2 border-transparent hover:border-border transition-all duration-300"
-          >
+          <Button size="icon" variant="ghost">
             <Bell className="w-5 h-5" />
           </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="rounded-full border-2 border-transparent hover:border-border transition-all duration-300"
-          >
+          <Button size="icon" variant="ghost">
             <Settings className="w-5 h-5" />
           </Button>
           <ThemeToggle />
 
-          {/* Profile Avatar Dropdown */}
+          {/* Profile Avatar */}
           <div className="relative">
             <div
               className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary cursor-pointer"
@@ -356,32 +434,20 @@ export default function DashboardNavbar() {
         </div>
       </header>
 
-      {/* Create Modal */}
+      {/* Create Project Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full
-                    sm:max-w-md md:max-w-2xl lg:max-w-4xl mx-auto animate-fadeIn
-                    max-h-[90vh] overflow-y-auto">
-
-            {/* Header */}
-            {/* Modal Header */}
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full sm:max-w-4xl mx-auto max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-5 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Create New Project
-              </h2>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-500 hover:text-gray-800 dark:hover:text-white"
-              >
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Create New Project</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-gray-800 dark:hover:text-white">
                 <X size={20} />
               </button>
             </div>
 
-            {/* Body */}
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="lg:p-6 p-2 w-full grid gap-6
-                sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              className="lg:p-6 p-2 w-full grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
             >
               {/* Left Column */}
               <div className="space-y-5">
@@ -432,14 +498,12 @@ export default function DashboardNavbar() {
                     name="members"
                     control={control}
                     defaultValue={[]}
-                    render={({ field }) => (
-                      <MemberInput value={field.value} onChange={field.onChange} />
-                    )}
+                    render={({ field }) => <MemberInput value={field.value} onChange={field.onChange} />}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Date Range</label>
-                  <div className=" items-center gap-2">
+                  <div className="items-center gap-2">
                     <input
                       {...register("startDate")}
                       type="date"
@@ -491,41 +555,31 @@ export default function DashboardNavbar() {
                   ) : selectedEmoji ? (
                     <span className="text-6xl">{selectedEmoji}</span>
                   ) : (
-                    <>
-                      <Upload size={24} />
-                      <p className="mt-2 text-sm">Upload project logo</p>
-                      <span className="text-xs">Min 600×600 PNG or JPEG</span>
-                    </>
+                    "Preview"
                   )}
+                </div>
 
-                  {showEmojiPicker && (
-                    <div className="absolute z-50 top-16 w-80 p-3 bg-white dark:bg-gray-800 shadow-lg rounded-xl">
-                      <EmojiPicker
-                        onEmojiClick={(emojiData) => {
-                          setSelectedEmoji(emojiData.emoji);
-                          setSelectedImage(null);
-                          setShowEmojiPicker(false);
-                        }}
-                      />
-                    </div>
-                  )}
+                {showEmojiPicker && (
+                  <div className="absolute bottom-[-250px] right-0 z-50">
+                    <EmojiPicker
+                      onEmojiClick={(e) => {
+                        setSelectedEmoji(e.emoji);
+                        setShowEmojiPicker(false);
+                      }}
+                    />
+                  </div>
+                )}
+
+                <div className="flex justify-end pt-5">
+                  <Button type="submit" size="sm" className="px-6 py-3">
+                    Create Project
+                  </Button>
                 </div>
               </div>
             </form>
-
-            {/* Footer */}
-            <div className="flex justify-end gap-3 p-5 border-t border-gray-200 dark:border-gray-700">
-              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button className="bg-primary text-white" onClick={handleSubmit(onSubmit)}>
-                Create
-              </Button>
-            </div>
           </div>
         </div>
       )}
-
     </>
   );
 }

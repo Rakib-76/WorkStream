@@ -1,5 +1,7 @@
 "use client";
 
+import { useContext } from "react";
+import CalendarSection from "../../Calender/CalenderSection";
 import Attendence from "../Attendence/Attendence";
 import Chat from "../Chat/Chat";
 import Overview from "../Overview/Overview";
@@ -7,8 +9,23 @@ import Reports from "../Reports/Reports";
 import Tasks from "../Tasks/Tasks";
 import Team from "../Team/Team";
 import Todo from "../Todo/Todo";
+import { DataContext } from "../../../../context/DataContext";
 
 export default function DashboardContent({ activeItem }) {
+
+  const { selectedProject } = useContext(DataContext);
+
+  if (!selectedProject) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center p-6">
+        <h2 className="text-lg font-bold">No Project Selected</h2>
+        <p className="text-muted-foreground mt-2">
+          Please select a project to view data.
+        </p>
+      </div>
+    );
+  }
+
   const renderContent = () => {
     switch (activeItem) {
       case "overview":
@@ -27,24 +44,21 @@ export default function DashboardContent({ activeItem }) {
       case "attendence":
         return (
           <div>
-           <Attendence></Attendence>
+            <Attendence></Attendence>
           </div>
         );
 
       case "calendar":
         return (
           <div className="p-6 bg-card border border-border rounded-xl shadow">
-            <h3 className="text-lg font-bold">📅 Calendar</h3>
-            <p className="text-muted-foreground mt-2">
-              Here will be your upcoming events and schedules.
-            </p>
+            <CalendarSection />
           </div>
         );
 
       case "todo":
         return (
           <div className="">
-           <Todo></Todo>
+            <Todo></Todo>
           </div>
         );
 
@@ -67,9 +81,9 @@ export default function DashboardContent({ activeItem }) {
 
       case "team":
         return (
-         <div>
+          <div>
             <Team></Team>
-         </div>
+          </div>
         );
 
       case "notes":
@@ -85,7 +99,7 @@ export default function DashboardContent({ activeItem }) {
       case "reports":
         return (
           <div className="p-6 bg-card border border-border rounded-xl  shadow">
-           <Reports></Reports>
+            <Reports></Reports>
           </div>
         );
 
