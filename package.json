@@ -64,12 +64,8 @@
     "daisyui": "^5.1.27",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
-<<<<<<< HEAD
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.0.0",
-=======
     "tailwindcss": "^4.1.14",
->>>>>>> cd19ca364bd576a4aa6895fe285e1542a6ef8729
     "typescript": "5.9.2"
   }
 }
