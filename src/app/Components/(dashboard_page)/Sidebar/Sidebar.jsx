@@ -16,13 +16,16 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { DataContext } from "../../../../context/DataContext";
 
-export default function Sidebar({ activeItem, setActiveItem, selectedProject }) {
+export default function Sidebar({ activeItem, setActiveItem }) {
   const [collapsed, setCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
+  //selectedProject project data from context
+  const {selectedProject} = useContext(DataContext);
 
   // Handle responsive collapse
   useEffect(() => {
