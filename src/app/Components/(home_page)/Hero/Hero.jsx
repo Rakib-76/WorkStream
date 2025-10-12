@@ -18,7 +18,7 @@ export function Hero() {
   // Handle getstarted button protect dashboard protect
   const handleGetStarted = () => {
     if (session) {
-      router.push("dashboard");
+      router.push("Dashboard");
     } else {
       router.push("/login");
     }
