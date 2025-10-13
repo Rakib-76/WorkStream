@@ -50,14 +50,14 @@ export default function RegisterForm() {
 
   // 🔥 Submit form
   const onSubmit = async (data) => {
-    // 1️⃣ register user
+      setLoading(true);
     const result = await registerUser({
       name: data.name,
       email: data.email,
       password: data.password,
       image: profilePic,
     });
-
+   
     if (result?.success) {
       // 2️⃣ auto login after registration
       const loginResult = await signIn("credentials", {
@@ -79,6 +79,7 @@ export default function RegisterForm() {
           timer: 2000,
           showConfirmButton: false,
         });
+        setLoading(false);
         router.refresh();
         setTimeout(() => router.push("/"), 1500);
       }
