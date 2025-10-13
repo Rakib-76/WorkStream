@@ -45,21 +45,34 @@ export default function Tasks() {
     : tasks.filter((task) => task.assignedTo === currentUser);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 py-16">
       {/* Tabs */}
-      <div className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 pt-1.5 text-sm font-medium ring-offset-background transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-muted-foreground ">
-        <button
-          className={`px-4 py-2 rounded-t ${activeTab === "all" ? "bg-background font-semibold" : ""}`}
-          onClick={() => setActiveTab("all")}
-        >
-          All Tasks
-        </button>
-        <button
-          className={`px-4 py-2 rounded-t ${activeTab === "my" ? "bg-background font-semibold" : ""}`}
-          onClick={() => setActiveTab("my")}
-        >
-          My Tasks
-        </button>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 pt-1.5 text-sm font-medium ring-offset-background transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-muted-foreground ">
+            <button
+              className={`px-4 py-2 rounded-t ${activeTab === "all" ? "bg-background font-semibold" : ""}`}
+              onClick={() => setActiveTab("all")}
+            >
+              My Tasks
+            </button>
+            <button
+              className={`px-4 py-2 rounded-t ${activeTab === "my" ? "bg-background font-semibold" : ""}`}
+              onClick={() => setActiveTab("my")}
+            >
+              All Tasks
+            </button>
+          </div>
+        </div>
+        <div>
+          <button
+            className="ml-auto flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition"
+            onClick={() => toast("Add Task clicked")}
+          >
+            <Plus className="w-4 h-4" />
+            Add Task
+          </button>
+        </div>
       </div>
 
       {/* Tasks Table */}
@@ -72,7 +85,7 @@ export default function Tasks() {
 function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
   return (
     <Card className="glass-card shadow-lg border border-gray-200 dark:border-gray-700">
-      
+
       <CardContent className="p-0 overflow-x-auto">
         <table className="w-full border-collapse min-w-[700px]">
           <thead className="bg-gray-100 dark:bg-gray-800">
