@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, MoreVertical, Edit, Trash2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../Components/(home_page)/UI/card";
+import { Card, CardContent } from "../../../Components/(home_page)/UI/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +9,9 @@ import {
   DropdownMenuTrigger,
 } from "../../../Components/(home_page)/UI/dropdown-menu";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import useAxiosSecure from "../../../../lib/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
 
 // ✅ Dummy tasks
 const initialTasks = [
@@ -21,6 +24,22 @@ export default function Tasks() {
   const [tasks, setTasks] = useState(initialTasks);
   const [activeTab, setActiveTab] = useState("all");
   const currentUser = "Abid"; // dynamically change if needed
+  const { data: session, status } = useSession();
+  const axiosSecure = useAxiosSecure();
+  const userEmail = session?.user?.email;
+
+  // ✅ Fetch projects
+  const { data: projects = [], isLoading } = useQuery({
+    queryKey: ["projects"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/api/projects");
+      return res.data;
+    },
+  });
+
+  // ✅ Check if current user is creator of any project
+
+  console.log(projects, userEmail);
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -64,15 +83,18 @@ export default function Tasks() {
             </button>
           </div>
         </div>
-        <div>
-          <button
-            className="ml-auto flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition"
-            onClick={() => toast("Add Task clicked")}
-          >
-            <Plus className="w-4 h-4" />
-            Add Task
-          </button>
-        </div>
+        {/* ✅ Conditional Add Task Button */}
+        {/* {canAddTask && (
+          <div>
+            <button
+              className="ml-auto flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition"
+              onClick={() => toast("Add Task clicked")}
+            >
+              <Plus className="w-4 h-4" />
+              Add Task
+            </button>
+          </div>
+        )} */}
       </div>
 
       {/* Tasks Table */}
