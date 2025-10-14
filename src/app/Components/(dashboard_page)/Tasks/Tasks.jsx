@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Plus, MoreVertical, Edit, Trash2 } from "lucide-react";
-import { Card, CardContent } from "../../../Components/(home_page)/UI/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../Components/(home_page)/UI/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,22 +24,28 @@ export default function Tasks() {
   const [tasks, setTasks] = useState(initialTasks);
   const [activeTab, setActiveTab] = useState("all");
   const currentUser = "Abid"; // dynamically change if needed
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const axiosSecure = useAxiosSecure();
   const userEmail = session?.user?.email;
+  const [isCreatedByUser, setIsCreatedByUser] = useState(false);
 
-  // ✅ Fetch projects
-  const { data: projects = [], isLoading } = useQuery({
+  // ✅ Fetch all projects
+  const { data: projects = [], isLoading, isError } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
       const res = await axiosSecure.get("/api/projects");
       return res.data;
     },
   });
+useEffect(() => {
+  if (projects?.data?.length && userEmail) {
+    const found = projects?.data?.some(project => project.createdBy === userEmail);
+    setIsCreatedByUser(found);
+  }
+}, [projects, userEmail]);
 
-  // ✅ Check if current user is creator of any project
 
-  console.log(projects, userEmail);
+console.log(isCreatedByUser);
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -83,18 +89,19 @@ export default function Tasks() {
             </button>
           </div>
         </div>
-        {/* ✅ Conditional Add Task Button */}
-        {/* {canAddTask && (
-          <div>
-            <button
-              className="ml-auto flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition"
-              onClick={() => toast("Add Task clicked")}
-            >
-              <Plus className="w-4 h-4" />
-              Add Task
-            </button>
-          </div>
-        )} */}
+        {
+          isCreatedByUser && (
+            <div>
+              <button
+                className="ml-auto flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition"
+                onClick={() => toast("Add Task clicked")}
+              >
+                <Plus className="w-4 h-4" />
+                Add Task
+              </button>
+            </div>
+          )
+        }
       </div>
 
       {/* Tasks Table */}
