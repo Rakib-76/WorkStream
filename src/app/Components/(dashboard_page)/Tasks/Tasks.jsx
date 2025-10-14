@@ -44,8 +44,9 @@ useEffect(() => {
   }
 }, [projects, userEmail]);
 
-
-console.log(isCreatedByUser);
+const handleAddTask = () => {
+  alert("Add Task clicked");
+} 
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -94,7 +95,7 @@ console.log(isCreatedByUser);
             <div>
               <button
                 className="ml-auto flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition"
-                onClick={() => toast("Add Task clicked")}
+                onClick={() => handleAddTask()}
               >
                 <Plus className="w-4 h-4" />
                 Add Task
