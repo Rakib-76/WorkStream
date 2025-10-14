@@ -1,6 +1,20 @@
 import { NextResponse } from "next/server";
 import dbConnect, { collectionNameObj } from "../../../lib/dbConnect";
 
+// 🟢 GET - Get all tasks
+export async function GET() {
+    try {
+        const taskCollection = dbConnect(collectionNameObj.taskCollection);
+        const tasks = await taskCollection.find().toArray();
+        return NextResponse.json({ success: true, data: tasks });
+    } catch (error) {
+        console.error("Error fetching tasks:", error);
+        return NextResponse.json(
+            { success: false, message: "Failed to fetch tasks" },
+            { status: 500 }
+        );
+    }
+}
 
 // 🟢 POST - Add a new task
 export async function POST(req) {
