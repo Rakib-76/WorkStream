@@ -21,30 +21,12 @@ const initialTasks = [
 ];
 
 export default function Tasks() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tasks, setTasks] = useState(initialTasks);
   const [activeTab, setActiveTab] = useState("all");
   const { data: session } = useSession();
   const axiosSecure = useAxiosSecure();
   const userEmail = session?.user?.email;
   const [isCreatedByUser, setIsCreatedByUser] = useState(false);
 
-  // ✅ Fetch all projects
-  const { data: projects = [], isLoading, isError } = useQuery({
-    queryKey: ["projects"],
-    queryFn: async () => {
-      const res = await axiosSecure.get("/api/projects");
-      return res.data;
-    },
-  });
-
-  // ✅ Check if the user is the creator of any project
-  useEffect(() => {
-    if (projects?.data?.length && userEmail) {
-      const found = projects?.data?.some(project => project.createdBy === userEmail);
-      setIsCreatedByUser(found);
-    }
-  }, [projects, userEmail]);
 
   // ✅ Fetch all tasks
   const { data: tasksData = [], refetch } = useQuery({
@@ -83,35 +65,20 @@ export default function Tasks() {
     <div className="space-y-6 py-16">
       {/* Tabs */}
       <div className="flex items-center justify-between">
-        <div>
-          <div className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 pt-1.5 text-sm font-medium ring-offset-background transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-muted-foreground ">
-            <button
-              className={`px-4 py-2 rounded-t ${activeTab === "my" ? "bg-background font-semibold" : ""}`}
-              onClick={() => setActiveTab("my")}
-            >
-              My Tasks
-            </button>
-            <button
-              className={`px-4 py-2 rounded-t ${activeTab === "all" ? "bg-background font-semibold" : ""}`}
-              onClick={() => setActiveTab("all")}
-            >
-              All Tasks
-            </button>
-          </div>
+        <div className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 pt-1.5 text-sm font-medium ring-offset-background transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-muted-foreground ">
+          <button
+            className={`px-4 py-2 rounded-t ${activeTab === "my" ? "bg-background font-semibold" : ""}`}
+            onClick={() => setActiveTab("my")}
+          >
+            My Tasks
+          </button>
+          <button
+            className={`px-4 py-2 rounded-t ${activeTab === "all" ? "bg-background font-semibold" : ""}`}
+            onClick={() => setActiveTab("all")}
+          >
+            All Tasks
+          </button>
         </div>
-        {
-          isCreatedByUser && (
-            <div>
-              <button
-                className="ml-auto flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition"
-                onClick={() => setIsModalOpen(true)}
-              >
-                <Plus className="w-4 h-4" />
-                Add Task
-              </button>
-            </div>
-          )
-        }
       </div>
 
       {/* Tasks Table */}
@@ -119,11 +86,7 @@ export default function Tasks() {
         getPriorityColor={getPriorityColor}
         getStatusColor={getStatusColor}
       />
-      <AddTaskFormModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onTaskAdded={refetch}
-      />
+      \
     </div>
   );
 }
