@@ -21,10 +21,9 @@ const initialTasks = [
 ];
 
 export default function Tasks() {
-      const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [tasks, setTasks] = useState(initialTasks);
   const [activeTab, setActiveTab] = useState("all");
-  const currentUser = "Abid"; // dynamically change if needed
   const { data: session } = useSession();
   const axiosSecure = useAxiosSecure();
   const userEmail = session?.user?.email;
@@ -38,12 +37,25 @@ export default function Tasks() {
       return res.data;
     },
   });
+
+  // ✅ Check if the user is the creator of any project
   useEffect(() => {
     if (projects?.data?.length && userEmail) {
       const found = projects?.data?.some(project => project.createdBy === userEmail);
       setIsCreatedByUser(found);
     }
   }, [projects, userEmail]);
+
+  // ✅ Fetch all tasks
+    const { data: tasksData = [], refetch } = useQuery({
+        queryKey: ["tasks"],
+        queryFn: async () => {
+            const res = await axiosSecure.get("/api/tasks");
+            return res.data.data;
+        },
+    });
+
+
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -64,8 +76,8 @@ export default function Tasks() {
   };
 
   const displayedTasks = activeTab === "all"
-    ? tasks
-    : tasks.filter((task) => task.assignedTo === currentUser);
+    ? tasksData
+    : tasksData.filter((task) => task.assignedTo === userEmail);
 
   return (
     <div className="space-y-3 py-16">
@@ -104,7 +116,12 @@ export default function Tasks() {
 
       {/* Tasks Table */}
       <TaskTable tasks={displayedTasks} getPriorityColor={getPriorityColor} getStatusColor={getStatusColor} />
-      <AddTaskFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} projectId={null}  />
+      <AddTaskFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        projectId={null}
+        onTaskAdded={refetch}
+      />
     </div>
   );
 }

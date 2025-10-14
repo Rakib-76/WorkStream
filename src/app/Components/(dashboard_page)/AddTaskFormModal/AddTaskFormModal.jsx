@@ -23,9 +23,9 @@ export default function AddTaskFormModal({ isOpen, onClose, projectId, onTaskAdd
         try {
             await axiosSecure.post("/api/tasks", newTask);
             Swal.fire({ icon: "success", title: "Task Added Successfully!", showConfirmButton: false, timer: 1500 });
-            // reset();
-            // onClose();
-            // onTaskAdded();
+            reset();
+            onClose();
+            onTaskAdded();
         } catch (error) {
             Swal.fire({ icon: "error", title: "Failed to Add Task!", text: error.message });
         }
