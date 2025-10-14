@@ -119,7 +119,7 @@ export default function AddTaskFormModal({ isOpen, onClose, onTaskAdded }) {
                                         <div>
                                             <label className="block text-sm font-medium mb-1">Assignee</label>
                                             <Controller
-                                                name="assignee"
+                                                name="assignedTo"
                                                 control={control}
                                                 defaultValue={[]}
                                                 render={({ field }) => (
