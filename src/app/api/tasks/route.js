@@ -5,7 +5,13 @@ import dbConnect, { collectionNameObj } from "../../../lib/dbConnect";
 export async function GET() {
     try {
         const taskCollection = dbConnect(collectionNameObj.taskCollection);
-        const tasks = await taskCollection.find().toArray();
+
+        // ✅ Sort by createdAt (descending order)
+        const tasks = await taskCollection
+            .find()
+            .sort({ createdAt: -1 }) // -1 = latest first
+            .toArray();
+
         return NextResponse.json({ success: true, data: tasks });
     } catch (error) {
         console.error("Error fetching tasks:", error);
@@ -15,6 +21,7 @@ export async function GET() {
         );
     }
 }
+
 
 // 🟢 POST - Add a new task
 export async function POST(req) {
