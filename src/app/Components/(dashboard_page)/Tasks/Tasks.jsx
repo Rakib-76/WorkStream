@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
-
+import AddTaskFormModal from "../AddTaskFormModal/AddTaskFormModal";
 // ✅ Dummy tasks
 const initialTasks = [
   { id: 1, title: "Design Landing Page", priority: "High", status: "In Progress", assignedTo: "Abid", deadline: "2025-10-10" },
@@ -21,6 +21,7 @@ const initialTasks = [
 ];
 
 export default function Tasks() {
+      const [isModalOpen, setIsModalOpen] = useState(false);
   const [tasks, setTasks] = useState(initialTasks);
   const [activeTab, setActiveTab] = useState("all");
   const currentUser = "Abid"; // dynamically change if needed
@@ -37,16 +38,12 @@ export default function Tasks() {
       return res.data;
     },
   });
-useEffect(() => {
-  if (projects?.data?.length && userEmail) {
-    const found = projects?.data?.some(project => project.createdBy === userEmail);
-    setIsCreatedByUser(found);
-  }
-}, [projects, userEmail]);
-
-const handleAddTask = () => {
-  alert("Add Task clicked");
-} 
+  useEffect(() => {
+    if (projects?.data?.length && userEmail) {
+      const found = projects?.data?.some(project => project.createdBy === userEmail);
+      setIsCreatedByUser(found);
+    }
+  }, [projects, userEmail]);
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -95,7 +92,7 @@ const handleAddTask = () => {
             <div>
               <button
                 className="ml-auto flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition"
-                onClick={() => handleAddTask()}
+                onClick={() => setIsModalOpen(true)}
               >
                 <Plus className="w-4 h-4" />
                 Add Task
@@ -107,6 +104,7 @@ const handleAddTask = () => {
 
       {/* Tasks Table */}
       <TaskTable tasks={displayedTasks} getPriorityColor={getPriorityColor} getStatusColor={getStatusColor} />
+      <AddTaskFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} projectId={null}  />
     </div>
   );
 }

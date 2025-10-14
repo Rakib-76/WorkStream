@@ -6,7 +6,7 @@ import { X, Calendar, Tag, UserPlus, Flag, Clock } from "lucide-react";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 
-export default function AddTaskModal({ isOpen, onClose, projectId, onTaskAdded }) {
+export default function AddTaskFormModal({ isOpen, onClose, projectId, onTaskAdded }) {
     const axiosSecure = useAxiosSecure();
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
@@ -18,13 +18,14 @@ export default function AddTaskModal({ isOpen, onClose, projectId, onTaskAdded }
             lastUpdated: new Date(),
             tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
         };
+        console.log("New Task Data:", newTask);
 
         try {
             await axiosSecure.post("/api/tasks", newTask);
             Swal.fire({ icon: "success", title: "Task Added Successfully!", showConfirmButton: false, timer: 1500 });
-            reset();
-            onClose();
-            onTaskAdded();
+            // reset();
+            // onClose();
+            // onTaskAdded();
         } catch (error) {
             Swal.fire({ icon: "error", title: "Failed to Add Task!", text: error.message });
         }

@@ -1,32 +1,32 @@
 import { NextResponse } from "next/server";
-import dbConnect from "../../../lib/dbConnect"; // তোমার MongoDB client
+import dbConnect, { collectionNameObj } from "../../../lib/dbConnect";
 
+
+// 🟢 POST - Add a new task
 export async function POST(req) {
     try {
-        const taskData = await req.json();
+        const data = await req.json();
 
-        if (!taskData || !taskData.projectId || !taskData.title || !taskData.startDate || !taskData.deadline) {
-            return NextResponse.json(
-                { error: "Missing required fields (projectId, title, startDate, deadline)" },
-                { status: 400 }
-            );
-        }
+        const tasksCollection = dbConnect(collectionNameObj.taskCollection);
 
-        // Auto timestamps
-        taskData.createdAt = new Date();
-        taskData.lastUpdated = new Date();
+        const result = await tasksCollection.insertOne({
+            ...data,
+            createdAt: new Date(),
+            lastUpdated: new Date(),
+        });
 
-        // Tags string থেকে array convert
-        if (taskData.tags && typeof taskData.tags === "string") {
-            taskData.tags = taskData.tags.split(",").map((tag) => tag.trim());
-        }
-
-        const collection = await dbConnect("tasks"); // dynamic collection: "tasks"
-        const result = await collection.insertOne(taskData);
-
-        return NextResponse.json({ success: true, data: result }, { status: 200 });
+        return NextResponse.json(
+            {
+                message: "✅ Task created successfully!",
+                insertedId: result.insertedId,
+            },
+            { status: 201 }
+        );
     } catch (error) {
-        console.error("Error creating task:", error);
-        return NextResponse.json({ error: "Failed to create task" }, { status: 500 });
+        console.error("❌ Task API Error:", error);
+        return NextResponse.json(
+            { message: "Failed to create task", error: error.message },
+            { status: 500 }
+        );
     }
 }

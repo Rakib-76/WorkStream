@@ -11,7 +11,7 @@ import Swal from "sweetalert2";
 export default function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const callbackUrl = searchParams.get("callbackUrl") || "/Dashboard";
+    const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [loading, setLoading] = useState(false);
 
