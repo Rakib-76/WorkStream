@@ -7,6 +7,28 @@ import Swal from "sweetalert2";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 
 export default function AddTaskModal({ isOpen, onClose, projectId, onTaskAdded }) {
+    const axiosSecure = useAxiosSecure();
+    const { register, handleSubmit, reset, formState: { errors } } = useForm();
+
+    const onSubmit = async (data) => {
+        const newTask = {
+            ...data,
+            projectId,
+            createdAt: new Date(),
+            lastUpdated: new Date(),
+            tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
+        };
+
+        try {
+            await axiosSecure.post("/api/tasks", newTask);
+            Swal.fire({ icon: "success", title: "Task Added Successfully!", showConfirmButton: false, timer: 1500 });
+            reset();
+            onClose();
+            onTaskAdded();
+        } catch (error) {
+            Swal.fire({ icon: "error", title: "Failed to Add Task!", text: error.message });
+        }
+    };
 
     return (
         <AnimatePresence>
