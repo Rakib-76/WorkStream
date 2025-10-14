@@ -1,19 +1,22 @@
 "use client";
-import React from "react";
-import { useForm } from "react-hook-form";
+import React, { useContext } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, Tag, UserPlus, Flag, Clock } from "lucide-react";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
+import { DataContext } from "../../../../context/DataContext";
+import { MemberInput } from "../../../../lib/MemberInput";
 
-export default function AddTaskFormModal({ isOpen, onClose, projectId, onTaskAdded }) {
+export default function AddTaskFormModal({ isOpen, onClose, onTaskAdded }) {
     const axiosSecure = useAxiosSecure();
-    const { register, handleSubmit, reset, formState: { errors } } = useForm();
+    const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+    const { selectedProject } = useContext(DataContext);
 
     const onSubmit = async (data) => {
         const newTask = {
             ...data,
-            projectId,
+            projectId: selectedProject?._id,
             createdAt: new Date(),
             lastUpdated: new Date(),
             tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
@@ -41,7 +44,7 @@ export default function AddTaskFormModal({ isOpen, onClose, projectId, onTaskAdd
                     exit={{ opacity: 0 }}
                 >
                     <motion.div
-                        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg p-6 relative"
+                        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full md:mx-10 p-6 relative"
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.9, opacity: 0 }}
@@ -60,103 +63,113 @@ export default function AddTaskFormModal({ isOpen, onClose, projectId, onTaskAdd
 
                         {/* Form */}
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
-                            {/* Input Field */}
-                            <div>
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Title</label>
-                                <input
-                                    type="text"
-                                    placeholder="Enter task title"
-                                    {...register("title", { required: "Title is required" })}
-                                    className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
-                                />
-                                {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
-                            </div>
-
-                            {/* Textarea */}
-                            <div>
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Description</label>
-                                <textarea
-                                    rows={3}
-                                    placeholder="Write task details..."
-                                    {...register("description")}
-                                    className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none transition"
-                                />
-                            </div>
-
-                            {/* Dates */}
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-sm font-medium flex items-center gap-1 text-gray-700 dark:text-gray-200">
-                                        <Calendar size={14} /> Start Date
-                                    </label>
-                                    <input
-                                        type="date"
-                                        {...register("startDate", { required: "Start date required" })}
-                                        className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                    />
+                                    {/* Input Field */}
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Title</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Enter task title"
+                                            {...register("title", { required: "Title is required" })}
+                                            className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                                        />
+                                        {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
+                                    </div>
+
+                                    {/* Textarea */}
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Description</label>
+                                        <textarea
+                                            rows={3}
+                                            placeholder="Write task details..."
+                                            {...register("description")}
+                                            className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none transition"
+                                        />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium flex items-center gap-1 text-gray-700 dark:text-gray-200">
-                                        <Clock size={14} /> Deadline
-                                    </label>
-                                    <input
-                                        type="date"
-                                        {...register("deadline", { required: "Deadline required" })}
-                                        className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                    />
-                                </div>
-                            </div>
+                                    {/* Dates */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="text-sm font-medium flex items-center gap-1 text-gray-700 dark:text-gray-200">
+                                                <Calendar size={14} /> Start Date
+                                            </label>
+                                            <input
+                                                type="date"
+                                                {...register("startDate", { required: "Start date required" })}
+                                                className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium flex items-center gap-1 text-gray-700 dark:text-gray-200">
+                                                <Clock size={14} /> Deadline
+                                            </label>
+                                            <input
+                                                type="date"
+                                                {...register("deadline", { required: "Deadline required" })}
+                                                className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
 
-                            {/* Assignee + Priority */}
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="text-sm font-medium flex items-center gap-1 text-gray-700 dark:text-gray-200">
-                                        <UserPlus size={14} /> Assignee
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter username"
-                                        {...register("assignee")}
-                                        className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-sm font-medium flex items-center gap-1 text-gray-700 dark:text-gray-200">
-                                        <Flag size={14} /> Priority
-                                    </label>
-                                    <select
-                                        {...register("priority")}
-                                        defaultValue="medium"
-                                        className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    {/* Assignee + Priority */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {/* ✅ Assignee using MemberInput */}
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Assignee</label>
+                                            <Controller
+                                                name="assignee"
+                                                control={control}
+                                                defaultValue={[]}
+                                                render={({ field }) => (
+                                                    <MemberInput
+                                                        value={field.value}
+                                                        onChange={field.onChange}
+                                                    />
+                                                )}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium flex items-center gap-1 text-gray-700 dark:text-gray-200">
+                                                <Flag size={14} /> Priority
+                                            </label>
+                                            <select
+                                                {...register("priority")}
+                                                defaultValue="medium"
+                                                className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                            >
+                                                <option value="low">Low</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="high">High</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* Tags */}
+                                    <div>
+                                        <label className="text-sm font-medium flex items-center gap-1 text-gray-700 dark:text-gray-200">
+                                            <Tag size={14} /> Tags (comma separated)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="frontend, api, ui"
+                                            {...register("tags")}
+                                            className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                        />
+                                    </div>
+
+                                    {/* Submit Button */}
+                                    <button
+                                        type="submit"
+                                        className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg shadow-md transition"
                                     >
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                    </select>
+                                        Add Task
+                                    </button>
                                 </div>
                             </div>
 
-                            {/* Tags */}
-                            <div>
-                                <label className="text-sm font-medium flex items-center gap-1 text-gray-700 dark:text-gray-200">
-                                    <Tag size={14} /> Tags (comma separated)
-                                </label>
-                                <input
-                                    type="text"
-                                    placeholder="frontend, api, ui"
-                                    {...register("tags")}
-                                    className="w-full mt-1 p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                />
-                            </div>
 
-                            {/* Submit Button */}
-                            <button
-                                type="submit"
-                                className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg shadow-md transition"
-                            >
-                                Add Task
-                            </button>
                         </form>
                     </motion.div>
                 </motion.div>

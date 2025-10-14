@@ -47,13 +47,13 @@ export default function Tasks() {
   }, [projects, userEmail]);
 
   // ✅ Fetch all tasks
-    const { data: tasksData = [], refetch } = useQuery({
-        queryKey: ["tasks"],
-        queryFn: async () => {
-            const res = await axiosSecure.get("/api/tasks");
-            return res.data.data;
-        },
-    });
+  const { data: tasksData = [], refetch } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/api/tasks");
+      return res.data.data;
+    },
+  });
 
 
 
@@ -80,7 +80,7 @@ export default function Tasks() {
     : tasksData.filter((task) => task.assignedTo === userEmail);
 
   return (
-    <div className="space-y-3 py-16">
+    <div className="space-y-6 py-16">
       {/* Tabs */}
       <div className="flex items-center justify-between">
         <div>
@@ -115,11 +115,13 @@ export default function Tasks() {
       </div>
 
       {/* Tasks Table */}
-      <TaskTable tasks={displayedTasks} getPriorityColor={getPriorityColor} getStatusColor={getStatusColor} />
+      <TaskTable tasks={displayedTasks}
+        getPriorityColor={getPriorityColor}
+        getStatusColor={getStatusColor}
+      />
       <AddTaskFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        projectId={null}
         onTaskAdded={refetch}
       />
     </div>
@@ -147,7 +149,7 @@ function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
           </thead>
           <tbody>
             {tasks.length === 0 ? (
-              <tr>
+              <tr >
                 <td colSpan={6} className="p-4 text-center text-gray-500">
                   No tasks found
                 </td>
@@ -155,7 +157,7 @@ function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
             ) : (
               tasks.map((task) => (
                 <tr
-                  key={task.id}
+                  key={task._id}
                   className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition"
                 >
                   <td className="p-3 font-medium">{task.title}</td>
