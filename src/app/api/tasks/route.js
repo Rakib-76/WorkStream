@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect, { collectionNameObj } from "../../../lib/dbConnect";
 
-// 🟢 GET - Get all tasks
+//  GET - Get all tasks
 export async function GET() {
     try {
         const taskCollection = dbConnect(collectionNameObj.taskCollection);
@@ -23,7 +23,7 @@ export async function GET() {
 }
 
 
-// 🟢 POST - Add a new task
+//  POST - Add a new task
 export async function POST(req) {
     try {
         const data = await req.json();

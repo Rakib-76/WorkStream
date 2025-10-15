@@ -2,7 +2,7 @@
 
 import { useContext } from "react";
 import CalendarSection from "../../Calender/CalenderSection";
-import ChatSection from"../../Chat/ChatSection";
+import ChatSection from "../../Chat/ChatSection";
 import Attendence from "../Attendence/Attendence";
 import Overview from "../Overview/Overview";
 import Reports from "../Reports/Reports";
@@ -25,6 +25,7 @@ export default function DashboardContent({ activeItem }) {
       </div>
     );
   }
+  const projectId = selectedProject?._id;
 
   const renderContent = () => {
     switch (activeItem) {
@@ -51,7 +52,7 @@ export default function DashboardContent({ activeItem }) {
       case "calendar":
         return (
           <div className="p-6 bg-card border border-border rounded-xl shadow mt-14">
-            <CalendarSection />
+            <CalendarSection projectId={projectId} />
           </div>
         );
 
@@ -65,7 +66,7 @@ export default function DashboardContent({ activeItem }) {
       case "chat":
         return (
           <div className="p-6 bg-card border border-border rounded-xl shadow mt-14">
-         <ChatSection/>
+            <ChatSection />
           </div>
         );
 
