@@ -30,48 +30,48 @@ export default function DashboardContent({ activeItem }) {
     switch (activeItem) {
       case "overview":
         return (
-          <div>
+          <div className="mt-10">
             <Overview />
           </div>
         );
 
       case "tasks":
         return (
-          <div>
+          <div className="mt-14">
             <Tasks></Tasks>
           </div>
         );
       case "attendence":
         return (
-          <div>
+          <div className="mt-14">
             <Attendence></Attendence>
           </div>
         );
 
       case "calendar":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl shadow">
+          <div className="p-6 bg-card border border-border rounded-xl shadow mt-14">
             <CalendarSection />
           </div>
         );
 
       case "todo":
         return (
-          <div className="">
+          <div className="mt-14">
             <Todo></Todo>
           </div>
         );
 
       case "chat":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl shadow">
+          <div className="p-6 bg-card border border-border rounded-xl shadow mt-14">
          <ChatSection/>
           </div>
         );
 
       case "callmeet":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl shadow">
+          <div className="p-6 bg-card border border-border rounded-xl shadow mt-14">
             <h3 className="text-lg font-bold">📞 Call / Meet</h3>
             <p className="text-muted-foreground mt-2">
               Video/voice meeting integration section.
@@ -81,14 +81,14 @@ export default function DashboardContent({ activeItem }) {
 
       case "team":
         return (
-          <div>
+          <div className="mt-10">
             <Team></Team>
           </div>
         );
 
       case "notes":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl shadow">
+          <div className="p-6 bg-card border border-border rounded-xl shadow mt-14">
             <h3 className="text-lg font-bold">📝 Notes</h3>
             <p className="text-muted-foreground mt-2">
               Save your important notes here.
@@ -98,7 +98,7 @@ export default function DashboardContent({ activeItem }) {
 
       case "reports":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl  shadow">
+          <div className="p-6 bg-card border border-border rounded-xl  shadow mt-14">
             <Reports></Reports>
           </div>
         );

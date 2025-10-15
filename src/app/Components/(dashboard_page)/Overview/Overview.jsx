@@ -262,7 +262,7 @@ const TasksStatisticsChart = () => {
 
   return (
     <motion.div
-      className="bg-white dark:bg-[#1E1E2E] border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-xl col-span-1 flex flex-col"
+      className=" bg-white dark:bg-[#1E1E2E] border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-xl col-span-1 flex flex-col"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.4 }}

@@ -183,7 +183,7 @@ export default function DashboardNavbar() {
             <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md">
               <Waves className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
+            <span className="hidden lg:block text-xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
               WorkStream
             </span>
           </div>
@@ -213,7 +213,7 @@ export default function DashboardNavbar() {
           {/* Create Button */}
           <Button
             size="sm"
-            className="hidden sm:flex gap-2 items-center bg-primary text-primary-foreground"
+            className="hidden gap-2 items-center bg-primary text-primary-foreground"
             onClick={() => setIsModalOpen(true)}
           >
             <PlusCircle className="w-4 h-4" />
@@ -224,7 +224,7 @@ export default function DashboardNavbar() {
           <div className="relative" ref={projectsDropdownRef}>
             <button
               onClick={() => setProjectsDropdownOpen(!projectsDropdownOpen)}
-              className="bg-accent text-black hover:bg-accent/90 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all outline-none h-8 px-4 py-1"
+              className=" hidden md:inline-flex bg-accent text-black hover:bg-accent/90 lg:inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all outline-none h-8 px-4 py-1"
             >
               <FolderKanban className="w-4 h-4" />
               Projects
