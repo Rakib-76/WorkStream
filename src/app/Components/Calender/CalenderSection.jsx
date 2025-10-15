@@ -16,22 +16,52 @@ export default function CalendarSection() {
 
 
     useEffect(() => {
-        fetchEvents();
+        const fetchTasks = async () => {
+            try {
+                const response = await fetch('/api/tasks');
+                const result = await response.json(); // API Response
+
+
+                // array nischit hoyar jonno
+                if (result.success && Array.isArray(result.data)) {
+                    const tasks = result.data;
+                    //   Task array
+
+
+                    // Map the tasks into a calendar event format.
+
+
+                    const formattedEvents = tasks.map(task => {
+
+
+                        const startDateTime = task.startDate; // যেমন: "2025-10-16"
+                        const endDateTime = task.endDate;   // যেমন: "2025-10-23"
+
+
+                        return {
+                            title: task.title + ' (' + task.priority + ')', // show title and priority
+                            start: new Date(startDateTime), // event starting date
+                            end: new Date(endDateTime),     // event ending date
+                            allDay: true,
+                            resource: task, // full task
+                        };
+                    });
+
+
+                    setEvents(formattedEvents);
+                } else {
+                    console.error("API returned an error or data is not an array:", result);
+                    setEvents([]);
+                }
+            } catch (error) {
+                console.error("Failed to fetch tasks:", error);
+            }
+        };
+
+
+        fetchTasks();
     }, []);
 
-
-    async function fetchEvents() {
-        setLoading(true);
-        try {
-            const res = await axios.get("/api/events");
-            setEvents(res.data.map((e) => ({ id: e.id, title: e.title, start: e.start, end: e.end, allDay: e.allDay })));
-        } catch (err) {
-            console.error(err);
-            alert("Failed to load events");
-        } finally {
-            setLoading(false);
-        }
-    }
 
 
     async function handleDateClick(info) {
@@ -39,7 +69,7 @@ export default function CalendarSection() {
         if (!title) return;
         const payload = { title, start: info.dateStr, allDay: info.allDay };
         try {
-            const res = await axios.post("/api/events", payload, { headers: { "Content-Type": "application/json" } });
+            const res = await axios.post("/api/tasks", payload, { headers: { "Content-Type": "application/json" } });
             const ev = res.data;
             setEvents((prev) => [...prev, { id: ev.id, title: ev.title, start: ev.start, end: ev.end }]);
         } catch (err) {
@@ -55,7 +85,7 @@ export default function CalendarSection() {
         if (!action) return;
         if (action.toLowerCase() === "delete") {
             try {
-                await axios.delete(`/api/events?id=${ev.id}`);
+                await axios.delete(`/api/tasks?id=${ev.id}`);
                 ev.remove();
                 setEvents((prev) => prev.filter((e) => e.id !== ev.id));
             } catch (err) {
@@ -66,7 +96,7 @@ export default function CalendarSection() {
         }
         // update title
         try {
-            const res = await axios.patch("/api/events", { id: ev.id, title: action });
+            const res = await axios.patch("/api/tasks", { id: ev.id, title: action });
             ev.setProp("title", res.data.title);
             setEvents((prev) => prev.map((e) => (e.id === ev.id ? { ...e, title: res.data.title } : e)));
         } catch (err) {
@@ -80,7 +110,7 @@ export default function CalendarSection() {
         const ev = dropInfo.event;
         try {
             const payload = { id: ev.id, start: ev.start?.toISOString(), end: ev.end?.toISOString(), allDay: ev.allDay };
-            const res = await axios.patch("/api/events", payload);
+            const res = await axios.patch("/api/tasks", payload);
             // update local
             setEvents((prev) => prev.map((e) => (e.id === ev.id ? { ...e, start: res.data.start, end: res.data.end } : e)));
         } catch (err) {
@@ -96,7 +126,7 @@ export default function CalendarSection() {
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">📅 Project Calendar</h3>
                 <div>
-                    <button onClick={fetchEvents} className="btn btn-sm">
+                    <button className="btn btn-sm">
                         Refresh
                     </button>
                 </div>
