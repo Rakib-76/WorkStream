@@ -13,12 +13,7 @@ import { useSession } from "next-auth/react";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
 import AddTaskFormModal from "../AddTaskFormModal/AddTaskFormModal";
-// ✅ Dummy tasks
-const initialTasks = [
-  { id: 1, title: "Design Landing Page", priority: "High", status: "In Progress", assignedTo: "Abid", deadline: "2025-10-10" },
-  { id: 2, title: "Set up Database", priority: "Medium", status: "Pending", assignedTo: "Bayzid", deadline: "2025-10-15" },
-  { id: 3, title: "Deploy Project", priority: "Low", status: "Completed", assignedTo: "Abid", deadline: "2025-10-20" },
-];
+
 
 export default function Tasks() {
   const [activeTab, setActiveTab] = useState("all");
@@ -28,7 +23,7 @@ export default function Tasks() {
   const [isCreatedByUser, setIsCreatedByUser] = useState(false);
 
 
-  // ✅ Fetch all tasks
+  // Fetch all tasks
   const { data: tasksData = [], refetch } = useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
@@ -57,9 +52,12 @@ export default function Tasks() {
     }
   };
 
+  // only creator see task my task fetch
+
   const displayedTasks = activeTab === "all"
     ? tasksData
-    : tasksData.filter((task) => task.assignedTo === userEmail);
+    //  My Tasks: Filter kora hocche task-er creatorEmail diye
+    : tasksData.filter((task) => task.creatorEmail === userEmail);
 
   return (
     <div className="space-y-6 py-16">
@@ -86,12 +84,12 @@ export default function Tasks() {
         getPriorityColor={getPriorityColor}
         getStatusColor={getStatusColor}
       />
-      \
+      
     </div>
   );
 }
 
-// ✅ Table component
+//  Table component
 function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
   return (
     <Card className="glass-card shadow-lg border border-gray-200 dark:border-gray-700">

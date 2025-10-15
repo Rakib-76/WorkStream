@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import MyRichTextEditor from "./MyRichTextEditor";
 import { DataContext } from "../../../../context/DataContext";
 import { MemberInput } from "../../../../lib/MemberInput";
+import { useSession } from "next-auth/react";
 
 export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
+  const { data: session, status } = useSession();
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("Low");
   const [selectedMembers, setSelectedMembers] = useState([]); // MemberInput এর জন্য state
@@ -37,17 +39,18 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
       endDate: endDate || "-",
       startTime: startTime || "-",
       endTime: endTime || "-",
-      assigneeTo: selectedMembers, 
+      creatorEmail: session.user.email,
+      assigneeTo: selectedMembers,
       files,
       comments: comment
         ? [
-            {
-              id: Date.now(),
-              text: comment,
-              author: "You",
-              time: new Date().toLocaleString(),
-            },
-          ]
+          {
+            id: Date.now(),
+            text: comment,
+            author: "You",
+            time: new Date().toLocaleString(),
+          },
+        ]
         : [],
       status: "Pending",
     };
@@ -120,13 +123,12 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                       className="accent-purple-500"
                     />
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        p === "Low"
+                      className={`px-2 py-1 rounded-full text-xs ${p === "Low"
                           ? "bg-green-100 text-green-600"
                           : p === "Medium"
-                          ? "bg-yellow-100 text-yellow-600"
-                          : "bg-red-100 text-red-600"
-                      }`}
+                            ? "bg-yellow-100 text-yellow-600"
+                            : "bg-red-100 text-red-600"
+                        }`}
                     >
                       {p}
                     </span>
@@ -137,10 +139,10 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
               {/* ✅ Assignee To (using MemberInput system) */}
               <div className="space-y-2">
                 <label className="font-medium">Assignee To</label>
-<MemberInput
-  value={selectedMembers}
-  onChange={setSelectedMembers}
-/>
+                <MemberInput
+                  value={selectedMembers}
+                  onChange={setSelectedMembers}
+                />
               </div>
 
               {/* Description */}
