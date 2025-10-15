@@ -136,6 +136,7 @@ export default function Todo() {
       </h1>
 
       {loading ? (
+          <LoadingSpinner />
 
       ) : error ? (
         <p className="text-center text-red-500 font-medium">{error}</p>
