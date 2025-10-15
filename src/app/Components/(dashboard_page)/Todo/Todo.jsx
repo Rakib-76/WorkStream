@@ -1,10 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Plus, MoreVertical, Check, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AddTaskModal from "./AddTaskModal";
 import TaskDetailModal from "./TaskDetailModal";
 import Swal from "sweetalert2";
+import useAxiosSecure from "../../../../lib/useAxiosSecure";
 
 export default function Todo() {
   const [columns, setColumns] = useState([
@@ -12,7 +13,6 @@ export default function Todo() {
     { id: 2, title: "In Progress", tasks: [] },
     { id: 3, title: "Done", tasks: [] },
   ]);
-
   const [openModal, setOpenModal] = useState(false);
   const [currentColumnId, setCurrentColumnId] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
@@ -23,15 +23,46 @@ export default function Todo() {
   // Task detail modal state
   const [selectedTask, setSelectedTask] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const axiosSecure = useAxiosSecure();
 
   // Add task
-  const handleAddTask = (newTask) => {
-    const newColumns = columns.map((col) =>
-      col.id === currentColumnId ? { ...col, tasks: [...col.tasks, newTask] } : col
-    );
-    setColumns(newColumns);
-    setCurrentColumnId(null);
+  const handleAddTask = async (newTask) => {
+    try {
+      // Find current column title
+      const currentColumn = columns.find(col => col.id === currentColumnId);
+
+      // Merge with column title
+      const taskWithColumn = {
+        ...newTask,
+        columnTitle: currentColumn?.title || "Untitled",
+      };
+
+      // ✅ Send to database
+      const res = await axiosSecure.post("/api/tasks", taskWithColumn);
+
+      if (res.data?.insertedId) {
+        // Update UI locally
+        const newColumns = columns.map((col) =>
+          col.id === currentColumnId
+            ? { ...col, tasks: [...col.tasks, taskWithColumn] }
+            : col
+        );
+        setColumns(newColumns);
+        setCurrentColumnId(null);
+
+        console.log("New Task:", taskWithColumn);
+        
+
+        Swal.fire("✅ Success", "Task added successfully!", "success");
+      } else {
+        Swal.fire("⚠️ Error", "Failed to save task!", "error");
+      }
+    } catch (error) {
+      console.error("Task submission failed:", error);
+      Swal.fire("❌ Error", "Something went wrong!", "error");
+    }
   };
+
 
   // Delete column
   const deleteColumn = (id) => {
@@ -160,13 +191,12 @@ export default function Todo() {
                   <p className="font-medium">{task.title}</p>
                   <div className="flex justify-between text-xs mt-2 items-center">
                     <span
-                      className={`px-2 py-0.5 rounded-full ${
-                        task.priority === "High"
+                      className={`px-2 py-0.5 rounded-full ${task.priority === "High"
                           ? "bg-red-100 text-red-600"
                           : task.priority === "Low"
-                          ? "bg-green-100 text-green-600"
-                          : "bg-yellow-100 text-yellow-600"
-                      }`}
+                            ? "bg-green-100 text-green-600"
+                            : "bg-yellow-100 text-yellow-600"
+                        }`}
                     >
                       {task.priority}
                     </span>
