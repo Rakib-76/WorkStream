@@ -8,7 +8,7 @@ import Link from "next/link";
 import Button from "../../../Components/(dashboard_page)/UI/Button";
 import EmojiPicker from "emoji-picker-react";
 import { useForm } from "react-hook-form";
-import { MemberInput } from "../Dashboard_nav/MemberInput";
+import { MemberInput } from "../../../../lib/MemberInput";
 
 export default function MobileNavbar({ activeItem, setActiveItem }) {
   const [isOpen, setIsOpen] = useState(false);

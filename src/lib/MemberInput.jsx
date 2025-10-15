@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import useAxiosSecure from "../../../../lib/useAxiosSecure";
+import useAxiosSecure from "./useAxiosSecure";
 
 export function MemberInput({ value = [], onChange }) {
   const [users, setUsers] = useState([]);

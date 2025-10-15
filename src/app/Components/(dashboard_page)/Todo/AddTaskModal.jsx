@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { X, Upload, User, Calendar, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MyRichTextEditor from "./MyRichTextEditor";
+import { DataContext } from "../../../../context/DataContext";
 
 const teamMembers = [
   { id: 1, name: "John Doe", email: "john@example.com" },
@@ -24,6 +25,7 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
   const [endDate, setEndDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const { selectedProject } = useContext(DataContext);
 
   const handleSelectMember = (member) => {
     if (!selectedMembers.find((m) => m.id === member.id)) {
@@ -43,29 +45,29 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
   const handleSubmit = () => {
     if (!title.trim()) return;
     const newTask = {
-      id: Date.now(),
+      projectId: selectedProject?._id || null,
       title,
       priority,
       description,
-      createdDate: new Date().toLocaleDateString("en-GB"),
       startDate: startDate || "-",
       endDate: endDate || "-", // acts as due date
-      startTime,
-      endTime,
+      startTime: startTime || "-",
+      endTime: endTime || "-",
       assignees: selectedMembers,
       files,
       comments: comment
         ? [
-            {
-              id: Date.now(),
-              text: comment,
-              author: "You",
-              time: new Date().toLocaleString(),
-            },
-          ]
+          {
+            id: Date.now(),
+            text: comment,
+            author: "You",
+            time: new Date().toLocaleString(),
+          },
+        ]
         : [],
       status: "Pending",
     };
+    console.log("New Task:", newTask);
     onSubmit(newTask);
     onClose();
 
@@ -135,13 +137,12 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                       className="accent-purple-500"
                     />
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        p === "Low"
-                          ? "bg-green-100 text-green-600"
-                          : p === "Medium"
+                      className={`px-2 py-1 rounded-full text-xs ${p === "Low"
+                        ? "bg-green-100 text-green-600"
+                        : p === "Medium"
                           ? "bg-yellow-100 text-yellow-600"
                           : "bg-red-100 text-red-600"
-                      }`}
+                        }`}
                     >
                       {p}
                     </span>

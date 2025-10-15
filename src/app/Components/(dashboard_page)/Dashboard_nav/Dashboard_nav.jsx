@@ -23,7 +23,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import Swal from "sweetalert2";
-import { MemberInput } from "./MemberInput";
+import { MemberInput } from "../../../../lib/MemberInput";
 import { Controller, useForm } from "react-hook-form";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import { DataContext } from "../../../../context/DataContext";
