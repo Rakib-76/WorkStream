@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Plus, MoreVertical, Check, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AddTaskModal from "./AddTaskModal";
@@ -24,6 +24,28 @@ export default function Todo() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const axiosSecure = useAxiosSecure();
+
+  // 🟢 Fetch all tasks from API
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const res = await axiosSecure.get("/api/tasks");
+        const allTasks = res.data?.data || [];
+        console.log(allTasks);
+
+        const updatedColumns = columns.map((col) => ({
+          ...col,
+          tasks: allTasks.filter((task) => task.columnTitle === col.title),
+        }));
+        setColumns(updatedColumns);
+      } catch (error) {
+        console.error("❌ Failed to load tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
 
   // Add task
   const handleAddTask = async (newTask) => {
@@ -51,7 +73,7 @@ export default function Todo() {
         setCurrentColumnId(null);
 
         console.log("New Task:", taskWithColumn);
-        
+
 
         Swal.fire("✅ Success", "Task added successfully!", "success");
       } else {
@@ -192,10 +214,10 @@ export default function Todo() {
                   <div className="flex justify-between text-xs mt-2 items-center">
                     <span
                       className={`px-2 py-0.5 rounded-full ${task.priority === "High"
-                          ? "bg-red-100 text-red-600"
-                          : task.priority === "Low"
-                            ? "bg-green-100 text-green-600"
-                            : "bg-yellow-100 text-yellow-600"
+                        ? "bg-red-100 text-red-600"
+                        : task.priority === "Low"
+                          ? "bg-green-100 text-green-600"
+                          : "bg-yellow-100 text-yellow-600"
                         }`}
                     >
                       {task.priority}
