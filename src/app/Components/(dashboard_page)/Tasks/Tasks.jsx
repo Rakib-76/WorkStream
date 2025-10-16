@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import AddTaskFormModal from "../AddTaskFormModal/AddTaskFormModal";
 
 
-export default function Tasks() {
+export default  function Tasks({ projectId }) {
   const [activeTab, setActiveTab] = useState("all");
   const { data: session } = useSession();
   const axiosSecure = useAxiosSecure();
@@ -25,11 +25,15 @@ export default function Tasks() {
 
   // Fetch all tasks
   const { data: tasksData = [], refetch } = useQuery({
-    queryKey: ["tasks"],
+    queryKey: ["tasks", projectId],
     queryFn: async () => {
-      const res = await axiosSecure.get("/api/tasks");
+      if(!projectId){
+        return [];
+      }
+      const res = await axiosSecure.get(`/api/tasks?projectId=${projectId}`);
       return res.data.data;
     },
+    enabled: !!projectId,
   });
 
 
@@ -84,7 +88,7 @@ export default function Tasks() {
         getPriorityColor={getPriorityColor}
         getStatusColor={getStatusColor}
       />
-      
+
     </div>
   );
 }
