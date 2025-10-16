@@ -368,9 +368,43 @@ export default function Todo() {
         isOpen={detailOpen}
         onClose={() => setDetailOpen(false)}
         task={selectedTask}
-        onStatusChange={(status) => console.log("Status:", status)}
-        onEdit={() => console.log("Edit clicked")}
+        onStatusChange={({ status, columnTitle, taskId }) => {
+          let taskToMove = null;
+
+          // 1️⃣ Remove task from current column
+          const newColumns = columns.map((col) => {
+            const remainingTasks = col.tasks.filter((t) => {
+              if (t._id === taskId) {
+                taskToMove = { ...t, status, columnTitle };
+                return false;
+              }
+              return true;
+            });
+            return { ...col, tasks: remainingTasks };
+          });
+
+          // 2️⃣ Add task to target column
+          const updatedColumns = newColumns.map((col) => {
+            if (col.title === columnTitle && taskToMove) {
+              return { ...col, tasks: [...col.tasks, taskToMove] };
+            }
+            return col;
+          });
+
+          setColumns(updatedColumns);
+
+          // 3️⃣ Close modal
+          setDetailOpen(false);
+
+          // 4️⃣ Update backend
+          axiosSecure
+            .patch(`/api/tasks/${taskId}`, { status, columnTitle })
+            .then(() => console.log("✅ Task updated!"))
+            .catch((err) => console.error("❌ Failed to update task:", err));
+        }}
+        onEdit={(task) => console.log("Edit clicked", task)}
       />
+
     </div>
   );
 }
