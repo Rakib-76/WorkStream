@@ -39,7 +39,7 @@ export default function DashboardContent({ activeItem }) {
       case "tasks":
         return (
           <div className="mt-14">
-            <Tasks></Tasks>
+            <Tasks projectId={projectId}></Tasks>
           </div>
         );
       case "attendence":
