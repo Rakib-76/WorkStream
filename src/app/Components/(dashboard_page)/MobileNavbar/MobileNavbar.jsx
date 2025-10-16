@@ -126,6 +126,7 @@ export default function MobileNavbar({ activeItem, setActiveItem, setSelectedPro
       Swal.fire("Error", "Something went wrong", "error");
     }
   };
+  
 
   const menuItems = [
     { name: "overview", label: "Overview" },
