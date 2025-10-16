@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, MoreVertical, Edit, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../Components/(home_page)/UI/card";
 import {
@@ -9,18 +9,34 @@ import {
   DropdownMenuTrigger,
 } from "../../../Components/(home_page)/UI/dropdown-menu";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import useAxiosSecure from "../../../../lib/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
+import AddTaskFormModal from "../AddTaskFormModal/AddTaskFormModal";
 
-// ✅ Dummy tasks
-const initialTasks = [
-  { id: 1, title: "Design Landing Page", priority: "High", status: "In Progress", assignedTo: "Abid", deadline: "2025-10-10" },
-  { id: 2, title: "Set up Database", priority: "Medium", status: "Pending", assignedTo: "Bayzid", deadline: "2025-10-15" },
-  { id: 3, title: "Deploy Project", priority: "Low", status: "Completed", assignedTo: "Abid", deadline: "2025-10-20" },
-];
 
-export default function Tasks() {
-  const [tasks, setTasks] = useState(initialTasks);
+export default  function Tasks({ projectId }) {
   const [activeTab, setActiveTab] = useState("all");
-  const currentUser = "Abid"; // dynamically change if needed
+  const { data: session } = useSession();
+  const axiosSecure = useAxiosSecure();
+  const userEmail = session?.user?.email;
+  const [isCreatedByUser, setIsCreatedByUser] = useState(false);
+
+
+  // Fetch all tasks
+  const { data: tasksData = [], refetch } = useQuery({
+    queryKey: ["tasks", projectId],
+    queryFn: async () => {
+      if(!projectId){
+        return [];
+      }
+      const res = await axiosSecure.get(`/api/tasks?projectId=${projectId}`);
+      return res.data.data;
+    },
+    enabled: !!projectId,
+  });
+
+
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -40,39 +56,48 @@ export default function Tasks() {
     }
   };
 
+  // only creator see task my task fetch
+
   const displayedTasks = activeTab === "all"
-    ? tasks
-    : tasks.filter((task) => task.assignedTo === currentUser);
+    ? tasksData
+    //  My Tasks: Filter kora hocche task-er creatorEmail diye
+    : tasksData.filter((task) => task.creatorEmail === userEmail);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 py-16">
       {/* Tabs */}
-      <div className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 pt-1.5 text-sm font-medium ring-offset-background transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-muted-foreground ">
-        <button
-          className={`px-4 py-2 rounded-t ${activeTab === "all" ? "bg-background font-semibold" : ""}`}
-          onClick={() => setActiveTab("all")}
-        >
-          All Tasks
-        </button>
-        <button
-          className={`px-4 py-2 rounded-t ${activeTab === "my" ? "bg-background font-semibold" : ""}`}
-          onClick={() => setActiveTab("my")}
-        >
-          My Tasks
-        </button>
+      <div className="flex items-center justify-between">
+        <div className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 pt-1.5 text-sm font-medium ring-offset-background transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-muted-foreground ">
+          <button
+            className={`px-4 py-2 rounded-t ${activeTab === "my" ? "bg-background font-semibold" : ""}`}
+            onClick={() => setActiveTab("my")}
+          >
+            My Tasks
+          </button>
+          <button
+            className={`px-4 py-2 rounded-t ${activeTab === "all" ? "bg-background font-semibold" : ""}`}
+            onClick={() => setActiveTab("all")}
+          >
+            All Tasks
+          </button>
+        </div>
       </div>
 
       {/* Tasks Table */}
-      <TaskTable tasks={displayedTasks} getPriorityColor={getPriorityColor} getStatusColor={getStatusColor} />
+      <TaskTable tasks={displayedTasks}
+        getPriorityColor={getPriorityColor}
+        getStatusColor={getStatusColor}
+      />
+
     </div>
   );
 }
 
-// ✅ Table component
+//  Table component
 function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
   return (
     <Card className="glass-card shadow-lg border border-gray-200 dark:border-gray-700">
-      
+
       <CardContent className="p-0 overflow-x-auto">
         <table className="w-full border-collapse min-w-[700px]">
           <thead className="bg-gray-100 dark:bg-gray-800">
@@ -89,7 +114,7 @@ function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
           </thead>
           <tbody>
             {tasks.length === 0 ? (
-              <tr>
+              <tr >
                 <td colSpan={6} className="p-4 text-center text-gray-500">
                   No tasks found
                 </td>
@@ -97,7 +122,7 @@ function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
             ) : (
               tasks.map((task) => (
                 <tr
-                  key={task.id}
+                  key={task._id}
                   className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition"
                 >
                   <td className="p-3 font-medium">{task.title}</td>

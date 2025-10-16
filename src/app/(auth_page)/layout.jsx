@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 import register from "../../assets/register.json";
@@ -32,7 +31,7 @@ export default function AuthLayout({ children }) {
 
       {/* RIGHT: Animation area */}
       <div className="hidden md:flex w-1/2 items-center justify-center relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-400 via-teal-500 to-blue-600 opacity-60 flex items-center justify-center p-6 transition-opacity duration-500">
+        <div className="absolute inset-0 bg-gradien-to-br from-green-400 via-teal-500 to-blue-600 opacity-60 flex items-center justify-center p-6 transition-opacity duration-500">
           <div className={`transition-opacity duration-500 ${fade ? "opacity-100" : "opacity-0"} w-full h-full flex items-center justify-center`}>
             {showFirst ? (
               <Lottie animationData={register} loop={true} />

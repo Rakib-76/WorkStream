@@ -18,9 +18,14 @@ import { signOut, useSession } from "next-auth/react";
 import Swal from "sweetalert2";
 import Button from "../../../Components/(dashboard_page)/UI/Button";
 import EmojiPicker from "emoji-picker-react";
+<<<<<<< HEAD
 import { useForm, Controller } from "react-hook-form";
 import { MemberInput } from "../Dashboard_nav/MemberInput";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
+=======
+import { useForm } from "react-hook-form";
+import { MemberInput } from "../../../../lib/MemberInput";
+>>>>>>> ebd273eee04a22d3bc0540d3676c1e0059a30094
 
 export default function MobileNavbar({ activeItem, setActiveItem, setSelectedProject }) {
   const [isOpen, setIsOpen] = useState(false);

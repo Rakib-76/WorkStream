@@ -11,8 +11,9 @@ import MobileNavbar from "../Components/(dashboard_page)/MobileNavbar/MobileNavb
 export default function DashboardLayout({ children }) {
   const [activeItem, setActiveItem] = useState("overview");
   const { data: session, status } = useSession();
-  const [selectedProject, setSelectedProject] = useState(null); // ✅ corrected name
   const router = useRouter();
+
+
 
   // Redirect if not logged in
   useEffect(() => {
@@ -44,7 +45,6 @@ export default function DashboardLayout({ children }) {
         <Sidebar
           activeItem={activeItem}
           setActiveItem={setActiveItem}
-          selectedProject={selectedProject} // ✅ send selected project
         />
 
         {/* Background gradient */}
@@ -75,7 +75,7 @@ export default function DashboardLayout({ children }) {
         <MobileNavbar activeItem={activeItem} setActiveItem={setActiveItem} />
 
         {/* Dashboard Navbar */}
-        <DashboardNavbar setSelectedProject={setSelectedProject} /> {/* ✅ pass setter */}
+        <DashboardNavbar /> {/* ✅ pass setter */}
 
         {/* Dashboard Main Content */}
         <main
@@ -85,7 +85,9 @@ export default function DashboardLayout({ children }) {
                      dark:from-slate-900 dark:via-gray-950 dark:to-indigo-950 
                      dark:border-t dark:border-indigo-700/50 dark:text-gray-100"
         >
-          <DashboardContent activeItem={activeItem} />
+          <DashboardContent
+            activeItem={activeItem}
+          />
         </main>
       </div>
     </div>

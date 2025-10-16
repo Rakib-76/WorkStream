@@ -1,21 +1,17 @@
 "use client";
-
-import React, { useState } from "react";
-import { X, Upload, User, Calendar, Clock } from "lucide-react";
+import React, { useContext, useState } from "react";
+import { X, Upload, Calendar, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MyRichTextEditor from "./MyRichTextEditor";
-
-const teamMembers = [
-  { id: 1, name: "John Doe", email: "john@example.com" },
-  { id: 2, name: "Jane Smith", email: "jane@example.com" },
-  { id: 3, name: "Mark Lee", email: "mark@example.com" },
-];
+import { DataContext } from "../../../../context/DataContext";
+import { MemberInput } from "../../../../lib/MemberInput";
+import { useSession } from "next-auth/react";
 
 export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
+  const { data: session, status } = useSession();
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("Low");
-  const [selectedMembers, setSelectedMembers] = useState([]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState([]); // MemberInput এর জন্য state
   const [files, setFiles] = useState([]);
   const [comment, setComment] = useState("");
   const [description, setDescription] = useState("");
@@ -24,45 +20,37 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
   const [endDate, setEndDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-
-  const handleSelectMember = (member) => {
-    if (!selectedMembers.find((m) => m.id === member.id)) {
-      setSelectedMembers([...selectedMembers, member]);
-    }
-    setDropdownOpen(false);
-  };
+  const { selectedProject } = useContext(DataContext);
 
   const handleFileUpload = (e) => {
     setFiles([...files, ...Array.from(e.target.files)]);
   };
 
   const removeFile = (file) => setFiles(files.filter((f) => f !== file));
-  const removeMember = (id) =>
-    setSelectedMembers(selectedMembers.filter((m) => m.id !== id));
 
   const handleSubmit = () => {
     if (!title.trim()) return;
     const newTask = {
-      id: Date.now(),
+      projectId: selectedProject?._id || null,
       title,
       priority,
       description,
-      createdDate: new Date().toLocaleDateString("en-GB"),
       startDate: startDate || "-",
-      endDate: endDate || "-", // acts as due date
-      startTime,
-      endTime,
-      assignees: selectedMembers,
+      endDate: endDate || "-",
+      startTime: startTime || "-",
+      endTime: endTime || "-",
+      creatorEmail: session.user.email,
+      assigneeTo: selectedMembers,
       files,
       comments: comment
         ? [
-            {
-              id: Date.now(),
-              text: comment,
-              author: "You",
-              time: new Date().toLocaleString(),
-            },
-          ]
+          {
+            id: Date.now(),
+            text: comment,
+            author: "You",
+            time: new Date().toLocaleString(),
+          },
+        ]
         : [],
       status: "Pending",
     };
@@ -135,13 +123,12 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                       className="accent-purple-500"
                     />
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        p === "Low"
+                      className={`px-2 py-1 rounded-full text-xs ${p === "Low"
                           ? "bg-green-100 text-green-600"
                           : p === "Medium"
-                          ? "bg-yellow-100 text-yellow-600"
-                          : "bg-red-100 text-red-600"
-                      }`}
+                            ? "bg-yellow-100 text-yellow-600"
+                            : "bg-red-100 text-red-600"
+                        }`}
                     >
                       {p}
                     </span>
@@ -149,54 +136,13 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                 ))}
               </div>
 
-              {/* Assignees */}
+              {/* ✅ Assignee To (using MemberInput system) */}
               <div className="space-y-2">
-                <label className="font-medium">Assignees</label>
-                <div className="flex flex-wrap gap-2">
-                  {selectedMembers.map((m) => (
-                    <span
-                      key={m.id}
-                      className="flex items-center gap-2 px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded-full"
-                    >
-                      {m.email}
-                      <button
-                        onClick={() => removeMember(m.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <X size={14} />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-
-                <div className="relative">
-                  <button
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="px-3 py-2 border rounded flex items-center gap-2 w-full hover:ring-1 ring-purple-400 transition"
-                  >
-                    <User size={16} /> Select Assignees
-                  </button>
-                  <AnimatePresence>
-                    {dropdownOpen && (
-                      <motion.ul
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute bg-white dark:bg-gray-700 border rounded shadow w-full mt-1 z-10"
-                      >
-                        {teamMembers.map((member) => (
-                          <li
-                            key={member.id}
-                            onClick={() => handleSelectMember(member)}
-                            className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
-                          >
-                            {member.name} - {member.email}
-                          </li>
-                        ))}
-                      </motion.ul>
-                    )}
-                  </AnimatePresence>
-                </div>
+                <label className="font-medium">Assignee To</label>
+                <MemberInput
+                  value={selectedMembers}
+                  onChange={setSelectedMembers}
+                />
               </div>
 
               {/* Description */}
