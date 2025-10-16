@@ -27,11 +27,10 @@ export default function Todo() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { selectedProject } = useContext(DataContext);
-  console.log(selectedProject?._id);
 
   // 🟢 Fetch all tasks from API
   useEffect(() => {
-    if (!selectedProject?._id) return; // Skip if project not selected
+    if (!selectedProject?._id) return;
 
     const fetchTasks = async () => {
       try {
@@ -56,7 +55,6 @@ export default function Todo() {
     fetchTasks();
   }, [selectedProject?._id, axiosSecure]);
 
-
   // 🟢 Add Task
   const handleAddTask = async (newTask) => {
     try {
@@ -64,13 +62,14 @@ export default function Todo() {
 
       const taskWithColumn = {
         ...newTask,
-        projectId: selectedProject?._id, // ✅ include project ID
+        projectId: selectedProject?._id,
         columnTitle: currentColumn?.title || "To Do",
       };
 
       const res = await axiosSecure.post("/api/tasks", taskWithColumn);
 
       if (res.data?.insertedId) {
+        taskWithColumn._id = res.data.insertedId; // add _id to task
         const newColumns = columns.map((col) =>
           col.id === currentColumnId
             ? { ...col, tasks: [...col.tasks, taskWithColumn] }
@@ -89,20 +88,35 @@ export default function Todo() {
     }
   };
 
+  // ❌ Delete Task
+  const deleteTask = (colId, taskId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This task will be deleted permanently!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axiosSecure.delete(`/api/tasks/${taskId}`); // backend delete
 
-  // 🗑 Delete Column
-  const deleteColumn = (id) => {
-    setColumns(columns.filter((col) => col.id !== id));
-    setMenuOpen(null);
-  };
+          const newColumns = columns.map((col) =>
+            col.id === colId
+              ? { ...col, tasks: col.tasks.filter((t) => t._id !== taskId) } // ✅ use _id
+              : col
+          );
+          setColumns(newColumns);
 
-  // ↔ Move Column Left/Right
-  const moveColumn = (index, direction) => {
-    const newColumns = [...columns];
-    const [removed] = newColumns.splice(index, 1);
-    newColumns.splice(index + direction, 0, removed);
-    setColumns(newColumns);
-    setMenuOpen(null);
+          Swal.fire("Deleted!", "Your task has been deleted.", "success");
+        } catch (err) {
+          console.error("❌ Failed to delete task:", err);
+          Swal.fire("❌ Error", "Failed to delete task.", "error");
+        }
+      }
+    });
   };
 
   // ➕ Add New Column
@@ -116,27 +130,19 @@ export default function Todo() {
     setAddingColumn(false);
   };
 
-  // ❌ Delete Task
-  const deleteTask = (colId, taskId) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "This task will be deleted permanently!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const newColumns = columns.map((col) =>
-          col.id === colId
-            ? { ...col, tasks: col.tasks.filter((t) => t.id !== taskId) }
-            : col
-        );
-        setColumns(newColumns);
-        Swal.fire("Deleted!", "Your task has been deleted.", "success");
-      }
-    });
+  // ↔ Move Column Left/Right
+  const moveColumn = (index, direction) => {
+    const newColumns = [...columns];
+    const [removed] = newColumns.splice(index, 1);
+    newColumns.splice(index + direction, 0, removed);
+    setColumns(newColumns);
+    setMenuOpen(null);
+  };
+
+  // 🗑 Delete Column
+  const deleteColumn = (id) => {
+    setColumns(columns.filter((col) => col.id !== id));
+    setMenuOpen(null);
   };
 
   return (
@@ -147,7 +153,6 @@ export default function Todo() {
 
       {loading ? (
         <LoadingSpinner />
-
       ) : error ? (
         <p className="text-center text-red-500 font-medium">{error}</p>
       ) : (
@@ -239,10 +244,10 @@ export default function Todo() {
                       <div className="flex justify-between text-xs mt-2 items-center">
                         <span
                           className={`px-2 py-0.5 rounded-full font-medium ${task.priority === "High"
-                            ? "bg-red-100 text-red-600"
-                            : task.priority === "Low"
-                              ? "bg-green-100 text-green-600"
-                              : "bg-yellow-100 text-yellow-600"
+                              ? "bg-red-100 text-red-600"
+                              : task.priority === "Low"
+                                ? "bg-green-100 text-green-600"
+                                : "bg-yellow-100 text-yellow-600"
                             }`}
                         >
                           {task.priority}
@@ -252,14 +257,10 @@ export default function Todo() {
                           className="flex items-center gap-2"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <span className="text-gray-500 dark:text-gray-300">
-                            {task.date}
-                          </span>
-
                           <div className="relative">
                             <button
                               onClick={() =>
-                                setMenuOpen(menuOpen === task.id ? null : task.id)
+                                setMenuOpen(menuOpen === task._id ? null : task._id)
                               }
                               className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
                             >
@@ -267,7 +268,7 @@ export default function Todo() {
                             </button>
 
                             <AnimatePresence>
-                              {menuOpen === task.id && (
+                              {menuOpen === task._id && (
                                 <motion.div
                                   initial={{ opacity: 0, y: -10 }}
                                   animate={{ opacity: 1, y: 0 }}
@@ -276,7 +277,7 @@ export default function Todo() {
                                 >
                                   <ul className="text-sm">
                                     <li
-                                      onClick={() => deleteTask(col.id, task.id)}
+                                      onClick={() => deleteTask(col.id, task._id)}
                                       className="px-3 py-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-600 dark:hover:text-white cursor-pointer"
                                     >
                                       Delete
@@ -316,9 +317,6 @@ export default function Todo() {
                 >
                   <Plus />
                 </button>
-                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-gray-700 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
-                  Create Column
-                </span>
               </div>
             ) : (
               <AnimatePresence>
@@ -368,8 +366,40 @@ export default function Todo() {
         isOpen={detailOpen}
         onClose={() => setDetailOpen(false)}
         task={selectedTask}
-        onStatusChange={(status) => console.log("Status:", status)}
-        onEdit={() => console.log("Edit clicked")}
+        onStatusChange={({ status, columnTitle, taskId }) => {
+          console.log("Status change requested:", { status, columnTitle, taskId });
+          let taskToMove = null;
+
+          // Remove task from current column
+          const newColumns = columns.map((col) => {
+            const remainingTasks = col.tasks.filter((t) => {
+              if (t._id === taskId) {
+                taskToMove = { ...t, status, columnTitle };
+                return false;
+              }
+              return true;
+            });
+            return { ...col, tasks: remainingTasks };
+          });
+
+          // Add task to target column
+          const updatedColumns = newColumns.map((col) => {
+            if (col.title === columnTitle && taskToMove) {
+              return { ...col, tasks: [...col.tasks, taskToMove] };
+            }
+            return col;
+          });
+
+          setColumns(updatedColumns);
+          setDetailOpen(false);
+
+          // Update backend
+          axiosSecure
+            .patch(`/api/tasks/${taskId}`, { status, columnTitle })
+            .then(() => console.log("✅ Task updated!"))
+            .catch((err) => console.error("❌ Failed to update task:", err));
+        }}
+        onEdit={(task) => console.log("Edit clicked", task)}
       />
     </div>
   );
