@@ -1,52 +1,69 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { X, Upload, Calendar, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MyRichTextEditor from "./MyRichTextEditor";
 import { DataContext } from "../../../../context/DataContext";
 import { MemberInput } from "../../../../lib/MemberInput";
 import { useSession } from "next-auth/react";
+import { useForm, Controller } from "react-hook-form";
 
 export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
-  const { data: session, status } = useSession();
-  const [title, setTitle] = useState("");
-  const [priority, setPriority] = useState("Low");
-  const [selectedMembers, setSelectedMembers] = useState([]); // MemberInput এর জন্য state
-  const [files, setFiles] = useState([]);
-  const [comment, setComment] = useState("");
-  const [description, setDescription] = useState("");
-
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  const { data: session } = useSession();
   const { selectedProject } = useContext(DataContext);
 
+  // ✅ useForm hook
+  const { register, handleSubmit, control, reset, watch } = useForm({
+    defaultValues: {
+      title: "",
+      priority: "Low",
+      selectedMembers: [],
+      files: [],
+      comment: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+      startTime: "",
+      endTime: "",
+    },
+  });
+
+  const files = watch("files") || [];
+
+  // ✅ File Upload Handler
   const handleFileUpload = (e) => {
-    setFiles([...files, ...Array.from(e.target.files)]);
+    const uploaded = Array.from(e.target.files);
+    const prev = files || [];
+    const newFiles = [...prev, ...uploaded];
+    reset({ ...watch(), files: newFiles });
   };
 
-  const removeFile = (file) => setFiles(files.filter((f) => f !== file));
+  const removeFile = (file) => {
+    const updated = files.filter((f) => f !== file);
+    reset({ ...watch(), files: updated });
+  };
 
-  const handleSubmit = () => {
-    if (!title.trim()) return;
+  // ✅ Submit Handler
+  const onFormSubmit = (data) => {
+    if (!data.title.trim()) return;
+
     const newTask = {
       projectId: selectedProject?._id || null,
-      title,
-      priority,
-      description,
-      startDate: startDate || "-",
-      endDate: endDate || "-",
-      startTime: startTime || "-",
-      endTime: endTime || "-",
-      creatorEmail: session.user.email,
-      assigneeTo: selectedMembers,
-      files,
-      comments: comment
+      title: data.title,
+      priority: data.priority,
+      description: data.description,
+      startDate: data.startDate || "-",
+      endDate: data.endDate || "-",
+      startTime: data.startTime || "-",
+      endTime: data.endTime || "-",
+      creatorEmail: session?.user?.email,
+      assigneeTo: data.selectedMembers,
+      files: data.files,
+      comments: data.comment
         ? [
           {
             id: Date.now(),
-            text: comment,
+            text: data.comment,
             author: "You",
             time: new Date().toLocaleString(),
           },
@@ -54,20 +71,10 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
         : [],
       status: "Pending",
     };
+
     onSubmit(newTask);
     onClose();
-
-    // reset
-    setTitle("");
-    setPriority("Low");
-    setSelectedMembers([]);
-    setFiles([]);
-    setComment("");
-    setDescription("");
-    setStartDate("");
-    setEndDate("");
-    setStartTime("");
-    setEndTime("");
+    reset();
   };
 
   return (
@@ -98,28 +105,23 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
             </div>
 
             {/* Scrollable Content */}
-            <div className="p-6 flex-1 overflow-y-auto space-y-5">
+            <form onSubmit={handleSubmit(onFormSubmit)} className="p-6 flex-1 overflow-y-auto space-y-5">
               {/* Title */}
               <input
                 type="text"
                 placeholder="Todo Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                {...register("title")}
                 className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-purple-500 outline-none transition"
               />
 
               {/* Priority */}
               <div className="flex gap-4">
                 {["Low", "Medium", "High"].map((p) => (
-                  <label
-                    key={p}
-                    className="flex items-center gap-2 cursor-pointer select-none"
-                  >
+                  <label key={p} className="flex items-center gap-2 cursor-pointer select-none">
                     <input
                       type="radio"
                       value={p}
-                      checked={priority === p}
-                      onChange={() => setPriority(p)}
+                      {...register("priority")}
                       className="accent-purple-500"
                     />
                     <span
@@ -136,19 +138,28 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                 ))}
               </div>
 
-              {/* ✅ Assignee To (using MemberInput system) */}
+              {/* ✅ Assignee To */}
               <div className="space-y-2">
                 <label className="font-medium">Assignee To</label>
-                <MemberInput
-                  value={selectedMembers}
-                  onChange={setSelectedMembers}
+                <Controller
+                  name="selectedMembers"
+                  control={control}
+                  render={({ field }) => (
+                    <MemberInput value={field.value} onChange={field.onChange} />
+                  )}
                 />
               </div>
 
               {/* Description */}
               <div>
                 <label className="font-semibold block mb-2">Descriptions</label>
-                <MyRichTextEditor value={description} onChange={setDescription} />
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field }) => (
+                    <MyRichTextEditor value={field.value} onChange={field.onChange} />
+                  )}
+                />
               </div>
 
               {/* Date & Time */}
@@ -157,35 +168,15 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex gap-2 items-center">
                     <Calendar size={18} />
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="border px-2 py-1 rounded w-full"
-                    />
+                    <input type="date" {...register("startDate")} className="border px-2 py-1 rounded w-full" />
                     <Clock size={18} />
-                    <input
-                      type="time"
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                      className="border px-2 py-1 rounded w-full"
-                    />
+                    <input type="time" {...register("startTime")} className="border px-2 py-1 rounded w-full" />
                   </div>
                   <div className="flex gap-2 items-center">
                     <Calendar size={18} />
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="border px-2 py-1 rounded w-full"
-                    />
+                    <input type="date" {...register("endDate")} className="border px-2 py-1 rounded w-full" />
                     <Clock size={18} />
-                    <input
-                      type="time"
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                      className="border px-2 py-1 rounded w-full"
-                    />
+                    <input type="time" {...register("endTime")} className="border px-2 py-1 rounded w-full" />
                   </div>
                 </div>
               </div>
@@ -201,6 +192,7 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                     >
                       {file.name}
                       <button
+                        type="button"
                         onClick={() => removeFile(file)}
                         className="text-red-500 hover:text-red-700"
                       >
@@ -211,12 +203,7 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                   <label className="flex items-center gap-2 cursor-pointer px-3 py-2 border rounded hover:bg-gray-100 dark:hover:bg-gray-700">
                     <Upload size={16} />
                     Upload File
-                    <input
-                      type="file"
-                      multiple
-                      onChange={handleFileUpload}
-                      className="hidden"
-                    />
+                    <input type="file" multiple onChange={handleFileUpload} className="hidden" />
                   </label>
                 </div>
               </div>
@@ -225,27 +212,27 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
               <textarea
                 rows="2"
                 placeholder="Add a comment..."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                {...register("comment")}
                 className="w-full border rounded px-3 py-2"
               />
-            </div>
 
-            {/* Actions */}
-            <div className="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-600 transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition"
-              >
-                Submit
-              </button>
-            </div>
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-600 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
           </motion.div>
         </motion.div>
       )}
