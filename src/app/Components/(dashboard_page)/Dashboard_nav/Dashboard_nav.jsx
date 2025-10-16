@@ -177,8 +177,9 @@ export default function DashboardNavbar() {
   return (
     <>
       {/* Navbar */}
-      <header className=" sticky top-0 z-50 w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between shadow-md">
-        {/* Left: Logo */}
+      <header className=" hidden md:block lg:block ">
+       <div className="sticky top-0 z-50 w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between shadow-md" >
+ {/* Left: Logo */}
         <Link href="/" className="group lg:block md:hidden">
           <div className="flex items-center space-x-3">
             <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md">
@@ -433,7 +434,9 @@ export default function DashboardNavbar() {
             )}
           </div>
         </div>
+      </div>
       </header>
+       
 
       {/* Create Project Modal */}
       {isModalOpen && (

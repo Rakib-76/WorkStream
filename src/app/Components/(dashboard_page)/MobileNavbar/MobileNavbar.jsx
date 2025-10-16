@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import {
   Menu,
   PlusCircle,
@@ -18,16 +18,16 @@ import { signOut, useSession } from "next-auth/react";
 import Swal from "sweetalert2";
 import Button from "../../../Components/(dashboard_page)/UI/Button";
 import EmojiPicker from "emoji-picker-react";
-<<<<<<< HEAD
 import { useForm, Controller } from "react-hook-form";
-import { MemberInput } from "../Dashboard_nav/MemberInput";
-import useAxiosSecure from "../../../../lib/useAxiosSecure";
-=======
-import { useForm } from "react-hook-form";
 import { MemberInput } from "../../../../lib/MemberInput";
->>>>>>> ebd273eee04a22d3bc0540d3676c1e0059a30094
+import useAxiosSecure from "../../../../lib/useAxiosSecure";
+import { DataContext } from "../../../../context/DataContext";
 
-export default function MobileNavbar({ activeItem, setActiveItem, setSelectedProject }) {
+export default function MobileNavbar({ activeItem, setActiveItem }) {
+  
+const {selectedProject,setSelectedProject } = useContext(DataContext);
+const [collapsed, setCollapsed] = useState(false);
+
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -35,12 +35,23 @@ export default function MobileNavbar({ activeItem, setActiveItem, setSelectedPro
   const [selectedEmoji, setSelectedEmoji] = useState(null);
   const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
   const [userProjects, setUserProjects] = useState([]);
-
   const projectsDropdownRef = useRef(null);
   const fileInputRef = useRef(null);
   const { data: session } = useSession();
   const axiosSecure = useAxiosSecure();
   const { control, register, handleSubmit, reset } = useForm();
+
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: selectedProject ? 0.3 : 0,
+      },
+    },
+  };
 
   // Fetch user-specific projects
   useEffect(() => {
@@ -131,13 +142,12 @@ export default function MobileNavbar({ activeItem, setActiveItem, setSelectedPro
       Swal.fire("Error", "Something went wrong", "error");
     }
   };
-  
 
   const menuItems = [
     { name: "overview", label: "Overview" },
-    {  name: "tasks", label: "Tasks"  },
+    { name: "tasks", label: "Tasks" },
     { name: "calendar", label: "Calendar" },
-     { name: "attendence", label: "Attendence" },
+    { name: "attendence", label: "Attendence" },
     { name: "todo", label: "To-do" },
     { name: "chat", label: "Chat" },
     { name: "callmeet", label: "Call/Meet" },
@@ -168,9 +178,10 @@ export default function MobileNavbar({ activeItem, setActiveItem, setSelectedPro
 
       {/* Drawer Menu */}
       <div
-        className={`absolute md:hidden top-[52px] left-0 w-full bg-background shadow-lg border-t border-border transition-all duration-500 ease-in-out overflow-hidden ${
-          isOpen ? "max-h-[calc(100vh-52px)]" : "max-h-0"
-        }`}
+        className={`absolute md:hidden top-[66px] left-0 w-full bg-background shadow-lg  transition-all duration-500 ease-in-out overflow-hidden z-[9999] ${
+  isOpen ? "max-h-[calc(100vh-52px)]" : "max-h-0"
+}`}
+
       >
         <div className="h-[calc(100vh-52px)] overflow-y-auto">
           {/* Profile */}
@@ -209,40 +220,102 @@ export default function MobileNavbar({ activeItem, setActiveItem, setSelectedPro
                 Projects
               </button>
 
-            <AnimatePresence>
-  {projectsDropdownOpen && (
-    <motion.div
-  initial={{ opacity: 0, y: -10 }}
-  animate={{ opacity: 1, y: 0 }}
-  exit={{ opacity: 0, y: -10 }}
-  className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden z-50"
->
+              <AnimatePresence>
+                {projectsDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute right-0 mt-2  bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden z-50"
+                  >
+                    {/* Header */}
+                    <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                        Your Projects
+                      </h4>
+                      <button
+                        onClick={() => setProjectsDropdownOpen(false)}
+                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"
+                      >
+                        ✕
+                      </button>
+                    </div>
 
-      {userProjects.length === 0 ? (
-        <div className="p-3 text-sm text-gray-500">No projects found</div>
-      ) : (
-        <ul>
-          {userProjects.map((project, i) => (
-            <li key={i}>
-              <button
-                onClick={() => {
-                  setSelectedProject(project);
-                  setProjectsDropdownOpen(false);
-                }}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
-              >
-                {project.projectName}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </motion.div>
-  )}
-</AnimatePresence>
+                    {/* Content */}
+                    <div className="max-h-64 overflow-y-auto p-3 space-y-2">
+                      {userProjects.length === 0 ? (
+                        <div className="text-sm text-gray-500 py-4 text-center">
+                          No projects found
+                        </div>
+                      ) : (
+                        userProjects.map((project) => (
+                          <button
+                            key={project._id}
+                            onClick={() => {
+                              setSelectedProject(project);
+                              setProjectsDropdownOpen(false);
+                            }}
+                            className={`w-full text-left p-3 rounded-xl border transition-all ${
+                              selectedProject?._id === project._id
+                                ? "border-primary bg-primary/10 shadow-sm"
+                                : "border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                                {project.projectName}
+                              </h3>
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded-full ${
+                                  project.priority === "High"
+                                    ? "bg-red-100 text-red-700 dark:bg-red-800/40 dark:text-red-300"
+                                    : project.priority === "Medium"
+                                    ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800/40 dark:text-yellow-300"
+                                    : "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
+                                }`}
+                              >
+                                {project.priority}
+                              </span>
+                            </div>
 
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              Manager: {project.manager?.name || "N/A"}
+                            </p>
+                          </button>
+                        ))
+                      )}
+                    </div>
+
+                    {/* Unselect */}
+                    <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+                      <button
+                        onClick={() => {
+                          setSelectedProject(null);
+                          setProjectsDropdownOpen(false);
+                        }}
+                        className="w-full text-center px-4 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-all"
+                      >
+                        Unselect Project
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
+
+          {/* Project name display */}
+          <div
+        className={`mt-2 mb-2 ml-4 transition-opacity duration-300 ${
+          collapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto"
+        }`}
+      >
+      
+        <h1 className="text-lg font-bold text-foreground truncate">
+          Project: {selectedProject ? selectedProject.projectName : "No Project Selected"}
+        </h1>
+      </div>
 
           {/* Menu Items */}
           <ul className="p-4 space-y-2">
@@ -374,7 +447,13 @@ export default function MobileNavbar({ activeItem, setActiveItem, setSelectedPro
                   </button>
                 </div>
                 {(selectedImage || selectedEmoji) && (
-                  <div className="mt-2 text-lg">{selectedImage ? <Image src={selectedImage} alt="logo" width={60} height={60} /> : selectedEmoji}</div>
+                  <div className="mt-2 text-lg">
+                    {selectedImage ? (
+                      <Image src={selectedImage} alt="logo" width={60} height={60} />
+                    ) : (
+                      selectedEmoji
+                    )}
+                  </div>
                 )}
               </div>
 
