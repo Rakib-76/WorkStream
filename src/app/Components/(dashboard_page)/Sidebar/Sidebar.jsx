@@ -89,16 +89,16 @@ export default function Sidebar({ activeItem, setActiveItem }) {
             <img
       src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
       alt="Uploaded Preview"
-      className="h-full object-contain rounded-xl"
+      className="h-10 object-contain rounded-xl"
     />
           </div>
         </Link>
-        <button
+        {/* <button
           onClick={() => setCollapsed(!collapsed)}
           className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition relative z-10"
         >
           {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-        </button>
+        </button> */}
       </div>
 
       {/* 🧩 Project Name Display */}
