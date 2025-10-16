@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Plus, MoreVertical, Check, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AddTaskModal from "./AddTaskModal";
@@ -7,6 +7,7 @@ import TaskDetailModal from "./TaskDetailModal";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner"; 
+import { DataContext } from "../../../../context/DataContext";
 
 export default function Todo() {
   const [columns, setColumns] = useState([
@@ -22,10 +23,11 @@ export default function Todo() {
   const [newColumnTitle, setNewColumnTitle] = useState("");
   const [selectedTask, setSelectedTask] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
-
   const axiosSecure = useAxiosSecure();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { selectedProject } = useContext(DataContext);
+  console.log(selectedProject?._id);
 
   // 🟢 Fetch all tasks from API
   useEffect(() => {
