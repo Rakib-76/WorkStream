@@ -64,7 +64,7 @@ export default  function Tasks({ projectId }) {
     : tasksData.filter((task) => task.creatorEmail === userEmail);
 
   return (
-    <div className="space-y-6 py-16">
+    <div className="space-y-6 ">
       {/* Tabs */}
       <div className="flex items-center justify-between">
         <div className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 pt-1.5 text-sm font-medium ring-offset-background transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-muted-foreground ">

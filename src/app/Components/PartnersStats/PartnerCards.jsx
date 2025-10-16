@@ -45,7 +45,7 @@ const partners = [
 
 export default function PartnerServices() {
   return (
-    <section className="py-16 bg-background text-foreground">
+    <section className=" bg-background text-foreground">
       <div className="container mx-auto px-6 lg:px-12">
         <h2 className="text-3xl font-bold text-center mb-12">
           Partner Services

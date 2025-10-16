@@ -358,7 +358,7 @@ const TasksStatisticsChart = () => {
 export default function Overview() {
   return (
     // Added base styling for a clean dark/light mode background
-    <div className="space-y-6 p-4 md:p-8 min-h-screen  text-gray-800 dark:text-gray-200">
+    <div className="space-y-6  min-h-screen  text-gray-800 dark:text-gray-200">
 
       {/* Title */}
       <h2 className="text-3xl font-bold">Dashboard Overview</h2>
