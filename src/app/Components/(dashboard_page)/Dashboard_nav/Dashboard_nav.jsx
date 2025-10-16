@@ -34,13 +34,14 @@ export default function DashboardNavbar() {
   const [showMemberSearch, setShowMemberSearch] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
+  const projectsDropdownRef = useRef(null);
   const [userProjects, setUserProjects] = useState([]);
   const { data: session } = useSession();
   const [selectedImage, setSelectedImage] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState(null);
   const fileInputRef = useRef(null);
-  const projectsDropdownRef = useRef(null);
+  
   const axiosSecure = useAxiosSecure();
   const { control, register, handleSubmit } = useForm();
   const [manager, setManager] = useState(null);
@@ -176,17 +177,34 @@ export default function DashboardNavbar() {
   return (
     <>
       {/* Navbar */}
-      <header className=" sticky top-0 z-50 w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between shadow-md">
-        {/* Left: Logo */}
+      <header className=" hidden md:block lg:block ">
+       <div className="sticky top-0 z-50 w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between shadow-md" >
+ {/* Left: Logo */}
         <Link href="/" className="group lg:block md:hidden">
-          <div className="flex items-center space-x-3">
+          {/* <div className="flex items-center space-x-3">
             <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md">
               <Waves className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="hidden lg:block text-xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
               WorkStream
             </span>
-          </div>
+          </div> */}
+         <div className="flex gap-2 items-center"> <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden group-hover:scale-105 transition-transform duration-300 shadow-md bg-white">
+  {/* <Image
+    src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
+    alt="WorkStream Logo"
+    width={40}
+    height={40}
+    className="object-contain"
+  /> */}
+   <img
+      src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
+      alt="Uploaded Preview"
+      className="h-full object-contain rounded-xl"
+    />
+    
+</div><span className="font-bold text-2xl ">WorkStream</span></div>
+
         </Link>
 
         {/* Middle Section */}
@@ -432,7 +450,9 @@ export default function DashboardNavbar() {
             )}
           </div>
         </div>
+      </div>
       </header>
+       
 
       {/* Create Project Modal */}
       {isModalOpen && (

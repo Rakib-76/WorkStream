@@ -257,7 +257,7 @@ export default function Team() {
   const handleCloseNotification = () => setNotification(null);
 
   return (
-    <section className="p-4 md:p-8 text-gray-800 dark:text-gray-200">
+    <section className=" text-gray-800 dark:text-gray-200">
       <Notification notification={notification} onClose={handleCloseNotification} />
 
       {/* Header + Add Member Btn */}

@@ -86,17 +86,19 @@ export default function Sidebar({ activeItem, setActiveItem }) {
       <div className="z-10 flex justify-between mb-4">
         <Link href="/" className="group md:block lg:hidden">
           <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md">
-              <Waves className="w-5 h-5 text-primary-foreground" />
-            </div>
+            <img
+      src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
+      alt="Uploaded Preview"
+      className="h-10 object-contain rounded-xl"
+    />
           </div>
         </Link>
-        <button
+        {/* <button
           onClick={() => setCollapsed(!collapsed)}
           className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition relative z-10"
         >
           {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-        </button>
+        </button> */}
       </div>
 
       {/* 🧩 Project Name Display */}
@@ -106,7 +108,7 @@ export default function Sidebar({ activeItem, setActiveItem }) {
         }`}
       >
         <h1 className="text-lg font-bold text-foreground truncate">
-          {selectedProject ? selectedProject.projectName : "No Project Selected"}
+          Project : {selectedProject ? selectedProject.projectName : "No Project Selected"}
         </h1>
       </div>
 
@@ -162,10 +164,10 @@ export default function Sidebar({ activeItem, setActiveItem }) {
                     <li
                       key={child.name}
                       onClick={() => setActiveItem(child.name)}
-                      className={`flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2 transition
+                      className={`flex  items-center gap-3 cursor-pointer rounded-br-4xl rounded-tr-4xl mr-16 px-3 py-2 transition
                         ${
                           activeItem === child.name
-                            ? "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] font-semibold shadow-md"
+                            ? "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)/40] text-[var(--primary-foreground)] font-semibold shadow-md"
                             : "hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
                         }`}
                     >
