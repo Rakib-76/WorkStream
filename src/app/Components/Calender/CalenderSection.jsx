@@ -9,7 +9,8 @@ import interactionPlugin from "@fullcalendar/interaction";
 import axios from "axios";
 
 
-export default function CalendarSection() {
+export default function CalendarSection({ projectId }) {
+    console.log(projectId)
     const [events, setEvents] = useState([]);
     const calendarRef = useRef(null);
     const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ export default function CalendarSection() {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await fetch('/api/tasks');
+                const response = await fetch(`/api/calenderTask?projectId=${projectId}`);
                 const result = await response.json(); // API Response
 
 
@@ -60,7 +61,7 @@ export default function CalendarSection() {
 
 
         fetchTasks();
-    }, []);
+    }, [projectId]);
 
 
 
