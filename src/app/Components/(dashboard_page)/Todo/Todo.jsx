@@ -6,7 +6,7 @@ import AddTaskModal from "./AddTaskModal";
 import TaskDetailModal from "./TaskDetailModal";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
-import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner"; 
+import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
 import { DataContext } from "../../../../context/DataContext";
 
 export default function Todo() {
@@ -31,15 +31,19 @@ export default function Todo() {
 
   // 🟢 Fetch all tasks from API
   useEffect(() => {
+    if (!selectedProject?._id) return; // Skip if project not selected
+
     const fetchTasks = async () => {
       try {
-        const res = await axiosSecure.get("/api/tasks");
+        setLoading(true);
+        const res = await axiosSecure.get(`/api/tasks?projectId=${selectedProject._id}`);
         const allTasks = res.data?.data || [];
 
         const updatedColumns = columns.map((col) => ({
           ...col,
           tasks: allTasks.filter((task) => task.columnTitle === col.title),
         }));
+
         setColumns(updatedColumns);
       } catch (err) {
         console.error("❌ Failed to load tasks:", err);
@@ -48,8 +52,10 @@ export default function Todo() {
         setLoading(false);
       }
     };
+
     fetchTasks();
-  }, [columns.length, axiosSecure]);
+  }, [selectedProject?._id, axiosSecure]);
+
 
   // 🟢 Add Task
   const handleAddTask = async (newTask) => {
@@ -58,7 +64,8 @@ export default function Todo() {
 
       const taskWithColumn = {
         ...newTask,
-        columnTitle: currentColumn?.title || "Untitled",
+        projectId: selectedProject?._id, // ✅ include project ID
+        columnTitle: currentColumn?.title || "To Do",
       };
 
       const res = await axiosSecure.post("/api/tasks", taskWithColumn);
@@ -81,6 +88,7 @@ export default function Todo() {
       Swal.fire("❌ Error", "Something went wrong!", "error");
     }
   };
+
 
   // 🗑 Delete Column
   const deleteColumn = (id) => {
@@ -138,7 +146,7 @@ export default function Todo() {
       </h1>
 
       {loading ? (
-          <LoadingSpinner />
+        <LoadingSpinner />
 
       ) : error ? (
         <p className="text-center text-red-500 font-medium">{error}</p>
@@ -230,13 +238,12 @@ export default function Todo() {
                       </p>
                       <div className="flex justify-between text-xs mt-2 items-center">
                         <span
-                          className={`px-2 py-0.5 rounded-full font-medium ${
-                            task.priority === "High"
-                              ? "bg-red-100 text-red-600"
-                              : task.priority === "Low"
+                          className={`px-2 py-0.5 rounded-full font-medium ${task.priority === "High"
+                            ? "bg-red-100 text-red-600"
+                            : task.priority === "Low"
                               ? "bg-green-100 text-green-600"
                               : "bg-yellow-100 text-yellow-600"
-                          }`}
+                            }`}
                         >
                           {task.priority}
                         </span>
