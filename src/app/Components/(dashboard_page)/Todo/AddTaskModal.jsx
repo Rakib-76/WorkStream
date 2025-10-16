@@ -208,7 +208,7 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                 </div>
               </div>
 
-              {/* Comment */}
+              {/* Comment dfg*/}
               <textarea
                 rows="2"
                 placeholder="Add a comment..."
