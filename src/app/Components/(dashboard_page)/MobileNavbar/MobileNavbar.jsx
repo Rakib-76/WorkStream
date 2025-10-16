@@ -160,13 +160,18 @@ const [collapsed, setCollapsed] = useState(false);
     <>
       {/* Mobile Header */}
       <header className="md:hidden fixed top-0 left-0 right-0 bg-card border-b border-border flex items-center justify-between px-4 py-3 z-50">
-        <Link href="/" className="group">
+        {/* <Link href="/" className="group">
           <div className="flex items-center space-x-3">
             <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl shadow-md">
               <Waves className="w-5 h-5 text-primary-foreground" />
             </div>
           </div>
-        </Link>
+        </Link> */}
+        <img
+      src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
+      alt="Uploaded Preview"
+      className="h-10 object-contain rounded-xl"
+    />
 
         <button
           onClick={() => setIsOpen(!isOpen)}

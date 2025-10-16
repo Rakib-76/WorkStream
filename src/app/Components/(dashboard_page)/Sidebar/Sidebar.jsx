@@ -86,9 +86,11 @@ export default function Sidebar({ activeItem, setActiveItem }) {
       <div className="z-10 flex justify-between mb-4">
         <Link href="/" className="group md:block lg:hidden">
           <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md">
-              <Waves className="w-5 h-5 text-primary-foreground" />
-            </div>
+            <img
+      src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
+      alt="Uploaded Preview"
+      className="h-full object-contain rounded-xl"
+    />
           </div>
         </Link>
         <button
