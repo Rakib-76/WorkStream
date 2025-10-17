@@ -6,6 +6,8 @@ export const collectionNameObj = {
   taskCollection: "tasks",
   blogCollection: "blogs",
   fileCollection: "projectFiles",
+  notificationsCollection:"notifications",
+ 
 }
 
 export default function dbConnect(collectionName) {
