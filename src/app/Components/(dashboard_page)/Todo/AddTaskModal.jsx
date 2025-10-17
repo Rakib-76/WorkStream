@@ -11,19 +11,39 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
   const { data: session, status } = useSession();
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("Low");
-  const [selectedMembers, setSelectedMembers] = useState([]); // MemberInput এর জন্য state
+  const [selectedMembers, setSelectedMembers] = useState([]);
   const [files, setFiles] = useState([]);
   const [comment, setComment] = useState("");
   const [description, setDescription] = useState("");
-
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const { selectedProject } = useContext(DataContext);
 
-  const handleFileUpload = (e) => {
-    setFiles([...files, ...Array.from(e.target.files)]);
+  // ===== Cloudinary Upload =====
+  const handleFileUpload = async (e) => {
+    const selectedFiles = Array.from(e.target.files);
+
+    const uploadedFiles = await Promise.all(
+      selectedFiles.map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        return {
+          name: file.name,
+          url: data.url,         // Cloudinary file URL
+          public_id: data.public_id, // optional for delete
+        };
+      })
+    );
+
+    setFiles((prev) => [...prev, ...uploadedFiles]);
   };
 
   const removeFile = (file) => setFiles(files.filter((f) => f !== file));
@@ -41,16 +61,16 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
       endTime: endTime || "-",
       creatorEmail: session.user.email,
       assigneeTo: selectedMembers,
-      files,
+      files, // this now contains uploaded URLs
       comments: comment
         ? [
-          {
-            id: Date.now(),
-            text: comment,
-            author: "You",
-            time: new Date().toLocaleString(),
-          },
-        ]
+            {
+              id: Date.now(),
+              text: comment,
+              author: "You",
+              time: new Date().toLocaleString(),
+            },
+          ]
         : [],
       status: "Pending",
     };
@@ -123,12 +143,13 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                       className="accent-purple-500"
                     />
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${p === "Low"
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        p === "Low"
                           ? "bg-green-100 text-green-600"
                           : p === "Medium"
-                            ? "bg-yellow-100 text-yellow-600"
-                            : "bg-red-100 text-red-600"
-                        }`}
+                          ? "bg-yellow-100 text-yellow-600"
+                          : "bg-red-100 text-red-600"
+                      }`}
                     >
                       {p}
                     </span>
@@ -136,13 +157,10 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                 ))}
               </div>
 
-              {/* ✅ Assignee To (using MemberInput system) */}
+              {/* Assignee To */}
               <div className="space-y-2">
                 <label className="font-medium">Assignee To</label>
-                <MemberInput
-                  value={selectedMembers}
-                  onChange={setSelectedMembers}
-                />
+                <MemberInput value={selectedMembers} onChange={setSelectedMembers} />
               </div>
 
               {/* Description */}
