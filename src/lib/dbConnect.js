@@ -4,6 +4,7 @@ export const collectionNameObj = {
   userCollection:"workStream_user",
   testimonialsCollection:"testimonials", 
   taskCollection:"tasks",
+  notificationsCollection:"notifications",
   blogCollection:"blogs"
 }
 
