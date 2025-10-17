@@ -27,6 +27,7 @@ import { MemberInput } from "../../../../lib/MemberInput";
 import { Controller, useForm } from "react-hook-form";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import { DataContext } from "../../../../context/DataContext";
+import NotificationBell from "../NotificationBell/NotificationBell";
 
 export default function DashboardNavbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -376,12 +377,7 @@ export default function DashboardNavbar() {
 
           {/* Right Section */}
           <div className="flex items-center gap-3 relative">
-            <Button size="icon" variant="ghost">
-              <Bell className="w-5 h-5" />
-            </Button>
-            <Button size="icon" variant="ghost">
-              <Settings className="w-5 h-5" />
-            </Button>
+            <NotificationBell className="w-5 h-5" selectedProjectId={selectedProject?._id} userEmail={userEmail} />
             <ThemeToggle />
 
             {/* Profile Avatar */}
