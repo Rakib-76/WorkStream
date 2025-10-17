@@ -83,7 +83,7 @@ export default function DashboardContent({ activeItem }) {
       case "team":
         return (
           <div className="">
-            <Team></Team>
+            <Team projectId={projectId}></Team>
           </div>
         );
 
