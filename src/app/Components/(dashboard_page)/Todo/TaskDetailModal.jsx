@@ -7,7 +7,6 @@ import dayjs from "dayjs";
 
 export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange, onEdit, taskId }) {
   if (!isOpen || !task) return null;
-  console.log("Rendering TaskDetailModal for task:", task);
 
   const [comments, setComments] = useState(task?.comments || []);
   const [newComment, setNewComment] = useState("");
