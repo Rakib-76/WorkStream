@@ -7,7 +7,7 @@ import { io } from "socket.io-client";
 
 let socket;
 
-export default function NotificationBell({ selectedProjectId, userEmail }) {
+export default function NotificationBell({ selectedProjectId }) {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(false);
@@ -16,15 +16,9 @@ export default function NotificationBell({ selectedProjectId, userEmail }) {
 
     // Initialize socket
     useEffect(() => {
-        if (!socket) {
-            socket = io({
-                path: "/api/socket",
-            });
-        }
+        if (!socket) socket = io({ path: "/api/socket" });
 
-        // Listen for live notifications
         socket.on("new_notification", (data) => {
-            // Only show notifications relevant to this project
             if (data.projectId === selectedProjectId) {
                 setNotifications(prev => [data, ...prev]);
             }
@@ -35,7 +29,7 @@ export default function NotificationBell({ selectedProjectId, userEmail }) {
         };
     }, [selectedProjectId]);
 
-    // Fetch notifications from DB when project changes
+    // Fetch notifications from DB
     useEffect(() => {
         if (!selectedProjectId) return;
 
@@ -58,9 +52,7 @@ export default function NotificationBell({ selectedProjectId, userEmail }) {
         try {
             const res = await axiosSecure.patch(`/api/notifications/${id}/read`);
             if (res.data.success) {
-                setNotifications(prev =>
-                    prev.map(n => (n._id === id ? { ...n, read: true } : n))
-                );
+                setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
             }
         } catch (err) {
             console.error(err);
@@ -80,15 +72,9 @@ export default function NotificationBell({ selectedProjectId, userEmail }) {
 
     return (
         <div className="relative" ref={dropdownRef}>
-            <button
-                onClick={() => setOpenDropdown(!openDropdown)}
-                className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-                aria-label="Notifications"
-            >
+            <button onClick={() => setOpenDropdown(!openDropdown)} className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
                 <Bell className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-                {notifications.some(n => !n.read) && (
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-gray-800" />
-                )}
+                {notifications.some(n => !n.read) && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-gray-800" />}
             </button>
 
             {openDropdown && (
@@ -100,12 +86,7 @@ export default function NotificationBell({ selectedProjectId, userEmail }) {
                     ) : (
                         <div className="overflow-y-auto max-h-96">
                             {notifications.map(n => (
-                                <div
-                                    key={n._id}
-                                    onClick={() => markAsRead(n._id)}
-                                    className={`p-3 border-b last:border-none cursor-pointer transition-colors ${n.read ? "bg-gray-100 dark:bg-gray-700" : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                                        }`}
-                                >
+                                <div key={n._id} onClick={() => markAsRead(n._id)} className={`p-3 border-b last:border-none cursor-pointer transition-colors ${n.read ? "bg-gray-100 dark:bg-gray-700" : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50"}`}>
                                     <p className="text-sm text-gray-800 dark:text-gray-100">{n.message}</p>
                                     <p className="text-xs text-gray-400">{new Date(n.createdAt).toLocaleString()}</p>
                                 </div>
