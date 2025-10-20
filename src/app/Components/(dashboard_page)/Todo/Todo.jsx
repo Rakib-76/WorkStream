@@ -33,7 +33,7 @@ export default function Todo() {
   const userName = session?.user?.name || "Unknown User";
   const userEmail = session?.user?.email || "Unknown Email";
   const userImage = session?.user?.image || "/def-profile.jpeg";
-  
+
   // 🟢 Fetch all tasks from API
   useEffect(() => {
     if (!selectedProject?._id) return;
@@ -84,6 +84,7 @@ export default function Todo() {
         );
         setColumns(newColumns);
         setCurrentColumnId(null);
+
         // 🟢 Send Notification
         await axiosSecure.post("/api/notifications", {
           projectId: selectedProject?._id,
@@ -93,7 +94,7 @@ export default function Todo() {
             email: userEmail,
             image: userImage,
           },
-          message: `${userName} created a new task: ${newTask.title}`,
+          message: `${userName} added a new task: ${newTask.title}`,
           type: "task_created",
         });
 
@@ -387,7 +388,6 @@ export default function Todo() {
         onClose={() => setDetailOpen(false)}
         task={selectedTask}
         onStatusChange={({ status, columnTitle, taskId }) => {
-          console.log("Status change requested:", { status, columnTitle, taskId });
           let taskToMove = null;
 
           // Remove task from current column
@@ -413,12 +413,30 @@ export default function Todo() {
           setColumns(updatedColumns);
           setDetailOpen(false);
 
-          // Update backend
+          // ✅ Update backend
           axiosSecure
             .patch(`/api/tasks/${taskId}`, { status, columnTitle })
-            .then(() => console.log("✅ Task updated!"))
+            .then(async () => {
+              console.log("✅ Task updated!");
+
+              // ✅ Send notification
+              await axiosSecure.post("/api/notifications", {
+                projectId: selectedProject?._id,
+                taskId,
+                user: {
+                  name: userName,
+                  email: userEmail,
+                  image: userImage,
+                },
+                message: `${userName} changed task "${taskToMove?.title}" status to "${status}"`,
+                type: "task_status_change",
+              });
+
+              console.log("📩 Notification sent!");
+            })
             .catch((err) => console.error("❌ Failed to update task:", err));
         }}
+
         onEdit={(task) => console.log("Edit clicked", task)}
       />
     </div>
