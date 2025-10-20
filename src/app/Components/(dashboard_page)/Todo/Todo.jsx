@@ -122,14 +122,34 @@ export default function Todo() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axiosSecure.delete(`/api/tasks/${taskId}`); // backend delete
+          // 🔹 Find the deleted task before removing
+          const deletedTask = columns
+            .find((col) => col.id === colId)
+            ?.tasks.find((t) => t._id === taskId);
 
+          // 🔹 Delete task from backend
+          await axiosSecure.delete(`/api/tasks/${taskId}`);
+
+          // 🔹 Update frontend state
           const newColumns = columns.map((col) =>
-            col.id === colId
-              ? { ...col, tasks: col.tasks.filter((t) => t._id !== taskId) } // ✅ use _id
+            col.id === colId 
+              ? { ...col, tasks: col.tasks.filter((t) => t._id !== taskId) }
               : col
           );
           setColumns(newColumns);
+
+          // ✅ Send notification
+          await axiosSecure.post("/api/notifications", {
+            projectId: selectedProject?._id,
+            taskId,
+            user: {
+              name: userName,
+              email: userEmail,
+              image: userImage,
+            },
+            message: `${userName} deleted the task "${deletedTask?.title}"`,
+            type: "task_deleted",
+          });
 
           Swal.fire("Deleted!", "Your task has been deleted.", "success");
         } catch (err) {
@@ -139,6 +159,7 @@ export default function Todo() {
       }
     });
   };
+
 
   // ➕ Add New Column
   const handleAddColumn = () => {
