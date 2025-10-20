@@ -1,17 +1,14 @@
 "use client";
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { X, Upload, Calendar, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MyRichTextEditor from "./MyRichTextEditor";
 import { DataContext } from "../../../../context/DataContext";
 import { MemberInput } from "../../../../lib/MemberInput";
 import { useSession } from "next-auth/react";
-import { io } from "socket.io-client";
-
-let socket;
 
 export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("Low");
   const [selectedMembers, setSelectedMembers] = useState([]);
@@ -23,17 +20,6 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const { selectedProject } = useContext(DataContext);
-
-  // ===== Socket Setup =====
-  useEffect(() => {
-    if (!socket) {
-      socket = io("/api/socket");
-    }
-
-    return () => {
-      if (socket) socket.off();
-    };
-  }, []);
 
   // ===== Cloudinary Upload =====
   const handleFileUpload = async (e) => {
@@ -51,8 +37,8 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
         const data = await res.json();
         return {
           name: file.name,
-          url: data.url,
-          public_id: data.public_id,
+          url: data.url,         // Cloudinary file URL
+          public_id: data.public_id, // optional for delete
         };
       })
     );
@@ -62,9 +48,8 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
 
   const removeFile = (file) => setFiles(files.filter((f) => f !== file));
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!title.trim()) return;
-
     const newTask = {
       projectId: selectedProject?._id || null,
       title,
@@ -76,36 +61,23 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
       endTime: endTime || "-",
       creatorEmail: session.user.email,
       assigneeTo: selectedMembers,
-      files,
+      files, // this now contains uploaded URLs
       comments: comment
         ? [
-          {
-            id: Date.now(),
-            text: comment,
-            author: "You",
-            time: new Date().toLocaleString(),
-          },
-        ]
+            {
+              id: Date.now(),
+              text: comment,
+              author: "You",
+              time: new Date().toLocaleString(),
+            },
+          ]
         : [],
       status: "Pending",
     };
-
-    // Call parent onSubmit to save task to DB
     onSubmit(newTask);
     onClose();
 
-    // ===== Send Notification via Socket =====
-    if (socket) {
-      socket.emit("send_notification", {
-        title: `New Task: ${newTask.title}`,
-        type: "task_created",
-        projectId: newTask.projectId,
-        userEmail: newTask.assigneeTo.map((u) => u.email) || [],
-        timestamp: new Date(),
-      });
-    }
-
-    // ===== Reset form =====
+    // reset
     setTitle("");
     setPriority("Low");
     setSelectedMembers([]);
@@ -147,6 +119,7 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
 
             {/* Scrollable Content */}
             <div className="p-6 flex-1 overflow-y-auto space-y-5">
+              {/* Title */}
               <input
                 type="text"
                 placeholder="Todo Title"
@@ -170,12 +143,13 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                       className="accent-purple-500"
                     />
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${p === "Low"
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        p === "Low"
                           ? "bg-green-100 text-green-600"
                           : p === "Medium"
-                            ? "bg-yellow-100 text-yellow-600"
-                            : "bg-red-100 text-red-600"
-                        }`}
+                          ? "bg-yellow-100 text-yellow-600"
+                          : "bg-red-100 text-red-600"
+                      }`}
                     >
                       {p}
                     </span>

@@ -45,12 +45,11 @@ export default function DashboardNavbar() {
   const { control, register, handleSubmit } = useForm();
   const [manager, setManager] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   const { data: session } = useSession();
   const userName = session?.user?.name || "Unknown User";
   const userEmail = session?.user?.email || "Unknown Email";
   const userImage = session?.user?.image || "/def-profile.jpeg";
-  console.log("User Info:", { userName, userEmail, userImage });
 
   // data from Context
   const { setSelectedProject, selectedProject } = useContext(DataContext);
@@ -163,6 +162,32 @@ export default function DashboardNavbar() {
         collectionName: "projects",
         projectData: payload,
       });
+      
+      // ✅ send notification after successful project creation
+      if (response.data.success) {
+        await axiosSecure.post("/api/notifications", {
+          projectId: response.data.data.insertedId,
+          user: {
+            name: userName,
+            email: userEmail,
+            image: userImage,
+          },
+          message: `${userName} created a new project: ${data.projectName}`,
+          type: "project_created",
+        });
+
+        Swal.fire({
+          icon: "success",
+          title: "Project Created!",
+          text: "Your project has been saved successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
+        setIsModalOpen(false);
+      } else {
+        Swal.fire("Error", response.data.error || "Failed to create project", "error");
+      }
 
       if (response.data.success) {
         Swal.fire({

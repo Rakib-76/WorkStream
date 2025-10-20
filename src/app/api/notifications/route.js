@@ -1,39 +1,33 @@
 import dbConnect, { collectionNameObj } from "../../../lib/dbConnect";
-import { getIo } from "../../../lib/socket";
 
-// POST: create notification
-export async function POST(req, res) {
+// ✅ POST: create notification
+export async function POST(req) {
     try {
-        const { projectId, message, createdBy, type } = await req.json();
+        const { projectId, taskId, user, message, type } = await req.json();
 
-        if (!projectId || !message || !createdBy) {
-            return res.status(400).json({ success: false, error: "Missing required fields" });
+        if (!projectId || !message || !user?.email) {
+            return new Response(JSON.stringify({ success: false, error: "Missing fields" }), { status: 400 });
         }
 
         const notification = {
             projectId,
+            taskId: taskId || null,
+            user,
             message,
-            createdBy,
             type: type || "info",
-            read: false,
+            isRead: false,
             createdAt: new Date().toISOString(),
         };
 
         const collection = await dbConnect(collectionNameObj.notificationsCollection);
         const result = await collection.insertOne(notification);
 
-        // Emit to socket
-        const io = getIo();
-        if (io) io.emit("new_notification", notification);
-
-        res.status(201).json({ success: true, notificationId: result.insertedId });
+        return new Response(JSON.stringify({ success: true, id: result.insertedId }), { status: 201 });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, error: err.message });
+        return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500 });
     }
 }
-
-// GET: get notifications by projectId
+// ✅ GET: get notifications by projectId
 export async function GET(req) {
     try {
         const { searchParams } = new URL(req.url);
