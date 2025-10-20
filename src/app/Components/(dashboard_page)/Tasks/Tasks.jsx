@@ -13,6 +13,7 @@ import { useSession } from "next-auth/react";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
 import AddTaskFormModal from "../AddTaskFormModal/AddTaskFormModal";
+import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
 
 
 export default function Tasks({ projectId }) {
@@ -21,15 +22,17 @@ export default function Tasks({ projectId }) {
   const axiosSecure = useAxiosSecure();
   const userEmail = session?.user?.email;
   const [isCreatedByUser, setIsCreatedByUser] = useState(false);
+   const [loading, setLoading] = useState(true);
 
 
   // Fetch all tasks
-  const { data: tasksData = [], refetch } = useQuery({
+  const { data: tasksData = [], refetch , isLoading} = useQuery({
     queryKey: ["tasks", projectId],
     queryFn: async () => {
       if (!projectId) {
         return [];
       }
+      setLoading(true);
       const res = await axiosSecure.get(`/api/tasks?projectId=${projectId}`);
       return res.data.data;
     },
@@ -57,6 +60,9 @@ export default function Tasks({ projectId }) {
   };
 
   // only creator see task my task fetch
+  if(isLoading){
+    return <LoadingSpinner/>
+  }
 
   const displayedTasks =
     activeTab === "all"
