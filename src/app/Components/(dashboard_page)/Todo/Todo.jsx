@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
 import { DataContext } from "../../../../context/DataContext";
+import { useSession } from "next-auth/react";
 
 export default function Todo() {
   const [columns, setColumns] = useState([
@@ -28,6 +29,11 @@ export default function Todo() {
   const [error, setError] = useState(null);
   const { selectedProject } = useContext(DataContext);
 
+  const { data: session } = useSession();
+  const userName = session?.user?.name || "Unknown User";
+  const userEmail = session?.user?.email || "Unknown Email";
+  const userImage = session?.user?.image || "/def-profile.jpeg";
+  
   // 🟢 Fetch all tasks from API
   useEffect(() => {
     if (!selectedProject?._id) return;
@@ -59,7 +65,6 @@ export default function Todo() {
   const handleAddTask = async (newTask) => {
     try {
       const currentColumn = columns.find((col) => col.id === currentColumnId);
-
       const taskWithColumn = {
         ...newTask,
         projectId: selectedProject?._id,
@@ -69,7 +74,9 @@ export default function Todo() {
       const res = await axiosSecure.post("/api/tasks", taskWithColumn);
 
       if (res.data?.insertedId) {
-        taskWithColumn._id = res.data.insertedId; // add _id to task
+        // ✅ Task added successfully
+        taskWithColumn._id = res.data.insertedId;
+
         const newColumns = columns.map((col) =>
           col.id === currentColumnId
             ? { ...col, tasks: [...col.tasks, taskWithColumn] }
@@ -77,6 +84,18 @@ export default function Todo() {
         );
         setColumns(newColumns);
         setCurrentColumnId(null);
+        // 🟢 Send Notification
+        await axiosSecure.post("/api/notifications", {
+          projectId: selectedProject?._id,
+          taskId: res?.data?.insertedId,
+          user: {
+            name: userName,
+            email: userEmail,
+            image: userImage,
+          },
+          message: `${userName} created a new task: ${newTask.title}`,
+          type: "task_created",
+        });
 
         Swal.fire("✅ Success", "Task added successfully!", "success");
       } else {
@@ -87,6 +106,7 @@ export default function Todo() {
       Swal.fire("❌ Error", "Something went wrong!", "error");
     }
   };
+
 
   // ❌ Delete Task
   const deleteTask = (colId, taskId) => {
@@ -244,10 +264,10 @@ export default function Todo() {
                       <div className="flex justify-between text-xs mt-2 items-center">
                         <span
                           className={`px-2 py-0.5 rounded-full font-medium ${task.priority === "High"
-                              ? "bg-red-100 text-red-600"
-                              : task.priority === "Low"
-                                ? "bg-green-100 text-green-600"
-                                : "bg-yellow-100 text-yellow-600"
+                            ? "bg-red-100 text-red-600"
+                            : task.priority === "Low"
+                              ? "bg-green-100 text-green-600"
+                              : "bg-yellow-100 text-yellow-600"
                             }`}
                         >
                           {task.priority}
