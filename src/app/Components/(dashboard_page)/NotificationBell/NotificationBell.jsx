@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import { Bell } from "lucide-react";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
+import { io } from "socket.io-client";
+
+let socket;
 
 export default function NotificationBell({ selectedProjectId, userEmail }) {
     const [notifications, setNotifications] = useState([]);
@@ -11,7 +14,28 @@ export default function NotificationBell({ selectedProjectId, userEmail }) {
     const dropdownRef = useRef(null);
     const axiosSecure = useAxiosSecure();
 
-    // Fetch notifications when selectedProjectId changes
+    // Initialize socket
+    useEffect(() => {
+        if (!socket) {
+            socket = io({
+                path: "/api/socket",
+            });
+        }
+
+        // Listen for live notifications
+        socket.on("new_notification", (data) => {
+            // Only show notifications relevant to this project
+            if (data.projectId === selectedProjectId) {
+                setNotifications(prev => [data, ...prev]);
+            }
+        });
+
+        return () => {
+            socket.off("new_notification");
+        };
+    }, [selectedProjectId]);
+
+    // Fetch notifications from DB when project changes
     useEffect(() => {
         if (!selectedProjectId) return;
 
@@ -29,18 +53,18 @@ export default function NotificationBell({ selectedProjectId, userEmail }) {
         fetchNotifications();
     }, [selectedProjectId, axiosSecure]);
 
+    // Mark notification as read
     const markAsRead = async (id) => {
-        console.log("Marking as read:", id);
-        // try {
-        //     const res = await axiosSecure.patch(`/api/notifications/${id}/read`);
-        //     if (res.data.success) {
-        //         setNotifications(prev =>
-        //             prev.map(n => (n._id === id ? { ...n, read: true } : n))
-        //         );
-        //     }
-        // } catch (err) {
-        //     console.error(err);
-        // }
+        try {
+            const res = await axiosSecure.patch(`/api/notifications/${id}/read`);
+            if (res.data.success) {
+                setNotifications(prev =>
+                    prev.map(n => (n._id === id ? { ...n, read: true } : n))
+                );
+            }
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     // Close dropdown on outside click
