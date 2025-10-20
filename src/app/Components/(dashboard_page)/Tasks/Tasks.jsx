@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import AddTaskFormModal from "../AddTaskFormModal/AddTaskFormModal";
 
 
-export default  function Tasks({ projectId }) {
+export default function Tasks({ projectId }) {
   const [activeTab, setActiveTab] = useState("all");
   const { data: session } = useSession();
   const axiosSecure = useAxiosSecure();
@@ -27,7 +27,7 @@ export default  function Tasks({ projectId }) {
   const { data: tasksData = [], refetch } = useQuery({
     queryKey: ["tasks", projectId],
     queryFn: async () => {
-      if(!projectId){
+      if (!projectId) {
         return [];
       }
       const res = await axiosSecure.get(`/api/tasks?projectId=${projectId}`);
@@ -58,10 +58,13 @@ export default  function Tasks({ projectId }) {
 
   // only creator see task my task fetch
 
-  const displayedTasks = activeTab === "all"
-    ? tasksData
-    //  My Tasks: Filter kora hocche task-er creatorEmail diye
-    : tasksData.filter((task) => task.creatorEmail === userEmail);
+  const displayedTasks =
+    activeTab === "all"
+      ? tasksData
+      : tasksData.filter((task) =>
+        task?.assigneeTo?.some(email => email === userEmail)
+      );
+
 
   return (
     <div className="space-y-6 ">
@@ -144,8 +147,13 @@ function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
                       {task.status}
                     </span>
                   </td>
-                  <td className="p-3">{task.assignedTo}</td>
-                  <td className="p-3">{task.deadline}</td>
+                  <td className="p-3">
+                    {task?.assigneeTo?.length > 0
+                      ? task.assigneeTo.join(" , ")
+                      : "No Assignee"}
+                  </td>
+
+                  <td className="p-3">{task.endDate}</td>
                   <td className="p-3 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
