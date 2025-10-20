@@ -1,6 +1,7 @@
 import dbConnect, { collectionNameObj } from "../../../lib/dbConnect";
+import { getIo } from "../../../lib/socket";
 
-// ✅ POST: create notification
+// POST: create notification
 export async function POST(req, res) {
     try {
         const { projectId, message, createdBy, type } = await req.json();
@@ -21,6 +22,10 @@ export async function POST(req, res) {
         const collection = await dbConnect(collectionNameObj.notificationsCollection);
         const result = await collection.insertOne(notification);
 
+        // Emit to socket
+        const io = getIo();
+        if (io) io.emit("new_notification", notification);
+
         res.status(201).json({ success: true, notificationId: result.insertedId });
     } catch (err) {
         console.error(err);
@@ -28,7 +33,7 @@ export async function POST(req, res) {
     }
 }
 
-// ✅ GET: get notifications by projectId
+// GET: get notifications by projectId
 export async function GET(req) {
     try {
         const { searchParams } = new URL(req.url);
