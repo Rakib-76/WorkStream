@@ -117,7 +117,7 @@ export default function DashboardNavbar() {
     const fetchCreatorInfo = async () => {
       if (!session?.user?.email) return;
       try {
-        const { data: creatorInfo } = await axiosSecure.get(`/api/users?email=${session.user.email}`);
+        const { data: creatorInfo } = await axiosSecure.get(`/api/users?email=${session?.user?.email}`);
         const managerData = {
           id: creatorInfo?._id,
           name: creatorInfo?.name || session?.user?.name,

@@ -58,7 +58,7 @@ const [collapsed, setCollapsed] = useState(false);
     const fetchUserProjects = async () => {
       if (!session?.user?.email) return;
       try {
-        const res = await axiosSecure.get(`/api/projects?email=${session.user.email}`);
+        const res = await axiosSecure.get(`/api/projects?email=${session?.user?.email}`);
         if (res.data.success) {
           const sortedProjects = res.data.data.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)

@@ -19,7 +19,7 @@ export default function NotificationBell({ selectedProjectId, userEmail }) {
             setLoading(true);
             try {
                 const res = await axiosSecure.get(`/api/notifications?projectId=${selectedProjectId}`);
-                if (res.data.success) setNotifications(res.data.notifications);
+                if (res?.data?.success) setNotifications(res?.data?.notifications);
             } catch (err) {
                 console.error(err);
             } finally {

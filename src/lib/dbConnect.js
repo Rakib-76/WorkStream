@@ -1,15 +1,17 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
-export const collectionNameObj = {
-  servicesCollection:"tools",
-  userCollection:"workStream_user",
-  testimonialsCollection:"testimonials", 
-  taskCollection:"tasks",
-  notificationsCollection:"notifications",
-  blogCollection:"blogs"
-}
 
-export default function dbConnect (collectionName){
-  
+export const collectionNameObj = {
+  servicesCollection: "tools",
+  userCollection: "workStream_user",
+  testimonialsCollection: "testimonials",
+  taskCollection: "tasks",
+  blogCollection: "blogs",
+  fileCollection: "projectFiles",
+  notificationsCollection: "notifications",
+};
+
+export default function dbConnect(collectionName) {
+
   const uri = process.env.NEXT_PUBLIC_MONGODB_URI
   // Create a MongoClient with a MongoClientOptions object to set the Stable API version
   const client = new MongoClient(uri, {
