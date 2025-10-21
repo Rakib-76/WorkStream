@@ -11,19 +11,19 @@ export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange,
   const [comments, setComments] = useState(task?.comments || []);
   const [newComment, setNewComment] = useState("");
 
-  // Pending বোতাম
+  // Pending 
   const markPending = () => {
     Swal.fire("Pending!", "Task marked as pending.", "info");
     onStatusChange({ status: "Pending", columnTitle: "To Do", taskId: task._id });
   };
 
-  // In Progress বোতাম
+  // In Progress 
   const markInProgress = () => {
     Swal.fire("In Progress!", "Task is now in progress.", "info");
     onStatusChange({ status: "In Progress", columnTitle: "In Progress", taskId: task._id });
   };
 
-  // Completed বোতাম
+  // Completed
   const markCompleted = () => {
     Swal.fire("Completed!", "Task completed successfully.", "success");
     onStatusChange({ status: "Completed", columnTitle: "Done", taskId: task._id });
