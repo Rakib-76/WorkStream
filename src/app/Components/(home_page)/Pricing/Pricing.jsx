@@ -47,27 +47,23 @@ export function Pricing() {
       return;
     }
 
-    const stripe = await stripePromise;
-    const { error } = await stripe.redirectToCheckout({
-      lineItems: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: { name: plan.name },
-            unit_amount: plan.amount * 100,
-          },
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      successUrl: window.location.origin + "/success",
-      cancelUrl: window.location.origin + "/cancel",
-    });
+    try {
+      const res = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
 
-    if (error) {
-      console.error(error);
+      const data = await res.json();
+
+      if (data.url) {
+        window.location.href = data.url; // redirect to Stripe checkout
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
+
 
   return (
     <section id="pricing" className="py-20 bg-[#0f172a] text-white">
@@ -82,8 +78,8 @@ export function Pricing() {
             <div
               key={index}
               className={`relative flex flex-col justify-between h-full rounded-2xl p-8 border transition-all duration-300 ${plan.highlight
-                  ? "bg-gradient-to-b from-blue-600 to-indigo-700 border-none"
-                  : "bg-[#111827] border border-gray-700"
+                ? "bg-gradient-to-b from-blue-600 to-indigo-700 border-none"
+                : "bg-[#111827] border border-gray-700"
                 }`}
             >
               {plan.highlight && (
@@ -130,8 +126,8 @@ export function Pricing() {
               <button
                 onClick={() => handleCheckout(plan)}
                 className={`w-full py-3 rounded-lg text-lg font-semibold transition-all ${plan.highlight
-                    ? "bg-white text-blue-700 hover:bg-gray-100"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
+                  ? "bg-white text-blue-700 hover:bg-gray-100"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
                   }`}
               >
                 {plan.buttonText}
