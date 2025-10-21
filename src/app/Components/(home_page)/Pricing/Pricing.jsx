@@ -1,168 +1,143 @@
-// import { Check, Star } from 'lucide-react';
-// import { Button } from '../UI/Button';
-// import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-// import { Badge } from './ui/badge';
+"use client";
+import React from "react";
+import { loadStripe } from "@stripe/stripe-js";
+import { Check } from "lucide-react";
 
-
+// Your Stripe public key
+const stripePromise = loadStripe("pk_test_51O...YOUR_STRIPE_PUBLIC_KEY");
 
 export function Pricing() {
+  const plans = [
+    {
+      name: "Basic",
+      price: "$0",
+      amount: 0,
+      subtitle: "Perfect for individuals or small teams getting started.",
+      features: [
+        "Up to 3 Projects",
+        "Basic Task Management",
+        "5GB File Storage",
+        "Community Support",
+      ],
+      buttonText: "Get Started",
+      highlight: false,
+      isFree: true,
+    },
+    {
+      name: "Premium",
+      price: "$99",
+      amount: 99,
+      subtitle: "For teams that need full control and collaboration tools.",
+      features: [
+        "Unlimited Projects",
+        "Advanced Task Automation",
+        "200GB File Storage",
+        "24/7 Priority Support",
+        "Slack, GitHub, Google Drive Integration",
+      ],
+      buttonText: "Upgrade Now",
+      highlight: true,
+      isFree: false,
+    },
+  ];
+
+  const handleCheckout = async (plan) => {
+    if (plan.isFree) {
+      alert("You selected the free plan!");
+      return;
+    }
+
+    const stripe = await stripePromise;
+    const { error } = await stripe.redirectToCheckout({
+      lineItems: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: { name: plan.name },
+            unit_amount: plan.amount * 100,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      successUrl: window.location.origin + "/success",
+      cancelUrl: window.location.origin + "/cancel",
+    });
+
+    if (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <section id="pricing" className="py-20 bg-card">
-      <div className="px-4  mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="max-w-xl  mx-auto text-center">
-          <h2 className="text-4xl font-bold  lg:text-5xl sm:text-5xl">
-            Pricing & Plans
-          </h2>
-          <p className="mt-4 text-lg leading-relaxed text-gray-600">
-            Choose the plan that fits your team’s workflow and scale your productivity.
-          </p>
-        </div>
+    <section id="pricing" className="py-20 bg-[#0f172a] text-white">
+      <div className="max-w-6xl mx-auto px-6 text-center">
+        <h2 className="text-4xl font-bold mb-4">Pricing & Plans</h2>
+        <p className="text-gray-400 text-lg mb-12">
+          Choose the plan that fits your workflow and scale your productivity.
+        </p>
 
-        {/* Desktop Table */}
-        <div className="hidden mt-16 lg:block">
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th className="py-8 pr-4"></th>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+          {plans.map((plan, index) => (
+            <div
+              key={index}
+              className={`relative flex flex-col justify-between h-full rounded-2xl p-8 border transition-all duration-300 ${plan.highlight
+                  ? "bg-gradient-to-b from-blue-600 to-indigo-700 border-none"
+                  : "bg-[#111827] border border-gray-700"
+                }`}
+            >
+              {plan.highlight && (
+                <span className="absolute top-0 right-0 mt-2 mr-6 bg-yellow-400 text-black text-sm font-semibold px-3 py-1 rounded-full">
+                  Popular
+                </span>
+              )}
 
-                <th className="px-4 py-8 text-center">
-                  <span className="text-base font-medium text-blue-600">Free</span>
-                  <p className="mt-6 text-6xl font-bold">$0</p>
-                  <p className="mt-2 text-base font-normal text-gray-500">Per month</p>
-                </th>
+              <div>
+                <h3
+                  className={`text-3xl font-bold ${plan.highlight ? "text-white" : "text-gray-100"
+                    }`}
+                >
+                  {plan.name}
+                </h3>
+                <p
+                  className={`mt-2 text-base ${plan.highlight ? "text-gray-200" : "text-gray-400"
+                    }`}
+                >
+                  {plan.subtitle}
+                </p>
+                <h4 className="text-6xl font-extrabold mt-6 mb-8">
+                  {plan.price}
+                </h4>
+              </div>
 
-                <th className="px-4 py-8 text-center">
-                  <span className="text-base font-medium text-blue-600">Team</span>
-                  <p className="mt-6 text-6xl font-bold">$99</p>
-                  <p className="mt-2 text-base font-normal text-gray-500">Per month</p>
-                </th>
+              <ul className="space-y-3 mb-8 text-left mx-auto w-full max-w-xs flex-1">
+                {plan.features.map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3">
+                    <Check
+                      className={`w-5 h-5 ${plan.highlight ? "text-green-300" : "text-blue-500"
+                        }`}
+                    />
+                    <span
+                      className={`${plan.highlight ? "text-gray-100" : "text-gray-300"
+                        }`}
+                    >
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+              </ul>
 
-                <th className="px-4 py-8 text-center bg-gray-900 rounded-t-xl">
-                  <span className="px-4 py-2 text-base font-medium text-white bg-blue-600 rounded-full">
-                    Popular
-                  </span>
-                  <p className="mt-6 text-6xl font-bold text-white">$150</p>
-                  <p className="mt-2 text-base font-normal text-gray-200">Per month</p>
-                </th>
-
-                <th className="px-4 py-8 text-center">
-                  <span className="text-base font-medium text-blue-600">Enterprise</span>
-                  <p className="mt-6 text-6xl font-bold">$490</p>
-                  <p className="mt-2 text-base font-normal text-gray-500">Per month</p>
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr>
-                <td className="py-4 pr-4 font-medium border-b border-gray-200">
-                  Projects
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">1</td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">10</td>
-                <td className="px-4 py-4 text-center text-white bg-gray-900 border-b border-white/20">
-                  50
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Unlimited</td>
-              </tr>
-
-              <tr>
-                <td className="py-4 pr-4 font-medium border-b border-gray-200">
-                  Team Members
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Up to 3</td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Up to 20</td>
-                <td className="px-4 py-4 text-center text-white bg-gray-900 border-b border-white/20">
-                  Up to 100
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Unlimited</td>
-              </tr>
-
-              <tr>
-                <td className="py-4 pr-4 font-medium border-b border-gray-200">
-                  Task Management
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Basic</td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Advanced</td>
-                <td className="px-4 py-4 text-center text-white bg-gray-900 border-b border-white/20">
-                  Advanced + Automation
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Full Suite</td>
-              </tr>
-
-              <tr>
-                <td className="py-4 pr-4 font-medium border-b border-gray-200">
-                  File Storage
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">1 GB</td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">50 GB</td>
-                <td className="px-4 py-4 text-center text-white bg-gray-900 border-b border-white/20">
-                  200 GB
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Unlimited</td>
-              </tr>
-
-              <tr>
-                <td className="py-4 pr-4 font-medium border-b border-gray-200">
-                  Integrations
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Limited</td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Slack, GitHub</td>
-                <td className="px-4 py-4 text-center text-white bg-gray-900 border-b border-white/20">
-                  Slack, GitHub, Google Drive, Jira
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">All</td>
-              </tr>
-
-              <tr>
-                <td className="py-4 pr-4 font-medium border-b border-gray-200">
-                  Support
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Community</td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">Email</td>
-                <td className="px-4 py-4 text-center text-white bg-gray-900 border-b border-white/20">
-                  Priority Chat
-                </td>
-                <td className="px-4 py-4 text-center border-b border-gray-200">24/7 Dedicated</td>
-              </tr>
-
-              <tr>
-                <td className="py-6 pr-4"></td>
-                <td className="px-4 py-6 text-center">
-                  <a
-                    href="#"
-                    className="inline-flex items-center font-semibold text-blue-600 hover:text-blue-700"
-                  >
-                    Get Started →
-                  </a>
-                </td>
-                <td className="px-4 py-6 text-center">
-                  <a
-                    href="#"
-                    className="inline-flex items-center font-semibold text-blue-600 hover:text-blue-700"
-                  >
-                    Get Started →
-                  </a>
-                </td>
-                <td className="px-4 py-6 text-center text-white bg-yellow-500 rounded-b-xl">
-                  <a
-                    href="#"
-                    className="inline-flex items-center font-semibold text-white"
-                  >
-                    Get Started →
-                  </a>
-                </td>
-                <td className="px-4 py-6 text-center">
-                  <a
-                    href="#"
-                    className="inline-flex items-center font-semibold text-blue-600 hover:text-blue-700"
-                  >
-                    Get Started →
-                  </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              <button
+                onClick={() => handleCheckout(plan)}
+                className={`w-full py-3 rounded-lg text-lg font-semibold transition-all ${plan.highlight
+                    ? "bg-white text-blue-700 hover:bg-gray-100"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}
+              >
+                {plan.buttonText}
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </section>
