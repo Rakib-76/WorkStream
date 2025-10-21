@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import Session from "./Provider/Session";
 import DataProvider from "../context/DataProvider";
 import ReactQueryProvider from "../lib/ReactQueryProvider";
+import { SocketProvider } from "../context/SocketProvider/SocketProvider.jsx";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -58,8 +59,10 @@ export default function RootLayout({ children }) {
           <ReactQueryProvider>
             <DataProvider>
               <ThemeProvider>
-                {children}
-                <Toaster position="top-right" reverseOrder={false} />
+                <SocketProvider>
+                  {children}
+                  <Toaster position="top-right" reverseOrder={false} />
+                </SocketProvider>
               </ThemeProvider>
             </DataProvider>
           </ReactQueryProvider>

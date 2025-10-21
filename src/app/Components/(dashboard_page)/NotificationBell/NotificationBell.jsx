@@ -1,49 +1,45 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { Bell } from "lucide-react";
-import useAxiosSecure from "../../../../lib/useAxiosSecure";
+import { useSocket } from "../../../../context/SocketProvider/SocketProvider";
 import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
 
-export default function NotificationBell({ selectedProjectId, userEmail }) {
+export default function NotificationBell({ selectedProjectId }) {
     const [notifications, setNotifications] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(false);
+    const [loading, setLoading] = useState(false);
     const dropdownRef = useRef(null);
-    const axiosSecure = useAxiosSecure();
+    const socket = useSocket();
 
-    // Fetch notifications when selectedProjectId changes
     useEffect(() => {
         if (!selectedProjectId) return;
 
-        const fetchNotifications = async () => {
-            setLoading(true);
-            try {
-                const res = await axiosSecure.get(`/api/notifications?projectId=${selectedProjectId}`);
-                if (res?.data?.success) setNotifications(res?.data?.notifications);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
+        setLoading(true);
+        // Optionally, fetch initial notifications from backend
+        fetch(`/api/notifications?projectId=${selectedProjectId}`)
+            .then((res) => res.json())
+            .then((data) => setNotifications(data.notifications || []))
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, [selectedProjectId]);
+
+    useEffect(() => {
+        if (!socket) return;
+        const handleNotification = (notif) => {
+            if (notif.projectId === selectedProjectId) {
+                setNotifications((prev) => [notif, ...prev]);
             }
         };
-        fetchNotifications();
-    }, [selectedProjectId, axiosSecure]);
+        socket.on("receive-notification", handleNotification);
+        return () => socket.off("receive-notification", handleNotification);
+    }, [socket, selectedProjectId]);
 
-    const markAsRead = async (id) => {
-        console.log("Marking as read:", id);
-        // try {
-        //     const res = await axiosSecure.patch(`/api/notifications/${id}/read`);
-        //     if (res.data.success) {
-        //         setNotifications(prev =>
-        //             prev.map(n => (n._id === id ? { ...n, read: true } : n))
-        //         );
-        //     }
-        // } catch (err) {
-        //     console.error(err);
-        // }
+    const markAsRead = (id) => {
+        setNotifications((prev) =>
+            prev.map((n) => (n._id === id ? { ...n, read: true } : n))
+        );
     };
 
-    // Close dropdown on outside click
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -51,7 +47,8 @@ export default function NotificationBell({ selectedProjectId, userEmail }) {
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
     return (
@@ -59,10 +56,9 @@ export default function NotificationBell({ selectedProjectId, userEmail }) {
             <button
                 onClick={() => setOpenDropdown(!openDropdown)}
                 className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-                aria-label="Notifications"
             >
                 <Bell className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-                {notifications.some(n => !n.read) && (
+                {notifications.some((n) => !n.read) && (
                     <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-gray-800" />
                 )}
             </button>
@@ -72,18 +68,26 @@ export default function NotificationBell({ selectedProjectId, userEmail }) {
                     {loading ? (
                         <LoadingSpinner />
                     ) : notifications.length === 0 ? (
-                        <div className="p-4 text-center text-sm text-gray-500">No notifications</div>
+                        <div className="p-4 text-center text-sm text-gray-500">
+                            No notifications
+                        </div>
                     ) : (
                         <div className="overflow-y-auto max-h-96">
-                            {notifications.map(n => (
+                            {notifications.map((n) => (
                                 <div
-                                    key={n._id}
+                                    key={n._id || Date.now()}
                                     onClick={() => markAsRead(n._id)}
-                                    className={`p-3 border-b last:border-none cursor-pointer transition-colors ${n.read ? "bg-gray-100 dark:bg-gray-700" : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                    className={`p-3 border-b last:border-none cursor-pointer transition-colors ${n.read
+                                            ? "bg-gray-100 dark:bg-gray-700"
+                                            : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                                         }`}
                                 >
-                                    <p className="text-sm text-gray-800 dark:text-gray-100">{n.message}</p>
-                                    <p className="text-xs text-gray-400">{new Date(n.createdAt).toLocaleString()}</p>
+                                    <p className="text-sm text-gray-800 dark:text-gray-100">
+                                        {n.message}
+                                    </p>
+                                    <p className="text-xs text-gray-400">
+                                        {new Date(n.createdAt || Date.now()).toLocaleString()}
+                                    </p>
                                 </div>
                             ))}
                         </div>

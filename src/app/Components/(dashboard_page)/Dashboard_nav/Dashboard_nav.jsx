@@ -7,6 +7,7 @@ import {
   Settings,
   Search,
   PlusCircle,
+  
   FolderKanban,
   User,
   LogOut,
@@ -36,7 +37,6 @@ export default function DashboardNavbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
   const projectsDropdownRef = useRef(null);
-  const searchContainerRef = useRef(null); 
   const [userProjects, setUserProjects] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -51,14 +51,10 @@ export default function DashboardNavbar() {
   const userName = session?.user?.name || "Unknown User";
   const userEmail = session?.user?.email || "Unknown Email";
   const userImage = session?.user?.image || "/def-profile.jpeg";
-  
-  // FIX 1: Set initial state to an empty string to prevent crash
-  const [searchText, setSearchText] = useState(""); 
 
   // data from Context
   const { setSelectedProject, selectedProject } = useContext(DataContext);
   const selectedProjectId = selectedProject?._id;
-
 
   // Fetch user-specific projects
   useEffect(() => {
@@ -73,13 +69,6 @@ export default function DashboardNavbar() {
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
           setUserProjects(sortedProjects);
-          // Set initial selected project from local storage if not already set
-          if (!selectedProject) {
-              const savedProject = JSON.parse(localStorage.getItem("selectedProject"));
-              if (savedProject && res.data.data.some(p => p._id === savedProject._id)) {
-                  setSelectedProject(savedProject);
-              }
-          }
         }
       }
       catch (err) {
@@ -90,23 +79,18 @@ export default function DashboardNavbar() {
     };
 
     fetchUserProjects();
-  }, [session?.user?.email, axiosSecure, selectedProject, setSelectedProject]);
+  }, [session?.user?.email, axiosSecure]);
 
-  // Close dropdowns if clicked outside
+  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      // Close Projects Dropdown
       if (projectsDropdownRef.current && !projectsDropdownRef.current.contains(e.target)) {
         setProjectsDropdownOpen(false);
-      }
-      // Keep search dropdown open only when mouse is over search area AND there is search text
-      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target) && searchText === "") {
-        setIsSearchOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [searchText]);
+  }, []);
 
   // Image upload handler
   const handleImageChange = (e) => {
@@ -117,7 +101,7 @@ export default function DashboardNavbar() {
   // Logout handler
   const handleLogout = async () => {
     await signOut({ redirect: false });
-    // remove selectedProject from localStorage
+    // ✅  remove selectedProject from localStorage
     localStorage.removeItem("selectedProject");
     Swal.fire({
       icon: "success",
@@ -145,15 +129,7 @@ export default function DashboardNavbar() {
       }
     };
     fetchCreatorInfo();
-  }, [session?.user?.email, axiosSecure]);
-
-  // Handle project selection from search or dropdown
-  const handleProjectSelect = (project) => {
-    setSelectedProject(project);
-    setProjectsDropdownOpen(false);
-    setIsSearchOpen(false);
-    setSearchText(""); // Clear search text after selection
-  };
+  }, [session?.user?.email]);
 
   // Create project
   const onSubmit = async (data) => {
@@ -223,8 +199,6 @@ export default function DashboardNavbar() {
           showConfirmButton: false,
         });
         setIsModalOpen(false);
-        // Optionally refetch projects after creation
-        // fetchUserProjects(); 
       } else {
         Swal.fire("Error", response.data.error || "Failed to create project", "error");
       }
@@ -234,13 +208,6 @@ export default function DashboardNavbar() {
     }
   };
 
-  // Project Filtering Logic
-  const filteredProjects = userProjects.filter((project) =>
-    project.projectName.toLowerCase().includes(searchText.toLowerCase()) ||
-    (project.projectTags && project.projectTags.some(tag => tag.toLowerCase().includes(searchText.toLowerCase())))
-  );
-
-
   return (
     <>
       {/* Navbar */}
@@ -248,83 +215,53 @@ export default function DashboardNavbar() {
         <div className="sticky top-0 z-50 w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between shadow-md" >
           {/* Left: Logo */}
           <Link href="/" className="group lg:block md:hidden">
+            {/* <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md">
+              <Waves className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span className="hidden lg:block text-xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
+              WorkStream
+            </span>
+          </div> */}
             <div className="flex gap-2 items-center"> <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden group-hover:scale-105 transition-transform duration-300 shadow-md bg-white">
+              {/* <Image
+    src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
+    alt="WorkStream Logo"
+    width={40}
+    height={40}
+    className="object-contain"
+  /> */}
               <img
                 src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
                 alt="Uploaded Preview"
                 className="h-full object-contain rounded-xl"
               />
+
             </div><span className="font-bold text-2xl ">WorkStream</span></div>
+
           </Link>
 
           {/* Middle Section */}
           <div className="flex-1 flex justify-center items-center gap-3 max-w-lg">
-            
-            {/* 🎯 Search Container with Relative Position */}
-            <div className="relative w-full max-w-sm" ref={searchContainerRef}> 
-              {/* ✅ এই ব্লকটি আপনার দেওয়া কোড দিয়ে প্রতিস্থাপিত হলো */}
-              <div
-                className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
-                    ? "w-64 border-primary/60 bg-background"
-                    : "w-10 justify-center border-transparent"
-                  }`}
-                onMouseEnter={() => setIsSearchOpen(true)}
-                onMouseLeave={() => setIsSearchOpen(false)}
-              >
-                <Search className="w-5 h-5 text-muted-foreground transition-colors duration-300" />
-                {isSearchOpen && (
-                  <input
-                    type="text"
-                    placeholder="Search by Project name or Tags"
-                    className="ml-2 bg-transparent focus:outline-none text-sm flex-1 text-foreground placeholder:text-muted-foreground"
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                  />
-                )}
-              </div>
-
-              {/* Search Results Dropdown (Absolute Position) - Show when text is present, regardless of mouse state */}
-              <AnimatePresence>
-                {searchText && ( // Only show when search text is present
-                  <motion.div
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -5 }}
-                    transition={{ duration: 0.15 }}
-                  
-                    className="absolute left-0 top-full mt-2 w-64 max-h-60 overflow-y-auto bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-100 dark:border-gray-700 z-50"
-                  >
-                    {filteredProjects.length > 0 ? (
-                      <div className="p-2 space-y-1">
-                        {filteredProjects.map((project) => (
-                          <button
-                            key={project._id}
-                            onClick={() => handleProjectSelect(project)}
-                            className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors flex justify-between items-center ${
-                                selectedProject?._id === project._id
-                                ? "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light"
-                                : "hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                            }`}
-                          >
-                            <span className="font-medium text-gray-800 dark:text-gray-100 truncate">
-                              {project.projectName}
-                            </span>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-4">
-                              {project.companyName}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="p-3 text-center text-sm text-gray-500 dark:text-gray-400">
-                        No projects found matching "{searchText}"
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            {/* Search */}
+            <div
+              className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
+                ? "w-64 border-primary/60 bg-background"
+                : "w-10 justify-center border-transparent"
+                }`}
+              onMouseEnter={() => setIsSearchOpen(true)}
+              onMouseLeave={() => setIsSearchOpen(false)}
+            >
+              <Search className="w-5 h-5 text-muted-foreground transition-colors duration-300" />
+              {isSearchOpen && (
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="ml-2 bg-transparent focus:outline-none text-sm flex-1 text-foreground placeholder:text-muted-foreground"
+                />
+              )}
             </div>
-            
+
             {/* Create Button */}
             <Button
               size="sm"
@@ -357,17 +294,17 @@ export default function DashboardNavbar() {
                     {/* Header */}
                     <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                       <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                        Your Projects ({userProjects.length})
+                        Your Projects
                       </h4>
                       <button
                         onClick={() => setProjectsDropdownOpen(false)}
                         className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"
                       >
-                        <X size={16} />
+                        ✕
                       </button>
                     </div>
 
-                    {/* Content: Use unfiltered list here for the main project picker */}
+                    {/* Content */}
                     <div className="max-h-80 overflow-y-auto p-3 space-y-3">
                       {loading ? (
                         <div className="flex justify-center items-center py-6">
@@ -385,10 +322,13 @@ export default function DashboardNavbar() {
                             whileTap={{ scale: 0.98 }}
                           >
                             <button
-                              onClick={() => handleProjectSelect(project)}
+                              onClick={() => {
+                                setSelectedProject(project);
+                                setProjectsDropdownOpen(false);
+                              }}
                               className={`w-full text-left p-3 rounded-xl border transition-all ${selectedProject?._id === project._id
-                                  ? "border-primary bg-primary/10 shadow-sm"
-                                  : "border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                ? "border-primary bg-primary/10 shadow-sm"
+                                : "border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                                 }`}
                             >
                               {/* Project Header */}
@@ -398,10 +338,10 @@ export default function DashboardNavbar() {
                                 </h3>
                                 <span
                                   className={`text-xs px-2 py-0.5 rounded-full ${project.priority === "High"
-                                      ? "bg-red-100 text-red-700 dark:bg-red-800/40 dark:text-red-300"
-                                      : project.priority === "Medium"
-                                        ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800/40 dark:text-yellow-300"
-                                        : "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
+                                    ? "bg-red-100 text-red-700 dark:bg-red-800/40 dark:text-red-300"
+                                    : project.priority === "Medium"
+                                      ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800/40 dark:text-yellow-300"
+                                      : "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
                                     }`}
                                 >
                                   {project.priority}
@@ -420,8 +360,8 @@ export default function DashboardNavbar() {
                               <div className="flex justify-between items-center mt-2">
                                 <span
                                   className={`text-xs font-medium px-2 py-0.5 rounded-full ${project.status === "Active"
-                                      ? "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
-                                      : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                                    ? "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
+                                    : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                                     }`}
                                 >
                                   {project.status}
@@ -440,7 +380,7 @@ export default function DashboardNavbar() {
                     {/* Divider */}
                     <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
-                    {/* Unselect Button */}
+                    {/* ✅ Unselect Button */}
                     <div className="p-3">
                       <button
                         onClick={() => {
@@ -457,10 +397,11 @@ export default function DashboardNavbar() {
               </AnimatePresence>
 
 
+
             </div>
           </div>
 
-          {/* Right Section (Omitted for brevity) */}
+          {/* Right Section */}
           <div className="flex items-center gap-3 relative">
             <NotificationBell className="w-5 h-5" selectedProjectId={selectedProject?._id} userEmail={userEmail} />
             <ThemeToggle />
@@ -542,7 +483,7 @@ export default function DashboardNavbar() {
       </header>
 
 
-      {/* Create Project Modal (Omitted for brevity) */}
+      {/* Create Project Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full sm:max-w-4xl mx-auto max-h-[90vh] overflow-y-auto">
