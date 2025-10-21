@@ -62,6 +62,7 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
       creatorEmail: session.user.email,
       assigneeTo: selectedMembers,
       files, // this now contains uploaded URLs
+      attendance: "present",
       comments: comment
         ? [
             {

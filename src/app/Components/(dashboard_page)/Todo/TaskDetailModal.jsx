@@ -5,24 +5,27 @@ import { motion, AnimatePresence } from "framer-motion";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 
-export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange, onEdit, taskId }) {
+export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange, onEdit, taskId, setAttendance}) {
   if (!isOpen || !task) return null;
 
   const [comments, setComments] = useState(task?.comments || []);
   const [newComment, setNewComment] = useState("");
 
+  // Pending Button
   // Pending 
   const markPending = () => {
     Swal.fire("Pending!", "Task marked as pending.", "info");
     onStatusChange({ status: "Pending", columnTitle: "To Do", taskId: task._id });
   };
 
+  // In Progress Button
   // In Progress 
   const markInProgress = () => {
     Swal.fire("In Progress!", "Task is now in progress.", "info");
     onStatusChange({ status: "In Progress", columnTitle: "In Progress", taskId: task._id });
   };
 
+  // Completed Button
   // Completed
   const markCompleted = () => {
     Swal.fire("Completed!", "Task completed successfully.", "success");
@@ -62,13 +65,12 @@ export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange,
               <h2 className="text-xl font-semibold flex items-center gap-2">
                 {task.title}
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    task.priority === "High"
-                      ? "bg-red-100 text-red-600"
-                      : task.priority === "Medium"
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${task.priority === "High"
+                    ? "bg-red-100 text-red-600"
+                    : task.priority === "Medium"
                       ? "bg-yellow-100 text-yellow-600"
                       : "bg-green-100 text-green-600"
-                  }`}
+                    }`}
                 >
                   {task.priority}
                 </span>
@@ -146,6 +148,20 @@ export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange,
                   <p className="text-sm text-gray-500">No files uploaded.</p>
                 )}
               </section>
+
+              {/* Attendance */}
+              <select
+                className="border rounded px-3 py-2 bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 transition"
+                onChange={async (e) => {
+                  const newAttendance = e.target.value;
+                  setAttendance(newAttendance); // update UI immediately
+                }}
+              >
+                <option value="Present">Present</option>
+                <option value="Late">Late</option>
+                <option value="Absent">Absent</option>
+              </select>
+
 
               {/* Comments */}
               <section>
