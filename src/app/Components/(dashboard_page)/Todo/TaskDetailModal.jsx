@@ -26,7 +26,7 @@ export default function TaskDetailModal({
   const [comments, setComments] = useState(task?.comments || []);
   const [newComment, setNewComment] = useState("");
 
-  // ✅ STATUS UPDATE FUNCTIONS
+  // ✅ STATUS BUTTONS
   const markPending = () => {
     Swal.fire("Pending!", "Task marked as pending.", "info");
     onStatusChange({
@@ -54,7 +54,7 @@ export default function TaskDetailModal({
     });
   };
 
-  // ✅ ADD COMMENT
+  // ✅ COMMENT ADD
   const handleAddComment = () => {
     if (!newComment.trim()) return;
     const commentObj = {
@@ -161,8 +161,7 @@ export default function TaskDetailModal({
                   currentUserEmail={task.loggedInUser}
                 />
               </section>
-
-              {/* FILES */}
+              {/* Files Section */}
               <section>
                 <h3 className="font-semibold mb-2 flex items-center gap-2">
                   <Paperclip size={16} /> Files
@@ -172,7 +171,7 @@ export default function TaskDetailModal({
                     {task.files.map((file, idx) => (
                       <a
                         key={idx}
-                        href={file.url}
+                        href={file.url} // Cloudinary URL or file URL
                         target="_blank"
                         rel="noopener noreferrer"
                         download
@@ -224,7 +223,7 @@ export default function TaskDetailModal({
               </section>
             </div>
 
-            {/* FOOTER BUTTONS */}
+            {/* FOOTER */}
             <div className="flex justify-between items-center p-4 border-t dark:border-gray-700 bg-white dark:bg-gray-900 sticky bottom-0">
               <button
                 onClick={() => onEdit(task)}
@@ -260,9 +259,7 @@ export default function TaskDetailModal({
   );
 }
 
-/* ---------------------------
-✅ Simplified AttendanceSection Component
----------------------------- */
+/* ✅ Attendance Section */
 const AttendanceSection = ({ task, currentUserEmail }) => {
   const [attendance, setAttendance] = useState([]);
 
@@ -272,11 +269,7 @@ const AttendanceSection = ({ task, currentUserEmail }) => {
       const end = dayjs(task.endDate);
       const dates = [];
 
-      for (
-        let d = start;
-        d.isBefore(end) || d.isSame(end, "day");
-        d = d.add(1, "day")
-      ) {
+      for (let d = start; d.isBefore(end) || d.isSame(end, "day"); d = d.add(1, "day")) {
         const dayName = d.format("dddd");
         const isHoliday = dayName === "Friday" || dayName === "Saturday";
         dates.push({
@@ -289,26 +282,24 @@ const AttendanceSection = ({ task, currentUserEmail }) => {
     }
   }, [task]);
 
-  // ✅ Attendance marking by click
   const handleAttendance = (index) => {
+    const today = dayjs().format("YYYY-MM-DD");
     setAttendance((prev) =>
       prev.map((item, i) => {
         if (i !== index) return item;
 
+        // শুধুমাত্র আজকের তারিখের জন্য change হবে
+        if (item.date !== today) return item;
+
         const now = dayjs();
         const tenAM = dayjs().hour(10).minute(0).second(0);
-
-        if (item.status === "Pending") {
+        if (item.status === "Pending")
           return { ...item, status: now.isAfter(tenAM) ? "Late" : "Present" };
-        }
-
-        // Allow toggling back to Pending if user wants to reset
-        return { ...item, status: "Pending" };
+        return item;
       })
     );
   };
 
-  // 🎨 Status color styles
   const getStatusColor = (status) => {
     switch (status) {
       case "Present":
@@ -324,10 +315,10 @@ const AttendanceSection = ({ task, currentUserEmail }) => {
 
   return (
     <div className="space-y-2">
-      {attendance.length === 0 ? (
-        <p className="text-sm text-gray-500">No date range available.</p>
-      ) : (
-        attendance.map((item, index) => (
+      {attendance.map((item, index) => {
+        const today = dayjs().format("YYYY-MM-DD");
+        const isToday = item.date === today;
+        return (
           <div
             key={item.date}
             className="flex items-center justify-between border rounded-lg px-3 py-2"
@@ -335,26 +326,24 @@ const AttendanceSection = ({ task, currentUserEmail }) => {
             <span>{item.date}</span>
             {item.status === "Holiday" ? (
               <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                  item.status
-                )}`}
+                className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(item.status)}`}
               >
                 Holiday
               </span>
             ) : (
               <button
                 onClick={() => handleAttendance(index)}
-                disabled={!task.assigneeTo?.includes(currentUserEmail)}
-                className={`px-3  py-1  rounded-full text-sm font-medium ${getStatusColor(
+                disabled={!isToday || !task.assigneeTo?.includes(currentUserEmail)}
+                className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
                   item.status
-                )}`}
+                )} ${!isToday ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {item.status}
               </button>
             )}
           </div>
-        ))
-      )}
+        );
+      })}
     </div>
   );
 };

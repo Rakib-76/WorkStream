@@ -33,6 +33,8 @@ export default function Todo() {
   const userName = session?.user?.name || "Unknown User";
   const userEmail = session?.user?.email || "Unknown Email";
   const userImage = session?.user?.image || "/def-profile.jpeg";
+  
+  const [attendance, setAttendance] = useState("");
 
   // 🟢 Fetch all tasks from API
   useEffect(() => {
@@ -132,7 +134,7 @@ taskWithColumn.createdAt = new Date().toISOString();
 
           // 🔹 Update frontend state
           const newColumns = columns.map((col) =>
-            col.id === colId 
+            col.id === colId
               ? { ...col, tasks: col.tasks.filter((t) => t._id !== taskId) }
               : col
           );
@@ -405,6 +407,7 @@ taskWithColumn.createdAt = new Date().toISOString();
 
       {/* Task Detail Modal */}
       <TaskDetailModal
+        setAttendance={setAttendance}
         isOpen={detailOpen}
         onClose={() => setDetailOpen(false)}
         task={selectedTask}
@@ -436,7 +439,7 @@ taskWithColumn.createdAt = new Date().toISOString();
 
           // ✅ Update backend
           axiosSecure
-            .patch(`/api/tasks/${taskId}`, { status, columnTitle })
+            .patch(`/api/tasks/${taskId}`, { status, columnTitle, attendance })
             .then(async () => {
               console.log("✅ Task updated!");
 
