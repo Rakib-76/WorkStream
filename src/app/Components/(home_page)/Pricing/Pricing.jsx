@@ -2,11 +2,15 @@
 import React from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Check } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 // Your Stripe public key
 const stripePromise = loadStripe("pk_test_51O...YOUR_STRIPE_PUBLIC_KEY");
 
 export function Pricing() {
+  const { data: session } = useSession();
+  const userEmail = session?.user?.email;
+  console.log("User Email in Pricing:", userEmail);
   const plans = [
     {
       name: "Basic",
@@ -51,7 +55,7 @@ export function Pricing() {
       const res = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, userEmail }), // <-- pass the session email here
       });
 
       const data = await res.json();
@@ -63,6 +67,7 @@ export function Pricing() {
       console.error(err);
     }
   };
+
 
 
   return (

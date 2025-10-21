@@ -1,38 +1,53 @@
 "use client";
-
-import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function Success() {
+export default function SuccessPage() {
     const searchParams = useSearchParams();
-    const email = searchParams.get("email"); // Stripe session এ পাঠানো email
-    const plan = searchParams.get("plan");   // Stripe session এ পাঠানো plan name
+    const email = searchParams.get("email");
+    const plan = searchParams.get("plan");
+    const [message, setMessage] = useState("Updating membership...");
 
     useEffect(() => {
         if (email && plan) {
-            fetch("/api/update-membership", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, newMembership: plan }), // plan name বা custom value
-            })
-                .then(res => res.json())
-                .then(data => console.log("Membership updated:", data))
-                .catch(err => console.error("Update membership error:", err));
+            const updateMembership = async () => {
+                try {
+                    const newMembership = plan.toLowerCase(); // e.g. 'premium'
+                    const res = await fetch("/api/update-membership", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, newMembership }),
+                    });
+
+                    const data = await res.json();
+                    if (res.ok) {
+                        setMessage(`✅ Payment successful! Membership upgraded to ${newMembership}.`);
+                    } else {
+                        setMessage(`❌ Failed to update membership: ${data.error}`);
+                    }
+                } catch (error) {
+                    setMessage("❌ Something went wrong while updating membership.");
+                }
+            };
+
+            updateMembership();
         }
     }, [email, plan]);
 
     return (
-        <div className="text-center mt-20 max-h-screen">
-            <h1 className="text-4xl font-bold text-green-500">Payment Successful!</h1>
-            <p className="mt-4">Thank you for your purchase. Your membership has been updated.</p>
-
-            <div className="mt-8 flex justify-center gap-4">
-                <a href="/" className="bg-blue-600 text-white px-4 py-2 rounded">
-                    Go to Dashboard
-                </a>
-                <a href="/" className="bg-green-600 text-white px-4 py-2 rounded">
-                    Home
-                </a>
+        <div className="flex items-center justify-center h-screen bg-green-50">
+            <div className="text-center p-8 bg-white rounded-xl shadow-lg">
+                <h1 className="text-3xl font-bold mb-4 text-green-600">Payment Success 🎉</h1>
+                <p className="text-gray-700">{message}</p>
+                <div className="mt-8 flex justify-center gap-4">
+                    <a href="/" className="bg-blue-600 text-white px-4 py-2 rounded">
+                        Go to Dashboard
+                    </a>
+                    <span className="text-black">or</span>
+                    <a href="/" className="bg-green-600 text-white px-4 py-2 rounded">
+                        Home
+                    </a>
+                </div>
             </div>
         </div>
     );

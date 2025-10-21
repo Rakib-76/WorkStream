@@ -3,7 +3,8 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
-    const { plan } = await req.json(); // plan info from frontend
+    const { plan, userEmail } = await req.json();
+
     try {
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
@@ -18,7 +19,8 @@ export async function POST(req) {
                 },
             ],
             mode: "payment",
-            success_url: `${process.env.NEXTAUTH_URL}/success`,
+            customer_email: userEmail, // 👈 Add user email to stripe checkout
+            success_url: `${process.env.NEXTAUTH_URL}/success?email=${userEmail}&plan=${plan.name}`,
             cancel_url: `${process.env.NEXTAUTH_URL}/cancel`,
         });
 
@@ -27,6 +29,7 @@ export async function POST(req) {
             headers: { "Content-Type": "application/json" },
         });
     } catch (err) {
+        console.error("Stripe session error:", err);
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });
     }
 }
