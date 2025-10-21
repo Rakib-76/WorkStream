@@ -1,34 +1,60 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { X, Calendar, Clock, MessageSquare, User, Paperclip, Edit3, Download } from "lucide-react";
+import {
+  X,
+  Calendar,
+  Clock,
+  MessageSquare,
+  User,
+  Paperclip,
+  Edit3,
+  Download,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 
-export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange, onEdit, taskId }) {
+export default function TaskDetailModal({
+  isOpen,
+  onClose,
+  task,
+  onStatusChange,
+  onEdit,
+}) {
   if (!isOpen || !task) return null;
 
   const [comments, setComments] = useState(task?.comments || []);
   const [newComment, setNewComment] = useState("");
 
-  // Pending 
+  // ✅ STATUS UPDATE FUNCTIONS
   const markPending = () => {
     Swal.fire("Pending!", "Task marked as pending.", "info");
-    onStatusChange({ status: "Pending", columnTitle: "To Do", taskId: task._id });
+    onStatusChange({
+      status: "Pending",
+      columnTitle: "To Do",
+      taskId: task._id,
+    });
   };
 
-  // In Progress 
   const markInProgress = () => {
     Swal.fire("In Progress!", "Task is now in progress.", "info");
-    onStatusChange({ status: "In Progress", columnTitle: "In Progress", taskId: task._id });
+    onStatusChange({
+      status: "In Progress",
+      columnTitle: "In Progress",
+      taskId: task._id,
+    });
   };
 
-  // Completed
   const markCompleted = () => {
     Swal.fire("Completed!", "Task completed successfully.", "success");
-    onStatusChange({ status: "Completed", columnTitle: "Done", taskId: task._id });
+    onStatusChange({
+      status: "Completed",
+      columnTitle: "Done",
+      taskId: task._id,
+    });
   };
 
+  // ✅ ADD COMMENT
   const handleAddComment = () => {
     if (!newComment.trim()) return;
     const commentObj = {
@@ -57,7 +83,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange,
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
           >
-            {/* Header */}
+            {/* HEADER */}
             <div className="flex justify-between items-center p-5 border-b dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10">
               <h2 className="text-xl font-semibold flex items-center gap-2">
                 {task.title}
@@ -73,23 +99,29 @@ export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange,
                   {task.priority}
                 </span>
               </h2>
-              <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full">
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full"
+              >
                 <X />
               </button>
             </div>
 
-            {/* Content */}
+            {/* BODY */}
             <div className="p-6 overflow-y-auto space-y-5 text-gray-800 dark:text-gray-200">
-              {/* Description */}
+              {/* DESCRIPTION */}
               <section>
                 <h3 className="font-semibold mb-2">📋 Description</h3>
-                <p className="text-sm leading-relaxed">{task.description || "No description provided."}</p>
+                <p className="text-sm leading-relaxed">
+                  {task.description || "No description provided."}
+                </p>
               </section>
 
-              {/* Dates */}
+              {/* DATES */}
               <section className="grid grid-cols-2 gap-3 text-sm">
                 <div className="flex items-center gap-2">
-                  <Calendar size={16} /> Created: {dayjs(task.createdAt).format("YYYY-MM-DD")}
+                  <Calendar size={16} /> Created:{" "}
+                  {dayjs(task.createdAt).format("YYYY-MM-DD")}
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar size={16} /> End: {task.endDate || "-"}
@@ -102,7 +134,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange,
                 </div>
               </section>
 
-              {/* Assignees */}
+              {/* ASSIGNEES */}
               <section>
                 <h3 className="font-semibold mb-2">👥 Assignees</h3>
                 <div className="flex flex-wrap gap-2">
@@ -121,7 +153,16 @@ export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange,
                 </div>
               </section>
 
-              {/* Files Section */}
+              {/* ✅ ATTENDANCE SECTION */}
+              <section>
+                <h3 className="font-semibold mb-2">📅 Attendance</h3>
+                <AttendanceSection
+                  task={task}
+                  currentUserEmail={task.loggedInUser}
+                />
+              </section>
+
+              {/* FILES */}
               <section>
                 <h3 className="font-semibold mb-2 flex items-center gap-2">
                   <Paperclip size={16} /> Files
@@ -131,7 +172,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange,
                     {task.files.map((file, idx) => (
                       <a
                         key={idx}
-                        href={file.url} // Cloudinary URL or file URL
+                        href={file.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         download
@@ -147,14 +188,17 @@ export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange,
                 )}
               </section>
 
-              {/* Comments */}
+              {/* COMMENTS */}
               <section>
                 <h3 className="font-semibold mb-2 flex items-center gap-2">
                   <MessageSquare size={16} /> Comments
                 </h3>
                 <div className="space-y-2 max-h-40 overflow-y-auto">
                   {comments.map((c) => (
-                    <div key={c.id} className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                    <div
+                      key={c.id}
+                      className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3"
+                    >
                       <p className="text-sm">{c.text}</p>
                       <p className="text-xs text-gray-500 mt-1">
                         — {c.author}, {c.time}
@@ -180,7 +224,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange,
               </section>
             </div>
 
-            {/* Footer: Status Buttons */}
+            {/* FOOTER BUTTONS */}
             <div className="flex justify-between items-center p-4 border-t dark:border-gray-700 bg-white dark:bg-gray-900 sticky bottom-0">
               <button
                 onClick={() => onEdit(task)}
@@ -215,3 +259,102 @@ export default function TaskDetailModal({ isOpen, onClose, task, onStatusChange,
     </AnimatePresence>
   );
 }
+
+/* ---------------------------
+✅ Simplified AttendanceSection Component
+---------------------------- */
+const AttendanceSection = ({ task, currentUserEmail }) => {
+  const [attendance, setAttendance] = useState([]);
+
+  useEffect(() => {
+    if (task.startDate && task.endDate) {
+      const start = dayjs(task.startDate);
+      const end = dayjs(task.endDate);
+      const dates = [];
+
+      for (
+        let d = start;
+        d.isBefore(end) || d.isSame(end, "day");
+        d = d.add(1, "day")
+      ) {
+        const dayName = d.format("dddd");
+        const isHoliday = dayName === "Friday" || dayName === "Saturday";
+        dates.push({
+          date: d.format("YYYY-MM-DD"),
+          status: isHoliday ? "Holiday" : "Pending",
+        });
+      }
+
+      setAttendance(dates);
+    }
+  }, [task]);
+
+  // ✅ Attendance marking by click
+  const handleAttendance = (index) => {
+    setAttendance((prev) =>
+      prev.map((item, i) => {
+        if (i !== index) return item;
+
+        const now = dayjs();
+        const tenAM = dayjs().hour(10).minute(0).second(0);
+
+        if (item.status === "Pending") {
+          return { ...item, status: now.isAfter(tenAM) ? "Late" : "Present" };
+        }
+
+        // Allow toggling back to Pending if user wants to reset
+        return { ...item, status: "Pending" };
+      })
+    );
+  };
+
+  // 🎨 Status color styles
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Present":
+        return "bg-green-100 text-green-700";
+      case "Late":
+        return "bg-yellow-100 text-yellow-700";
+      case "Holiday":
+        return "bg-gray-200 text-gray-500";
+      default:
+        return "bg-blue-100 text-blue-700"; // Pending
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      {attendance.length === 0 ? (
+        <p className="text-sm text-gray-500">No date range available.</p>
+      ) : (
+        attendance.map((item, index) => (
+          <div
+            key={item.date}
+            className="flex items-center justify-between border rounded-lg px-3 py-2"
+          >
+            <span>{item.date}</span>
+            {item.status === "Holiday" ? (
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                  item.status
+                )}`}
+              >
+                Holiday
+              </span>
+            ) : (
+              <button
+                onClick={() => handleAttendance(index)}
+                disabled={!task.assigneeTo?.includes(currentUserEmail)}
+                className={`px-3  py-1  rounded-full text-sm font-medium ${getStatusColor(
+                  item.status
+                )}`}
+              >
+                {item.status}
+              </button>
+            )}
+          </div>
+        ))
+      )}
+    </div>
+  );
+};

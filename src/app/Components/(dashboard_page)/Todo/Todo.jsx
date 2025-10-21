@@ -76,7 +76,7 @@ export default function Todo() {
       if (res.data?.insertedId) {
         // ✅ Task added successfully
         taskWithColumn._id = res.data.insertedId;
-
+taskWithColumn.createdAt = new Date().toISOString();
         const newColumns = columns.map((col) =>
           col.id === currentColumnId
             ? { ...col, tasks: [...col.tasks, taskWithColumn] }
