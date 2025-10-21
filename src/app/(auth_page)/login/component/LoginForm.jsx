@@ -48,6 +48,7 @@ export default function LoginForm() {
                 icon: 'error',
                 confirmButtonText: 'Try Again'
             });
+              setLoading(false);
         }
     };
 
