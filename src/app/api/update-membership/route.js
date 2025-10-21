@@ -7,6 +7,9 @@ export async function POST(req) {
         return new Response(JSON.stringify({ error: "Email and membership required" }), { status: 400 });
     }
 
+
+
+    
     try {
         const userCollection = await dbConnect(collectionNameObj.userCollection);
         const result = await userCollection.updateOne(
