@@ -13,23 +13,26 @@ import { useSession } from "next-auth/react";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
 import AddTaskFormModal from "../AddTaskFormModal/AddTaskFormModal";
+import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
 
 
-export default  function Tasks({ projectId }) {
+export default function Tasks({ projectId }) {
   const [activeTab, setActiveTab] = useState("all");
   const { data: session } = useSession();
   const axiosSecure = useAxiosSecure();
   const userEmail = session?.user?.email;
   const [isCreatedByUser, setIsCreatedByUser] = useState(false);
+   const [loading, setLoading] = useState(true);
 
 
   // Fetch all tasks
-  const { data: tasksData = [], refetch } = useQuery({
+  const { data: tasksData = [], refetch , isLoading} = useQuery({
     queryKey: ["tasks", projectId],
     queryFn: async () => {
-      if(!projectId){
+      if (!projectId) {
         return [];
       }
+      setLoading(true);
       const res = await axiosSecure.get(`/api/tasks?projectId=${projectId}`);
       return res.data.data;
     },
@@ -57,11 +60,17 @@ export default  function Tasks({ projectId }) {
   };
 
   // only creator see task my task fetch
+  if(isLoading){
+    return <LoadingSpinner/>
+  }
 
-  const displayedTasks = activeTab === "all"
-    ? tasksData
-    //  My Tasks: Filter kora hocche task-er creatorEmail diye
-    : tasksData.filter((task) => task.creatorEmail === userEmail);
+  const displayedTasks =
+    activeTab === "all"
+      ? tasksData
+      : tasksData.filter((task) =>
+        task?.assigneeTo?.some(email => email === userEmail)
+      );
+
 
   return (
     <div className="space-y-6 ">
@@ -144,8 +153,13 @@ function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
                       {task.status}
                     </span>
                   </td>
-                  <td className="p-3">{task.assignedTo}</td>
-                  <td className="p-3">{task.deadline}</td>
+                  <td className="p-3">
+                    {task?.assigneeTo?.length > 0
+                      ? task.assigneeTo.join(" , ")
+                      : "No Assignee"}
+                  </td>
+
+                  <td className="p-3">{task.endDate}</td>
                   <td className="p-3 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
