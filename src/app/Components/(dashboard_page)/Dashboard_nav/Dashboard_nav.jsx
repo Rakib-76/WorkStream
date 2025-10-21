@@ -64,11 +64,18 @@ export default function DashboardNavbar() {
       try {
         setLoading(true);
         const res = await axiosSecure.get(`/api/projects?email=${session.user.email}`);
-        if (res.data.success) {
-          const sortedProjects = res.data.data.sort(
+        if (res?.data?.success) {
+          const sortedProjects = res?.data?.data.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
           setUserProjects(sortedProjects);
+          // Set initial selected project from local storage if not already set
+          if (!selectedProject) {
+              const savedProject = JSON.parse(localStorage.getItem("selectedProject"));
+              if (savedProject && res?.data?.data.some(p => p._id === savedProject._id)) {
+                  setSelectedProject(savedProject);
+              }
+          }
         }
       }
       catch (err) {
@@ -165,9 +172,9 @@ export default function DashboardNavbar() {
       });
       
       // ✅ send notification after successful project creation
-      if (response.data.success) {
+      if (response?.data?.success) {
         await axiosSecure.post("/api/notifications", {
-          projectId: response.data.data.insertedId,
+          projectId: response?.data?.data?.insertedId,
           user: {
             name: userName,
             email: userEmail,
@@ -187,10 +194,10 @@ export default function DashboardNavbar() {
 
         setIsModalOpen(false);
       } else {
-        Swal.fire("Error", response.data.error || "Failed to create project", "error");
+        Swal.fire("Error", response?.data?.error || "Failed to create project", "error");
       }
 
-      if (response.data.success) {
+      if (response?.data?.success) {
         Swal.fire({
           icon: "success",
           title: "Project Created!",
@@ -200,7 +207,7 @@ export default function DashboardNavbar() {
         });
         setIsModalOpen(false);
       } else {
-        Swal.fire("Error", response.data.error || "Failed to create project", "error");
+        Swal.fire("Error", response?.data?.error || "Failed to create project", "error");
       }
     } catch (err) {
       console.error(err);
