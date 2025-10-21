@@ -83,7 +83,7 @@ export function Pricing() {
             <div
               key={index}
               className={`relative flex flex-col justify-between h-full rounded-2xl p-8 border transition-all duration-300 ${plan.highlight
-                ? "bg-gradient-to-b from-blue-600 to-indigo-700 border-none"
+                ? " from-blue-600 to-indigo-700 border-none"
                 : "bg-[#111827] border border-gray-700"
                 }`}
             >
