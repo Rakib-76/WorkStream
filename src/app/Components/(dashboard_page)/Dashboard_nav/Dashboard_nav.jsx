@@ -52,7 +52,8 @@ export default function DashboardNavbar() {
   const userEmail = session?.user?.email || "Unknown Email";
   const userImage = session?.user?.image || "/def-profile.jpeg";
   
-  // FIX 1: Set initial state to an empty string to prevent crash
+  // It is used for search 
+  
   const [searchText, setSearchText] = useState(""); 
 
   // data from Context
