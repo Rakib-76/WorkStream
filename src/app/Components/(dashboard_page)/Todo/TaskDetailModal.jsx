@@ -277,7 +277,7 @@ const AttendanceSection = ({ task, currentUserEmail }) => {
           status: isHoliday ? "Holiday" : "Pending",
         });
       }
-
+// kjnkn
       setAttendance(dates);
     }
   }, [task]);
