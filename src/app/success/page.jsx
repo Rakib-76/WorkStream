@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 
 export default function SuccessPage() {
     const searchParams = useSearchParams();
-    const [email , setEmail] = searchParams.get("email");
-    const [plan , setPlan ] = searchParams.get("plan");
+    const [email, setEmail] = useState(null);
+    const [plan, setPlan] = useState(null);
     const [message, setMessage] = useState("Updating membership...");
 
 
@@ -15,31 +15,31 @@ export default function SuccessPage() {
         const p = searchParams.get("plan");
         setEmail(e);
         setPlan(p);
-    },[searchParams]);
+    }, [searchParams]);
 
     useEffect(() => {
         if (!email || !plan) return;
-            const updateMembership = async () => {
-                try {
-                    const newMembership = plan.toLowerCase(); // e.g. 'premium'
-                    const res = await fetch("/api/update-membership", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email, newMembership }),
-                    });
+        const updateMembership = async () => {
+            try {
+                const newMembership = plan.toLowerCase(); // e.g. 'premium'
+                const res = await fetch("/api/update-membership", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, newMembership }),
+                });
 
-                    const data = await res.json();
-                    if (res.ok) {
-                        setMessage(`✅ Payment successful! Membership upgraded to ${newMembership}.`);
-                    } else {
-                        setMessage(`❌ Failed to update membership: ${data.error}`);
-                    }
-                } catch (error) {
-                    setMessage("❌ Something went wrong while updating membership.");
+                const data = await res.json();
+                if (res.ok) {
+                    setMessage(`✅ Payment successful! Membership upgraded to ${newMembership}.`);
+                } else {
+                    setMessage(`❌ Failed to update membership: ${data.error}`);
                 }
-            };
+            } catch (error) {
+                setMessage("❌ Something went wrong while updating membership.");
+            }
+        };
 
-            updateMembership();
+        updateMembership();
     }, [email, plan]);
 
     return (
