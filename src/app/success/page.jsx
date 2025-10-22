@@ -4,12 +4,20 @@ import { useEffect, useState } from "react";
 
 export default function SuccessPage() {
     const searchParams = useSearchParams();
-    const email = searchParams.get("email");
-    const plan = searchParams.get("plan");
+    const [email , setEmail] = searchParams.get("email");
+    const [plan , setPlan ] = searchParams.get("plan");
     const [message, setMessage] = useState("Updating membership...");
 
+
     useEffect(() => {
-        if (email && plan) {
+        const e = searchParams.get("email");
+        const p = searchParams.get("plan");
+        setEmail(e);
+        setPlan(p);
+    },[searchParams]);
+
+    useEffect(() => {
+        if (!email || !plan) return;
             const updateMembership = async () => {
                 try {
                     const newMembership = plan.toLowerCase(); // e.g. 'premium'
@@ -31,7 +39,6 @@ export default function SuccessPage() {
             };
 
             updateMembership();
-        }
     }, [email, plan]);
 
     return (
