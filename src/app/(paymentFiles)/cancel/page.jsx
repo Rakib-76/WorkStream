@@ -8,6 +8,7 @@ export default function CancelPage() {
     const plan = searchParams.get("plan");  
     const [message, setMessage] = useState("Payment was canceled.");
 
+    
     useEffect(() => {
         if (email && plan) {
             console.log(`Payment canceled for ${email} on plan ${plan}`);
