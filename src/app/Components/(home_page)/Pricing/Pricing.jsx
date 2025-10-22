@@ -1,8 +1,9 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Check } from "lucide-react";
 import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 // Your Stripe public key
 const stripePromise = loadStripe("pk_test_51O...YOUR_STRIPE_PUBLIC_KEY");
@@ -10,6 +11,8 @@ const stripePromise = loadStripe("pk_test_51O...YOUR_STRIPE_PUBLIC_KEY");
 export function Pricing() {
   const { data: session } = useSession();
   const userEmail = session?.user?.email;
+  const [loadingPlan, setLoadingPlan] = useState("");
+
   console.log("User Email in Pricing:", userEmail);
   const plans = [
     {
@@ -50,22 +53,29 @@ export function Pricing() {
       alert("You selected the free plan!");
       return;
     }
+    setLoadingPlan(plan.name);
+
+
 
     try {
       const res = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, userEmail }), // <-- pass the session email here
+        body: JSON.stringify({ plan, userEmail }),
       });
 
       const data = await res.json();
 
       if (data.url) {
-        window.location.href = data.url; // redirect to Stripe checkout
+        window.location.href = data.url;
       }
     } catch (err) {
       console.error(err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoadingPlan("");
     }
+
   };
 
 
@@ -130,13 +140,13 @@ export function Pricing() {
 
               <button
                 onClick={() => handleCheckout(plan)}
-                className={`w-full py-3 rounded-lg text-lg font-semibold transition-all ${plan.highlight
-                  ? "bg-white text-blue-700 hover:bg-gray-100"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
+                disabled={loadingPlan === plan.name}
+                className={`w-full py-3 rounded-lg text-lg font-semibold transition-all ${plan.highlight ? "bg-white text-blue-700 hover:bg-gray-100" : "bg-blue-600 text-white hover:bg-blue-700"
                   }`}
               >
-                {plan.buttonText}
+                {loadingPlan === plan.name ? "Processing..." : plan.buttonText}
               </button>
+
             </div>
           ))}
         </div>
