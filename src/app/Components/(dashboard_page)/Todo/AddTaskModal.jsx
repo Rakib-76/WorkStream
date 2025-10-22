@@ -20,6 +20,7 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const { selectedProject } = useContext(DataContext);
+  const [loading, setLoading] = useState(false);
 
   // ===== Cloudinary Upload =====
   const handleFileUpload = async (e) => {
