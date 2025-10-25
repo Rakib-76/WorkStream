@@ -1,3 +1,4 @@
+
 export default function CancelPage() {
     return (
         <div className="text-center mt-20">
@@ -5,4 +6,5 @@ export default function CancelPage() {
             <p>You cancelled the payment. Try again if you want.</p>
         </div>
     );
+}
 }

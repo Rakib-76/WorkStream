@@ -7,12 +7,19 @@ import Button from "../UI/Button";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import Swal from "sweetalert2";
+import Image from "next/image";
+import { User } from "lucide-react";
+import { Settings } from "lucide-react";
+import { SwitchCamera } from "lucide-react";
+import { LogOut } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 
 export default function Navbar() {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Mobile dropdown states (kept for mobile accordion style)
   const [mobileProductOpen, setMobileProductOpen] = useState(false);
@@ -230,23 +237,30 @@ export default function Navbar() {
 
   // handle logout functionality
   const handleLogout = async () => {
-    setLoading(true);
-    await signOut({ redirect: false });
-    // ✅  remove selectedProject from localStorage
-    localStorage.removeItem("selectedProject");
     Swal.fire({
-      icon: "success",
-      title: "Logged out!",
-      text: "You have successfully logged out.",
-      timer: 2000,
-      showConfirmButton: false,
-    }).then(() => {
-      // redirect manually if needed
-      window.location.href = "/login";
+      title: "Are you sure?",
+      text: "You are about to log out from your account.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log out!",
+      cancelButtonText: "Cancel",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await signOut({ redirect: false });
+        localStorage.removeItem("selectedProject");
+        Swal.fire({
+          icon: "success",
+          title: "Logged out!",
+          text: "You have successfully logged out.",
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => (window.location.href = "/login"));
+      }
     });
-    setLoading(false);
+  };
 
-  }
 
   return (
     <>
@@ -268,21 +282,21 @@ export default function Navbar() {
                   WorkStream
                 </span>
               </div> */}
-            <div className="flex gap-2 items-center"> <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden group-hover:scale-105 transition-transform duration-300 shadow-md bg-white">
-  {/* <Image
+              <div className="flex gap-2 items-center"> <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden group-hover:scale-105 transition-transform duration-300 shadow-md bg-white">
+                {/* <Image
     src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
     alt="WorkStream Logo"
     width={40}
     height={40}
     className="object-contain"
   /> */}
-   <img
-      src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
-      alt="Uploaded Preview"
-      className="h-full object-contain rounded-xl"
-    />
-    
-</div><span className="font-bold text-2xl ">WorkStream</span></div>
+                <img
+                  src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
+                  alt="Uploaded Preview"
+                  className="h-full object-contain rounded-xl"
+                />
+
+              </div><span className="font-bold text-2xl ">WorkStream</span></div>
             </Link>
 
             {/* Desktop Menu with Enhanced Ant Design Dropdowns */}
@@ -376,16 +390,69 @@ export default function Navbar() {
               {
                 session ? (
                   <>
-                    <span className="text-sm text-foreground font-medium">
-                      {session.user?.name}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      onClick={() => signOut()}
-                      className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium"
-                    >
-                      Logout
-                    </Button>
+                    {/* Profile Avatar */}
+                    <div className="relative">
+                      <div
+                        className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary cursor-pointer"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      >
+                        <Image
+                          src={session?.user?.imge || "/def-profile.png"}
+                          alt="Profile"
+                          width={36}
+                          height={36}
+                          className="object-contain text-white"
+                        />
+                      </div>
+
+                      {isDropdownOpen && (
+                        <div className="absolute right-0 mt-3 w-72 bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+                          <div className="flex items-center bg-gray-300 dark:bg-black gap-3 p-4 border-b border-gray-300 dark:border-gray-700">
+                            <div className="w-10 h-10 rounded-full overflow-hidden border border-primary">
+                              <Image
+                                src={session?.user?.image || "/def-profile.png"}
+                                alt="Profile"
+                                width={40}
+                                height={40}
+                                className="object-cover"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 dark:text-white">
+                                {session?.user?.name || "Unknown User"}
+                              </h4>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                {session?.user?.email || "No email"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <ul className="p-2 text-gray-700 dark:text-gray-200">
+                            <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                              <User size={18} /> Profile
+                            </li>
+                            <li
+                              onClick={() => (window.location.href = "/Dashboard")}
+                              className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                            >
+                              <LayoutDashboard size={18} /> Dashboard
+                            </li>
+                            <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                              <Settings size={18} /> Account settings
+                            </li>
+                            <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                              <SwitchCamera size={18} /> Switch account
+                            </li>
+                            <li
+                              onClick={handleLogout}
+                              className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer text-red-600"
+                            >
+                              <LogOut size={18} /> Log out
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                   </>
                 ) : (
                   <>
@@ -634,23 +701,69 @@ export default function Navbar() {
                   {
                     session ? (
                       <>
-                        <span className="text-sm text-foreground font-medium">
-                          {session.user?.name}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          onClick={handleLogout}
-                          className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium"
-                        >
-                          {loading ? (
-                            <>
-                              <span className="loading loading-spinner loading-sm"></span>
-                              Logging out...
-                            </>
-                          ) : (
-                            "Logout"
+                        {/* Profile Avatar */}
+                        <div className="relative">
+                          <div
+                            className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary cursor-pointer"
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                          >
+                            <Image
+                              src={session?.user?.image || "/def-profile.png"}
+                              alt="Profile"
+                              width={36}
+                              height={36}
+                              className="object-cover"
+                            />
+                          </div>
+
+                          {isDropdownOpen && (
+                            <div className="absolute right-0 mt-3 w-72 bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+                              <div className="flex items-center bg-gray-300 dark:bg-black gap-3 p-4 border-b border-gray-300 dark:border-gray-700">
+                                <div className="w-10 h-10 rounded-full overflow-hidden border border-primary">
+                                  <Image
+                                    src={session?.user?.image || "/def-profile.png"}
+                                    alt="Profile"
+                                    width={40}
+                                    height={40}
+                                    className="object-cover"
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-gray-900 dark:text-white">
+                                    {session?.user?.name || "Unknown User"}
+                                  </h4>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    {session?.user?.email || "No email"}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <ul className="p-2 text-gray-700 dark:text-gray-200">
+                                <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                                  <User size={18} /> Profile
+                                </li>
+                                <li
+                                  onClick={() => (window.location.href = "/Dashboard")}
+                                  className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer "
+                                >
+                                  <LayoutDashboard size={18} /> Dashboard
+                                </li>
+                                <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                                  <Settings size={18} /> Account settings
+                                </li>
+                                <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                                  <SwitchCamera size={18} /> Switch account
+                                </li>
+                                <li
+                                  onClick={handleLogout} t
+                                  className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer text-red-600"
+                                >
+                                  <LogOut size={18} /> Log out
+                                </li>
+                              </ul>
+                            </div>
                           )}
-                        </Button>
+                        </div>
                       </>
                     ) : (
                       <>
