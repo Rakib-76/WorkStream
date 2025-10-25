@@ -48,6 +48,7 @@ export default function Reports({ projectId }) {
   const [loading, setLoading] = useState(false);
 
   
+
   // ✅ Fetch project-based task completion trend from API
   useEffect(() => {
     if (!projectId) return;
@@ -226,6 +227,7 @@ export default function Reports({ projectId }) {
             Project Performance Report
           </CardTitle>
         </CardHeader>
+        <p>ji</p>
         <CardContent className="space-y-4">
           {projectProgress.map((p, i) => (
             <div key={i}>
