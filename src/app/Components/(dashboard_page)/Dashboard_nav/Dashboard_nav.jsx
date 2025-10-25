@@ -459,7 +459,7 @@ export default function DashboardNavbar() {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
                 <Image
-                  src={session?.user?.image || "/avatar.png"}
+                  src={session?.user?.image || "/def-profile.png"}
                   alt="Profile"
                   width={36}
                   height={36}
@@ -472,7 +472,7 @@ export default function DashboardNavbar() {
                   <div className="flex items-center bg-gray-300 dark:bg-black gap-3 p-4 border-b border-gray-300 dark:border-gray-700">
                     <div className="w-10 h-10 rounded-full overflow-hidden border border-primary">
                       <Image
-                        src={session?.user?.image || "/avatar.png"}
+                        src={session?.user?.image || "/def-profile.png"}
                         alt="Profile"
                         width={40}
                         height={40}
