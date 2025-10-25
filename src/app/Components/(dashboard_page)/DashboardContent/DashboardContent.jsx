@@ -98,7 +98,7 @@ export default function DashboardContent({ activeItem }) {
       case "reports":
         return (
           <div className="p-6 bg-card border border-border rounded-xl  shadow ">
-            <Reports></Reports>
+            <Reports projectId={projectId}></Reports>
           </div>
         );
 

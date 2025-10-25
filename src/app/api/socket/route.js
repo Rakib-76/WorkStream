@@ -5,7 +5,7 @@ let io;
 
 export const GET = async () => {
   if (!io) {
-    io = new Server(globalThis.server || 3000, {
+    io = new Server(globalThis.server, {
       path: "/api/socket",
       cors: { origin: "*" },
     });
