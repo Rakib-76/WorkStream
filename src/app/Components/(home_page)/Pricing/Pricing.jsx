@@ -1,11 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import { loadStripe } from "@stripe/stripe-js";
 import { Check } from "lucide-react";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast"; // <-- import
 
-const stripePromise = loadStripe("pk_test_51O...YOUR_STRIPE_PUBLIC_KEY");
 
 export function Pricing() {
   const { data: session } = useSession();

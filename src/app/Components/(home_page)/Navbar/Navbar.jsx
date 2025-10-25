@@ -230,23 +230,30 @@ export default function Navbar() {
 
   // handle logout functionality
   const handleLogout = async () => {
-    setLoading(true);
-    await signOut({ redirect: false });
-    // ✅  remove selectedProject from localStorage
-    localStorage.removeItem("selectedProject");
     Swal.fire({
-      icon: "success",
-      title: "Logged out!",
-      text: "You have successfully logged out.",
-      timer: 2000,
-      showConfirmButton: false,
-    }).then(() => {
-      // redirect manually if needed
-      window.location.href = "/login";
+      title: "Are you sure?",
+      text: "You are about to log out from your account.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log out!",
+      cancelButtonText: "Cancel",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await signOut({ redirect: false });
+        localStorage.removeItem("selectedProject");
+        Swal.fire({
+          icon: "success",
+          title: "Logged out!",
+          text: "You have successfully logged out.",
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => (window.location.href = "/login"));
+      }
     });
-    setLoading(false);
+  };
 
-  }
 
   return (
     <>
@@ -268,21 +275,21 @@ export default function Navbar() {
                   WorkStream
                 </span>
               </div> */}
-            <div className="flex gap-2 items-center"> <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden group-hover:scale-105 transition-transform duration-300 shadow-md bg-white">
-  {/* <Image
+              <div className="flex gap-2 items-center"> <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden group-hover:scale-105 transition-transform duration-300 shadow-md bg-white">
+                {/* <Image
     src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
     alt="WorkStream Logo"
     width={40}
     height={40}
     className="object-contain"
   /> */}
-   <img
-      src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
-      alt="Uploaded Preview"
-      className="h-full object-contain rounded-xl"
-    />
-    
-</div><span className="font-bold text-2xl ">WorkStream</span></div>
+                <img
+                  src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
+                  alt="Uploaded Preview"
+                  className="h-full object-contain rounded-xl"
+                />
+
+              </div><span className="font-bold text-2xl ">WorkStream</span></div>
             </Link>
 
             {/* Desktop Menu with Enhanced Ant Design Dropdowns */}
@@ -381,7 +388,7 @@ export default function Navbar() {
                     </span>
                     <Button
                       variant="ghost"
-                      onClick={() => signOut()}
+                      onClick={() => handleLogout()}
                       className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 font-medium"
                     >
                       Logout
