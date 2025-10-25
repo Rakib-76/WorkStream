@@ -466,7 +466,6 @@ export default function DashboardNavbar() {
                   className="object-cover"
                 />
               </div>
-
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-3 w-72 bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
                   <div className="flex items-center bg-gray-300 dark:bg-black gap-3 p-4 border-b border-gray-300 dark:border-gray-700">
