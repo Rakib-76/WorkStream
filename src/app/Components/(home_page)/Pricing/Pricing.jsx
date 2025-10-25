@@ -3,6 +3,10 @@ import React, { useState } from "react";
 import { Check } from "lucide-react";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast"; // <-- import
+import { loadStripe } from "@stripe/stripe-js";
+import { Check } from "lucide-react";
+import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 
 export function Pricing() {
@@ -10,6 +14,7 @@ export function Pricing() {
   const userEmail = session?.user?.email;
   const [loadingPlan, setLoadingPlan] = useState("");
 
+  console.log("User Email in Pricing:", userEmail);
   const plans = [
     {
       name: "Basic",
@@ -38,6 +43,9 @@ export function Pricing() {
       toast.success("🎉 Already selected this free plan!"); // <-- toast here
       return;
     }
+    setLoadingPlan(plan.name);
+
+
 
     setLoadingPlan(plan.name);
 
@@ -59,6 +67,7 @@ export function Pricing() {
     } finally {
       setLoadingPlan("");
     }
+
   };
 
   return (
@@ -105,6 +114,7 @@ export function Pricing() {
               >
                 {loadingPlan === plan.name ? "Processing..." : plan.buttonText}
               </button>
+
             </div>
           ))}
         </div>

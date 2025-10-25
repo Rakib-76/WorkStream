@@ -20,6 +20,7 @@ export default function TaskDetailModal({
   task,
   onStatusChange,
   onEdit,
+  currentUserEmail,
 }) {
   if (!isOpen || !task) return null;
 
@@ -156,10 +157,8 @@ export default function TaskDetailModal({
               {/* ✅ ATTENDANCE SECTION */}
               <section>
                 <h3 className="font-semibold mb-2">📅 Attendance</h3>
-                <AttendanceSection
-                  task={task}
-                  currentUserEmail={task.loggedInUser}
-                />
+                <AttendanceSection task={task} currentUserEmail={currentUserEmail} />
+
               </section>
               {/* Files Section */}
               <section>
@@ -260,6 +259,7 @@ export default function TaskDetailModal({
 }
 
 /* ✅ Attendance Section */
+
 const AttendanceSection = ({ task, currentUserEmail }) => {
   const [attendance, setAttendance] = useState([]);
 

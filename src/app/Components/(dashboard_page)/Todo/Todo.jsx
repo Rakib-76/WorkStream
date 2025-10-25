@@ -407,6 +407,7 @@ taskWithColumn.createdAt = new Date().toISOString();
 
       {/* Task Detail Modal */}
       <TaskDetailModal
+      currentUserEmail={session?.user?.email} 
         setAttendance={setAttendance}
         isOpen={detailOpen}
         onClose={() => setDetailOpen(false)}
