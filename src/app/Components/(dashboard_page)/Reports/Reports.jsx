@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -18,23 +18,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "../../../Components/(home_page)/UI/card";
 import { Download, Filter } from "lucide-react";
 
-// Dummy Data
+// Dummy Data (others stay static)
 const workloadData = [
   { name: "Syed Bayzid", total: 12, completed: 8 },
   { name: "Abu Sufian", total: 8, completed: 6 },
   { name: "Rahim Khan", total: 5, completed: 4 },
   { name: "Fatima Ahmed", total: 10, completed: 7 },
   { name: "Karim Hossain", total: 6, completed: 4 },
-];
-
-const taskCompletionTrend = [
-  { day: "Mon", completed: 5 },
-  { day: "Tue", completed: 8 },
-  { day: "Wed", completed: 4 },
-  { day: "Thu", completed: 7 },
-  { day: "Fri", completed: 10 },
-  { day: "Sat", completed: 6 },
-  { day: "Sun", completed: 9 },
 ];
 
 const overdueTasks = [
@@ -52,7 +42,65 @@ const projectProgress = [
   { name: "Pending", progress: 90 },
 ];
 
-export default function Reports() {
+export default function Reports({ projectId }) {
+  const [taskCompletionTrend, setTaskCompletionTrend] = useState([]);
+  const [taskPendingTrend, setTaskPendingTrend] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  
+
+  // ✅ Fetch project-based task completion trend from API
+  useEffect(() => {
+    if (!projectId) return;
+    setLoading(true);
+    const fetchCompletedTasks = async () => {
+      try {
+        const res = await fetch(`/api/completed?projectId=${projectId}`);
+        const json = await res.json();
+
+        if (json.success) {
+          // Transform priority data (High/Medium/Low) to line chart data
+          // Example format for LineChart: [{name: "High", completed: 5}, ...]
+          const trendData = json.data.map((d) => ({
+            name: d.priority,
+            completed: d.completed,
+          }));
+          setTaskCompletionTrend(trendData);
+        }
+      } catch (error) {
+        console.error("Error fetching completed task data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCompletedTasks();
+  }, [projectId]);
+  useEffect(() => {
+    if (!projectId) return;
+    setLoading(true);
+    const fetchPendingTasks = async () => {
+      try {
+        const res = await fetch(`/api/pending?projectId=${projectId}`);
+        const json = await res.json();
+
+        if (json.success) {
+          // Transform priority data (High/Medium/Low) to line chart data
+          // Example format for LineChart: [{name: "High", completed: 5}, ...]
+          const trendData = json.data.map((d) => ({
+            name: d.priority,
+            pending: d.pending,
+          }));
+         setTaskPendingTrend(trendData);
+        }
+      } catch (error) {
+        console.error("Error fetching completed task data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPendingTasks();
+  }, [projectId]);
+
   return (
     <div className="space-y-10 px-2 sm:px-4 md:px-6 lg:px-8 py-6 overflow-x-hidden">
       {/* Page Header */}
@@ -69,7 +117,6 @@ export default function Reports() {
           </p>
         </div>
 
-        {/* Export & Filter Buttons */}
         <div className="flex flex-wrap gap-2 justify-center md:justify-end w-full">
           <button className="flex items-center gap-2 px-2 sm:px-3 md:px-4 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition text-xs sm:text-sm font-medium">
             <Download size={16} /> Export
@@ -83,45 +130,46 @@ export default function Reports() {
       {/* Top Charts */}
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
         {/* Overdue Tasks */}
-        <Card className="rounded-2xl border border-gray-200 dark:border-gray-700 shadow-xl 
-          bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6">
-          <CardHeader>
-            <CardTitle className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-gray-200">
-              Top 5 Overdue Tasks
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" minHeight={200} height={250}>
-              <AreaChart data={overdueTasks}>
-                <defs>
-                  <linearGradient id="colorOverdue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#476EAE" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#476EAE" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                <XAxis dataKey="task" stroke="#6B7280" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#6B7280" tick={{ fontSize: 11 }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1F2937",
-                    color: "#fff",
-                    borderRadius: "8px",
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="overdue"
-                  stroke="#476EAE"
-                  fillOpacity={1}
-                  fill="url(#colorOverdue)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        {/* ✅ Pending Tasks by Priority */}
+<Card className="rounded-2xl border border-gray-200 dark:border-gray-700 shadow-xl 
+  bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6">
+  <CardHeader>
+    <CardTitle className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-gray-200">
+      Pending Tasks by Priority
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    {loading ? (
+      <p className="text-gray-500 text-center">Loading chart...</p>
+    ) : (
+      <ResponsiveContainer width="100%" minHeight={200} height={250}>
+  <AreaChart data={taskPendingTrend}>
+    <defs>
+      <linearGradient id="colorPending" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="5%" stopColor="#4E61D3" stopOpacity={0.8} />
+        <stop offset="95%" stopColor="#4E61D3" stopOpacity={0} />
+      </linearGradient>
+    </defs>
+    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+    <XAxis dataKey="name" stroke="#6B7280" tick={{ fontSize: 11 }} />
+    <YAxis stroke="#6B7280" tick={{ fontSize: 11 }} />
+    <Tooltip contentStyle={{ backgroundColor: "#1F2937", color: "#fff", borderRadius: "8px" }} />
+    <Area
+      type="monotone"
+      dataKey="pending"
+      stroke="#9ECFD4"
+      fillOpacity={1}
+      fill="url(#colorPending)"
+    />
+  </AreaChart>
+</ResponsiveContainer>
 
-        {/* Task Completion Trend */}
+    )}
+  </CardContent>
+</Card>
+
+
+        {/* ✅ Dynamic Task Completion Trend */}
         <Card className="rounded-2xl border border-gray-200 dark:border-gray-700 shadow-xl 
           bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6">
           <CardHeader>
@@ -130,28 +178,20 @@ export default function Reports() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" minHeight={200} height={250}>
-              <LineChart data={taskCompletionTrend}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                <XAxis dataKey="day" stroke="#6B7280" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#6B7280" tick={{ fontSize: 11 }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1F2937",
-                    color: "#fff",
-                    borderRadius: "8px",
-                  }}
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="completed"
-                  stroke="#06B6D4"
-                  strokeWidth={3}
-                  dot={{ r: 5 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <p className="text-gray-500 text-center">Loading chart...</p>
+            ) : (
+              <ResponsiveContainer width="100%" minHeight={200} height={250}>
+                <LineChart data={taskCompletionTrend}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                  <XAxis dataKey="name" stroke="#6B7280" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="#6B7280" tick={{ fontSize: 11 }} />
+                  <Tooltip contentStyle={{ backgroundColor: "#1F2937", color: "#fff", borderRadius: "8px" }} />
+                  <Legend />
+                  <Line type="monotone" dataKey="completed" stroke="#06B6D4" strokeWidth={3} dot={{ r: 5 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -168,21 +208,9 @@ export default function Reports() {
           <ResponsiveContainer width="100%" minHeight={220} height={300}>
             <BarChart data={workloadData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis
-                dataKey="name"
-                stroke="#6B7280"
-                tick={{ fontSize: 10 }}
-                interval={0}
-                height={60}
-              />
+              <XAxis dataKey="name" stroke="#6B7280" tick={{ fontSize: 10 }} interval={0} height={60} />
               <YAxis stroke="#6B7280" tick={{ fontSize: 11 }} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#1F2937",
-                  color: "#fff",
-                  borderRadius: "8px",
-                }}
-              />
+              <Tooltip contentStyle={{ backgroundColor: "#1F2937", color: "#fff", borderRadius: "8px" }} />
               <Legend />
               <Bar dataKey="total" fill="#6366F1" radius={[8, 8, 0, 0]} />
               <Bar dataKey="completed" fill="#10B981" radius={[8, 8, 0, 0]} />
@@ -199,6 +227,7 @@ export default function Reports() {
             Project Performance Report
           </CardTitle>
         </CardHeader>
+        <p>ji</p>
         <CardContent className="space-y-4">
           {projectProgress.map((p, i) => (
             <div key={i}>
