@@ -68,16 +68,16 @@ export default function DashboardNavbar() {
 
       try {
         setLoading(true);
-        const res = await axiosSecure.get(`/api/projects?email=${session.user.email}`);
-        if (res.data.success) {
-          const sortedProjects = res.data.data.sort(
+        const res = await axiosSecure.get(`/api/projects?email=${session?.user?.email}`);
+        if (res?.data?.success) {
+          const sortedProjects = res?.data?.data.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
           setUserProjects(sortedProjects);
           // Set initial selected project from local storage if not already set
           if (!selectedProject) {
             const savedProject = JSON.parse(localStorage.getItem("selectedProject"));
-            if (savedProject && res.data.data.some(p => p._id === savedProject._id)) {
+            if (savedProject && res?.data?.data.some(p => p._id === savedProject._id)) {
               setSelectedProject(savedProject);
             }
           }
@@ -248,14 +248,14 @@ export default function DashboardNavbar() {
           {/* Middle Section */}
           <div className="flex-1 flex justify-center items-center gap-3 max-w-lg">
 
-            {/* 🎯 Search Container with Relative Position */}
+            {/* Search Container with Relative Position */}
             <div className="relative w-full max-w-sm" ref={searchContainerRef}>
-              {/* ✅ এই ব্লকটি আপনার দেওয়া কোড দিয়ে প্রতিস্থাপিত হলো */}
               <div
-                className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
-                  ? "w-64 border-primary/60 bg-background"
-                  : "w-10 justify-center border-transparent"
-                  }`}
+                // className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
+                //   ? "w-64 border-primary/60 bg-background"
+                //   : "w-10 justify-center border-transparent"
+                //   }`}
+                className="flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border w-70 border-primary/60"
                 onMouseEnter={() => setIsSearchOpen(true)}
                 onMouseLeave={() => setIsSearchOpen(false)}
               >
@@ -263,7 +263,7 @@ export default function DashboardNavbar() {
                 {isSearchOpen && (
                   <input
                     type="text"
-                    placeholder="Search by Project name or Project Tags"
+                    placeholder="Search by Project name or Tags"
                     className="ml-2 bg-transparent focus:outline-none text-sm flex-1 text-foreground placeholder:text-muted-foreground"
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
@@ -279,7 +279,6 @@ export default function DashboardNavbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
                     transition={{ duration: 0.15 }}
-                    // w-64 ব্যবহার করা হলো যাতে এটি সার্চ ফিল্ডের প্রস্থের সাথে মিলে যায়
                     className="absolute left-0 top-full mt-2 w-64 max-h-60 overflow-y-auto bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-100 dark:border-gray-700 z-50"
                   >
                     {filteredProjects.length > 0 ? (
@@ -289,8 +288,8 @@ export default function DashboardNavbar() {
                             key={project._id}
                             onClick={() => handleProjectSelect(project)}
                             className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors flex justify-between items-center ${selectedProject?._id === project._id
-                                ? "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light"
-                                : "hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                              ? "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light"
+                              : "hover:bg-gray-100 dark:hover:bg-gray-700/50"
                               }`}
                           >
                             <span className="font-medium text-gray-800 dark:text-gray-100 truncate">
