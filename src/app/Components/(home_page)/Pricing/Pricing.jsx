@@ -9,8 +9,6 @@ export function Pricing() {
   const { data: session } = useSession();
   const userEmail = session?.user?.email;
   const [loadingPlan, setLoadingPlan] = useState("");
-
-  console.log("User Email in Pricing:", userEmail);
   const plans = [
     {
       name: "Basic",
