@@ -58,9 +58,16 @@ const ProfileModal = ({ isOpen, onClose }) => {
     } = profileData;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl overflow-hidden transform transition-all duration-500">
-                {/* Close Button */}
+        <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            onClick={onClose} // 🔹 Click on backdrop closes modal
+        >
+            {/* Modal content */}
+            <div
+                className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl overflow-hidden transform transition-all duration-300 scale-100"
+                onClick={(e) => e.stopPropagation()} // 🔹 Prevent closing when clicking inside modal
+            >
+                {/* Close button */}
                 <button
                     onClick={onClose}
                     className="absolute top-3 right-3 text-gray-600 hover:text-red-500 transition"
@@ -126,6 +133,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                 </div>
             </div>
         </div>
+
     );
 };
 
