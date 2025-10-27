@@ -217,7 +217,19 @@ export default function Todo() {
 
                 {/* Column Menu */}
                 <div className="relative">
-
+                  {
+                    manager === userEmail &&
+                    (
+                      <button
+                        onClick={() =>
+                          setMenuOpen(menuOpen === col.id ? null : col.id)
+                        }
+                        className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+                      >
+                        <MoreVertical size={18} />
+                      </button>
+                    )
+                  }
 
                   <AnimatePresence>
                     {menuOpen === col.id && (
