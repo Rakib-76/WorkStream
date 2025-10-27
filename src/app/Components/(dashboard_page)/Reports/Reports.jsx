@@ -227,7 +227,7 @@ export default function Reports({ projectId }) {
             Project Performance Report
           </CardTitle>
         </CardHeader>
-        <p>ji</p>
+       
         <CardContent className="space-y-4">
           {projectProgress.map((p, i) => (
             <div key={i}>

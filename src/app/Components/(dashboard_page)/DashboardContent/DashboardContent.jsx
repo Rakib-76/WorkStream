@@ -33,7 +33,7 @@ export default function DashboardContent({ activeItem }) {
       case "overview":
         return (
           <div className="">
-            <Overview />
+            <Overview projectId={projectId}/>
           </div>
         );
 
