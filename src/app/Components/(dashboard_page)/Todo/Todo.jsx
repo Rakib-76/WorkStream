@@ -372,12 +372,17 @@ export default function Todo() {
           <div className="flex items-start">
             {!addingColumn ? (
               <div className="group relative">
-                <button
-                  onClick={() => setAddingColumn(true)}
-                  className="w-14 h-14 flex items-center justify-center border-2 border-dashed rounded-2xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-                >
-                  <Plus />
-                </button>
+                {
+                  manager === userEmail &&
+                  (
+                    <button
+                      onClick={() => setAddingColumn(true)}
+                      className="w-14 h-14 flex items-center justify-center border-2 border-dashed rounded-2xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                    >
+                      <Plus />
+                    </button>
+                  )
+                }
               </div>
             ) : (
               <AnimatePresence>
