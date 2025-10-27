@@ -397,7 +397,7 @@ export default function Navbar() {
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                       >
                         <Image
-                          src={session?.user?.imge || "/def-profile.png"}
+                          src={session?.user?.image || "/def-profile.png"}
                           alt="Profile"
                           width={36}
                           height={36}
