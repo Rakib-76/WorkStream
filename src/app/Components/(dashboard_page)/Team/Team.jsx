@@ -2,6 +2,9 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { X, Loader2, Plus } from "lucide-react"; // Plus icon যোগ করা হয়েছে
 import axios from "axios";
+import { DataContext } from "../../../../context/DataContext";
+import { useContext } from "react";
+import { useSession } from "next-auth/react";
 
 // ----------------------------------------------------------------------
 // --- 1. Notification Component ---
@@ -205,6 +208,9 @@ export default function Team({ projectId }) {
   const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false); // New state for Modal
+  const { manager } = useContext(DataContext);
+  const { data: session } = useSession();
+  const userEmail = session?.user?.email || "Unknown Email";
 
   // --- Fetch tasks & map to team (wrapped in useCallback) ---
   const fetchTasks = useCallback(async () => {
@@ -271,13 +277,19 @@ export default function Team({ projectId }) {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-bold">Project Team ({team.length} Members)</h2>
         {/* Add Member Button */}
-        <button
-          onClick={() => setIsAddMemberModalOpen(true)}
-          className="p-2 rounded-full bg-pink-500 text-white hover:bg-pink-600 transition-colors shadow-lg"
-          title="Add New Team Member"
-        >
-          <Plus size={24} />
-        </button>
+        {
+          manager === userEmail &&
+          (
+            <button
+              onClick={() => setIsAddMemberModalOpen(true)}
+              className="p-2 rounded-full bg-pink-500 text-white hover:bg-pink-600 transition-colors shadow-lg"
+              title="Add New Team Member"
+            >
+              <Plus size={24} />
+            </button>
+          )
+        }
+
       </div>
 
       {/* Add Member Modal RENDER */}
