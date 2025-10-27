@@ -33,11 +33,7 @@ export default function Todo() {
   const userEmail = session?.user?.email || "Unknown Email";
   const userImage = session?.user?.image || "/def-profile.jpeg";
   const [attendance, setAttendance] = useState("");
-  if (manager === userEmail) {
-    console.log('ok');
-  } else {
-    console.log('not')
-  }
+
   // 🟢 Fetch all tasks from API
   useEffect(() => {
     if (!selectedProject?._id) return;
