@@ -202,7 +202,7 @@ export default function DashboardNavbar() {
         projectData: payload,
       });
 
-      if (response.data.success) {
+      if (response?.data?.success) {
         Swal.fire({
           icon: "success",
           title: "Project Created!",
@@ -214,7 +214,7 @@ export default function DashboardNavbar() {
         // Optionally refetch projects after creation
         // fetchUserProjects(); 
       } else {
-        Swal.fire("Error", response.data.error || "Failed to create project", "error");
+        Swal.fire("Error", response?.data?.error || "Failed to create project", "error");
       }
     } catch (err) {
       console.error(err);
