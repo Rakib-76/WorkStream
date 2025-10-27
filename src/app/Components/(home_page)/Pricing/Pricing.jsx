@@ -2,10 +2,6 @@
 import React, { useState } from "react";
 import { Check } from "lucide-react";
 import { useSession } from "next-auth/react";
-import toast from "react-hot-toast"; // <-- import
-import { loadStripe } from "@stripe/stripe-js";
-import { Check } from "lucide-react";
-import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
 
