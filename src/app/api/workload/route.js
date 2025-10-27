@@ -18,7 +18,7 @@ export async function GET(req) {
         { $match: { projectId: String(projectId) } }, // project wise filter
         {
           $group: {
-            _id: "$assignedTo", // team member (email or id)
+            _id: "$assigneeTo", // team member (email or id)
             total: { $sum: 1 }, // total tasks assigned
             completed: { $sum: { $cond: [{ $eq: ["$status", "Completed"] }, 1, 0] } }, // completed tasks
           },
