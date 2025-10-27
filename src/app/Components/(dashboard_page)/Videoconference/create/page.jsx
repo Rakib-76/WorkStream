@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Button } from "../../../(dashboard_page)/UI/Button_meet"
 import { ArrowLeft, Copy, Mail, Check, Share2 } from "lucide-react"
 import Link from "next/link"
 import { generateMeetingCode, generateMeetingLink, copyToClipboard, generateGmailShareLink } from "../../../../../lib/meeting_utils"
+import Button from "../../UI/Button"
 
 export default function CreateMeetingPage() {
   const [meetingCode, setMeetingCode] = useState("")

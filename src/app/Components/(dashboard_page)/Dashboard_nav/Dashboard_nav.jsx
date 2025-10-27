@@ -36,7 +36,7 @@ export default function DashboardNavbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
   const projectsDropdownRef = useRef(null);
-  const searchContainerRef = useRef(null); 
+  const searchContainerRef = useRef(null);
   const [userProjects, setUserProjects] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -51,10 +51,10 @@ export default function DashboardNavbar() {
   const userName = session?.user?.name || "Unknown User";
   const userEmail = session?.user?.email || "Unknown Email";
   const userImage = session?.user?.image || "/def-profile.jpeg";
-  
+
   // It is used for search 
-  
-  const [searchText, setSearchText] = useState(""); 
+
+  const [searchText, setSearchText] = useState("");
 
   // data from Context
   const { setSelectedProject, selectedProject } = useContext(DataContext);
@@ -68,18 +68,18 @@ export default function DashboardNavbar() {
 
       try {
         setLoading(true);
-        const res = await axiosSecure.get(`/api/projects?email=${session.user.email}`);
-        if (res.data.success) {
-          const sortedProjects = res.data.data.sort(
+        const res = await axiosSecure.get(`/api/projects?email=${session?.user?.email}`);
+        if (res?.data?.success) {
+          const sortedProjects = res?.data?.data.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
           setUserProjects(sortedProjects);
           // Set initial selected project from local storage if not already set
           if (!selectedProject) {
-              const savedProject = JSON.parse(localStorage.getItem("selectedProject"));
-              if (savedProject && res.data.data.some(p => p._id === savedProject._id)) {
-                  setSelectedProject(savedProject);
-              }
+            const savedProject = JSON.parse(localStorage.getItem("selectedProject"));
+            if (savedProject && res?.data?.data.some(p => p._id === savedProject._id)) {
+              setSelectedProject(savedProject);
+            }
           }
         }
       }
@@ -117,17 +117,30 @@ export default function DashboardNavbar() {
 
   // Logout handler
   const handleLogout = async () => {
-    await signOut({ redirect: false });
-    // remove selectedProject from localStorage
-    localStorage.removeItem("selectedProject");
     Swal.fire({
-      icon: "success",
-      title: "Logged out!",
-      text: "You have successfully logged out.",
-      timer: 2000,
-      showConfirmButton: false,
-    }).then(() => (window.location.href = "/"));
+      title: "Are you sure?",
+      text: "You are about to log out from your account.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log out!",
+      cancelButtonText: "Cancel",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await signOut({ redirect: false });
+        localStorage.removeItem("selectedProject");
+        Swal.fire({
+          icon: "success",
+          title: "Logged out!",
+          text: "You have successfully logged out.",
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => (window.location.href = "/"));
+      }
+    });
   };
+
 
   // Fetch creator info
   useEffect(() => {
@@ -189,7 +202,7 @@ export default function DashboardNavbar() {
         projectData: payload,
       });
 
-      if (response.data.success) {
+      if (response?.data?.success) {
         Swal.fire({
           icon: "success",
           title: "Project Created!",
@@ -201,7 +214,7 @@ export default function DashboardNavbar() {
         // Optionally refetch projects after creation
         // fetchUserProjects(); 
       } else {
-        Swal.fire("Error", response.data.error || "Failed to create project", "error");
+        Swal.fire("Error", response?.data?.error || "Failed to create project", "error");
       }
     } catch (err) {
       console.error(err);
@@ -234,15 +247,15 @@ export default function DashboardNavbar() {
 
           {/* Middle Section */}
           <div className="flex-1 flex justify-center items-center gap-3 max-w-lg">
-            
-            {/* 🎯 Search Container with Relative Position */}
-            <div className="relative w-full max-w-sm" ref={searchContainerRef}> 
-              {/* ✅ এই ব্লকটি আপনার দেওয়া কোড দিয়ে প্রতিস্থাপিত হলো */}
+
+            {/* Search Container with Relative Position */}
+            <div className="relative w-full max-w-sm" ref={searchContainerRef}>
               <div
-                className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
-                    ? "w-64 border-primary/60 bg-background"
-                    : "w-10 justify-center border-transparent"
-                  }`}
+                // className={`flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border ${isSearchOpen
+                //   ? "w-64 border-primary/60 bg-background"
+                //   : "w-10 justify-center border-transparent"
+                //   }`}
+                className="flex items-center rounded-full px-3 py-1 bg-muted transition-all duration-500 ease-in-out border w-70 border-primary/60"
                 onMouseEnter={() => setIsSearchOpen(true)}
                 onMouseLeave={() => setIsSearchOpen(false)}
               >
@@ -250,7 +263,7 @@ export default function DashboardNavbar() {
                 {isSearchOpen && (
                   <input
                     type="text"
-                    placeholder="Search by Project name or Project Tags"
+                    placeholder="Search by Project name or Tags"
                     className="ml-2 bg-transparent focus:outline-none text-sm flex-1 text-foreground placeholder:text-muted-foreground"
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
@@ -266,7 +279,6 @@ export default function DashboardNavbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
                     transition={{ duration: 0.15 }}
-                    // w-64 ব্যবহার করা হলো যাতে এটি সার্চ ফিল্ডের প্রস্থের সাথে মিলে যায়
                     className="absolute left-0 top-full mt-2 w-64 max-h-60 overflow-y-auto bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-100 dark:border-gray-700 z-50"
                   >
                     {filteredProjects.length > 0 ? (
@@ -275,11 +287,10 @@ export default function DashboardNavbar() {
                           <button
                             key={project._id}
                             onClick={() => handleProjectSelect(project)}
-                            className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors flex justify-between items-center ${
-                                selectedProject?._id === project._id
-                                ? "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light"
-                                : "hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                            }`}
+                            className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors flex justify-between items-center ${selectedProject?._id === project._id
+                              ? "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light"
+                              : "hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                              }`}
                           >
                             <span className="font-medium text-gray-800 dark:text-gray-100 truncate">
                               {project.projectName}
@@ -299,7 +310,7 @@ export default function DashboardNavbar() {
                 )}
               </AnimatePresence>
             </div>
-            
+
             {/* Create Button */}
             <Button
               size="sm"
@@ -362,8 +373,8 @@ export default function DashboardNavbar() {
                             <button
                               onClick={() => handleProjectSelect(project)}
                               className={`w-full text-left p-3 rounded-xl border transition-all ${selectedProject?._id === project._id
-                                  ? "border-primary bg-primary/10 shadow-sm"
-                                  : "border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                ? "border-primary bg-primary/10 shadow-sm"
+                                : "border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                                 }`}
                             >
                               {/* Project Header */}
@@ -373,10 +384,10 @@ export default function DashboardNavbar() {
                                 </h3>
                                 <span
                                   className={`text-xs px-2 py-0.5 rounded-full ${project.priority === "High"
-                                      ? "bg-red-100 text-red-700 dark:bg-red-800/40 dark:text-red-300"
-                                      : project.priority === "Medium"
-                                        ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800/40 dark:text-yellow-300"
-                                        : "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
+                                    ? "bg-red-100 text-red-700 dark:bg-red-800/40 dark:text-red-300"
+                                    : project.priority === "Medium"
+                                      ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800/40 dark:text-yellow-300"
+                                      : "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
                                     }`}
                                 >
                                   {project.priority}
@@ -395,8 +406,8 @@ export default function DashboardNavbar() {
                               <div className="flex justify-between items-center mt-2">
                                 <span
                                   className={`text-xs font-medium px-2 py-0.5 rounded-full ${project.status === "Active"
-                                      ? "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
-                                      : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                                    ? "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
+                                    : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                                     }`}
                                 >
                                   {project.status}
@@ -447,20 +458,19 @@ export default function DashboardNavbar() {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
                 <Image
-                  src={session?.user?.image || "/avatar.png"}
+                  src={session?.user?.image || "/def-profile.png"}
                   alt="Profile"
                   width={36}
                   height={36}
                   className="object-cover"
                 />
               </div>
-
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-3 w-72 bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
                   <div className="flex items-center bg-gray-300 dark:bg-black gap-3 p-4 border-b border-gray-300 dark:border-gray-700">
                     <div className="w-10 h-10 rounded-full overflow-hidden border border-primary">
                       <Image
-                        src={session?.user?.image || "/avatar.png"}
+                        src={session?.user?.image || "/def-profile.png"}
                         alt="Profile"
                         width={40}
                         height={40}
@@ -484,21 +494,6 @@ export default function DashboardNavbar() {
                     <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                       <Settings size={18} /> Account settings
                     </li>
-                    <li
-                      onClick={() => setShowMemberSearch(!showMemberSearch)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-                    >
-                      <UserPlus size={18} /> Add member
-                    </li>
-                    {showMemberSearch && (
-                      <div className="px-4 py-2 transition-all duration-300">
-                        <input
-                          type="text"
-                          placeholder="Search member..."
-                          className="w-full rounded-md px-3 py-2 border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                      </div>
-                    )}
                     <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                       <SwitchCamera size={18} /> Switch account
                     </li>

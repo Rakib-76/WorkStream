@@ -1,15 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
-import { DataContext } from "./DataContext"; 
+import { DataContext } from "./DataContext";
 import { useSession } from "next-auth/react";
 import useAxiosSecure from "../lib/useAxiosSecure";
 
 const DataProvider = ({ children }) => {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const axiosSecure = useAxiosSecure();
-
-    // 🧩 selectedProject state
     const [selectedProject, setSelectedProject] = useState(null);
+    const manager = selectedProject?.manager?.email;
 
     // 🔹 Load from localStorage when app loads
     useEffect(() => {
@@ -22,7 +21,6 @@ const DataProvider = ({ children }) => {
             }
         }
     }, []);
-
     // 🔹 Save to localStorage whenever it changes
     useEffect(() => {
         if (selectedProject) {
@@ -37,9 +35,9 @@ const DataProvider = ({ children }) => {
         axiosSecure,
         selectedProject,
         setSelectedProject,
+        manager,
     };
-
-    return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
+return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 };
 
 export default DataProvider;

@@ -1,3 +1,4 @@
+
 export default function CancelPage() {
     return (
         <div className="text-center mt-20">
@@ -6,3 +7,4 @@ export default function CancelPage() {
         </div>
     );
 }
+

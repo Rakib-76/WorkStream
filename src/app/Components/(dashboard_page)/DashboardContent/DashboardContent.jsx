@@ -46,7 +46,8 @@ export default function DashboardContent({ activeItem }) {
       case "attendence":
         return (
           <div className="">
-            <Attendence></Attendence>
+            <Attendence projectId={projectId}></Attendence>
+            {/* <Attendence></Attendence> */}
           </div>
         );
 
