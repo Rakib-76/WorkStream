@@ -11,7 +11,6 @@ const DataProvider = ({ children }) => {
     const manager = selectedProject?.manager?.email;
     const userEmail = session?.user?.email;
     const [userData, setUserData] = useState(null)
-
     // 🔹 Load from localStorage when app loads
     useEffect(() => {
         const saved = localStorage.getItem("selectedProject");
@@ -32,18 +31,18 @@ const DataProvider = ({ children }) => {
         }
     }, [selectedProject]);
     useEffect(() => {
-        if (!userEmail) return; 
-
-        const fetchUserData = async () => {
-            try {
-                const res = await axiosSecure.get(`/api/users?email=${userEmail}`);
-                setUserData(res.data);
-            } catch (error) {
-                console.error("Failed to fetch user:", error);
+if (userEmail && status === "authenticated") {
+            const fetchUserData = async () => {
+                try {
+                    const res = await axiosSecure.get(`/api/users?email=${userEmail}`);
+                    setUserData(res.data);
+                } catch (error) {
+                    console.error("Failed to fetch user:", error);
+                }
             }
+            fetchUserData();
         };
 
-        fetchUserData();
     }, [userEmail, axiosSecure]);
 
     const value = {

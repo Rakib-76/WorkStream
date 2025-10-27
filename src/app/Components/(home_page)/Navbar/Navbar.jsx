@@ -13,6 +13,9 @@ import { Settings } from "lucide-react";
 import { SwitchCamera } from "lucide-react";
 import { LogOut } from "lucide-react";
 import { LayoutDashboard } from "lucide-react";
+import { useContext } from "react";
+import { DataContext } from "../../../../context/DataContext";
+import ProfileModal from "../ProfileModal/ProfileModal";
 
 export default function Navbar() {
 
@@ -25,6 +28,8 @@ export default function Navbar() {
   const [mobileProductOpen, setMobileProductOpen] = useState(false);
   const [mobileCompanyOpen, setMobileCompanyOpen] = useState(false);
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
+  const { userData } = useContext(DataContext);
+  const [open, setOpen] = useState(false);
 
   // Scroll effect
   useEffect(() => {
@@ -235,8 +240,8 @@ export default function Navbar() {
     },
   ];
 
-  const handleProfileBtn = () =>{
-    console.log('onClick')
+  const handleProfileBtn = () => {
+    setOpen(true)
   }
 
   // handle logout functionality
@@ -433,7 +438,7 @@ export default function Navbar() {
 
                           <ul className="p-2 text-gray-700 dark:text-gray-200">
                             <li className=" px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                              <button className="flex items-center gap-2" onClick={()=>handleProfileBtn()}>
+                              <button className="flex items-center gap-2" onClick={() => handleProfileBtn()}>
                                 <User size={18} /> Profile
                               </button>
                             </li>
@@ -746,7 +751,7 @@ export default function Navbar() {
 
                               <ul className="p-2 text-gray-700 dark:text-gray-200">
                                 <li className=" px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                                  <button className="flex items-center gap-2" onClick={()=>handleProfileBtn()}>
+                                  <button className="flex items-center gap-2" onClick={() => handleProfileBtn()}>
                                     <User size={18} /> Profile
                                   </button>
                                 </li>
@@ -796,6 +801,8 @@ export default function Navbar() {
             </div>
           )}
         </div>
+        <ProfileModal isOpen={open} onClose={() => setOpen(false)} />
+
       </nav>
 
       {/* Enhanced Custom CSS for perfect theme integration */}
