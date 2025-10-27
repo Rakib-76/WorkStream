@@ -235,6 +235,10 @@ export default function Navbar() {
     },
   ];
 
+  const handleProfileBtn = () =>{
+    console.log('onClick')
+  }
+
   // handle logout functionality
   const handleLogout = async () => {
     Swal.fire({
@@ -428,8 +432,10 @@ export default function Navbar() {
                           </div>
 
                           <ul className="p-2 text-gray-700 dark:text-gray-200">
-                            <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                              <User size={18} /> Profile
+                            <li className=" px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                              <button className="flex items-center gap-2" onClick={()=>handleProfileBtn()}>
+                                <User size={18} /> Profile
+                              </button>
                             </li>
                             <li
                               onClick={() => (window.location.href = "/Dashboard")}
@@ -739,8 +745,10 @@ export default function Navbar() {
                               </div>
 
                               <ul className="p-2 text-gray-700 dark:text-gray-200">
-                                <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                                  <User size={18} /> Profile
+                                <li className=" px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                                  <button className="flex items-center gap-2" onClick={()=>handleProfileBtn()}>
+                                    <User size={18} /> Profile
+                                  </button>
                                 </li>
                                 <li
                                   onClick={() => (window.location.href = "/Dashboard")}

@@ -9,6 +9,8 @@ const DataProvider = ({ children }) => {
     const axiosSecure = useAxiosSecure();
     const [selectedProject, setSelectedProject] = useState(null);
     const manager = selectedProject?.manager?.email;
+    const userEmail = session?.user?.email;
+    const [userData, setUserData] = useState(null)
 
     // 🔹 Load from localStorage when app loads
     useEffect(() => {
@@ -29,6 +31,20 @@ const DataProvider = ({ children }) => {
             localStorage.removeItem("selectedProject");
         }
     }, [selectedProject]);
+    useEffect(() => {
+        if (!userEmail) return; 
+
+        const fetchUserData = async () => {
+            try {
+                const res = await axiosSecure.get(`/api/users?email=${userEmail}`);
+                setUserData(res.data);
+            } catch (error) {
+                console.error("Failed to fetch user:", error);
+            }
+        };
+
+        fetchUserData();
+    }, [userEmail, axiosSecure]);
 
     const value = {
         session,
@@ -36,8 +52,10 @@ const DataProvider = ({ children }) => {
         selectedProject,
         setSelectedProject,
         manager,
+        userData,
+        setUserData,
     };
-return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
+    return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 };
 
 export default DataProvider;
