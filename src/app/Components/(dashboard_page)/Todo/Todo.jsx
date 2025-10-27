@@ -351,15 +351,20 @@ export default function Todo() {
               </div>
 
               {/* Add Task Button */}
-              <button
-                onClick={() => {
-                  setCurrentColumnId(col.id);
-                  setOpenModal(true);
-                }}
-                className="mt-4 w-full py-2 text-sm border rounded-lg flex items-center justify-center gap-1 font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-              >
-                <Plus size={16} /> Add Task
-              </button>
+              {
+                manager === userEmail &&
+                (
+                  <button
+                    onClick={() => {
+                      setCurrentColumnId(col.id);
+                      setOpenModal(true);
+                    }}
+                    className="mt-4 w-full py-2 text-sm border rounded-lg flex items-center justify-center gap-1 font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                  >
+                    <Plus size={16} /> Add Task
+                  </button>
+                )
+              }
             </motion.div>
           ))}
 
