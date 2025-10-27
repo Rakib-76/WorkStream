@@ -309,14 +309,19 @@ export default function Todo() {
                           onClick={(e) => e.stopPropagation()}
                         >
                           <div className="relative">
-                            <button
-                              onClick={() =>
-                                setMenuOpen(menuOpen === task._id ? null : task._id)
-                              }
-                              className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
-                            >
-                              <MoreVertical size={16} />
-                            </button>
+                            {
+                              manager === userEmail &&
+                              (
+                                <button
+                                  onClick={() =>
+                                    setMenuOpen(menuOpen === task._id ? null : task._id)
+                                  }
+                                  className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                                >
+                                  <MoreVertical size={16} />
+                                </button>
+                              )
+                            }
 
                             <AnimatePresence>
                               {menuOpen === task._id && (
