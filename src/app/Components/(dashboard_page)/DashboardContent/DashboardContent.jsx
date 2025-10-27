@@ -9,6 +9,7 @@ import Reports from "../Reports/Reports";
 import Tasks from "../Tasks/Tasks";
 import Team from "../Team/Team";
 import Todo from "../Todo/Todo";
+import Videoconference from "../Videoconference/Videoconference";
 import { DataContext } from "../../../../context/DataContext";
 
 export default function DashboardContent({ activeItem }) {
@@ -45,7 +46,8 @@ export default function DashboardContent({ activeItem }) {
       case "attendence":
         return (
           <div className="">
-            <Attendence></Attendence>
+            <Attendence projectId={projectId}></Attendence>
+            {/* <Attendence></Attendence> */}
           </div>
         );
 
@@ -73,10 +75,7 @@ export default function DashboardContent({ activeItem }) {
       case "callmeet":
         return (
           <div className="p-6 bg-card border border-border rounded-xl shadow ">
-            <h3 className="text-lg font-bold">📞 Call / Meet</h3>
-            <p className="text-muted-foreground mt-2">
-              Video/voice meeting integration section.
-            </p>
+            <Videoconference></Videoconference>
           </div>
         );
 
@@ -100,7 +99,7 @@ export default function DashboardContent({ activeItem }) {
       case "reports":
         return (
           <div className="p-6 bg-card border border-border rounded-xl  shadow ">
-            <Reports></Reports>
+            <Reports projectId={projectId}></Reports>
           </div>
         );
 

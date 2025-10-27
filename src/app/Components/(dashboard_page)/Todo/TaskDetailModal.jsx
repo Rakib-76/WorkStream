@@ -27,7 +27,7 @@ export default function TaskDetailModal({
   const [comments, setComments] = useState(task?.comments || []);
   const [newComment, setNewComment] = useState("");
 
-  // ✅ STATUS BUTTONS
+  //  STATUS BUTTONS
   const markPending = () => {
     Swal.fire("Pending!", "Task marked as pending.", "info");
     onStatusChange({
@@ -55,7 +55,7 @@ export default function TaskDetailModal({
     });
   };
 
-  // ✅ COMMENT ADD
+  //  COMMENT ADD
   const handleAddComment = () => {
     if (!newComment.trim()) return;
     const commentObj = {
@@ -89,13 +89,12 @@ export default function TaskDetailModal({
               <h2 className="text-xl font-semibold flex items-center gap-2">
                 {task.title}
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    task.priority === "High"
-                      ? "bg-red-100 text-red-600"
-                      : task.priority === "Medium"
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${task.priority === "High"
+                    ? "bg-red-100 text-red-600"
+                    : task.priority === "Medium"
                       ? "bg-yellow-100 text-yellow-600"
                       : "bg-green-100 text-green-600"
-                  }`}
+                    }`}
                 >
                   {task.priority}
                 </span>
@@ -154,7 +153,7 @@ export default function TaskDetailModal({
                 </div>
               </section>
 
-              {/* ✅ ATTENDANCE SECTION */}
+              {/*  ATTENDANCE SECTION */}
               <section>
                 <h3 className="font-semibold mb-2">📅 Attendance</h3>
                 <AttendanceSection task={task} currentUserEmail={currentUserEmail} />
@@ -258,11 +257,12 @@ export default function TaskDetailModal({
   );
 }
 
-/* ✅ Attendance Section */
+/*Attendance Section */
 
 const AttendanceSection = ({ task, currentUserEmail }) => {
   const [attendance, setAttendance] = useState([]);
 
+  // Build attendance dates between startDate & endDate
   useEffect(() => {
     if (task.startDate && task.endDate) {
       const start = dayjs(task.startDate);
@@ -272,32 +272,78 @@ const AttendanceSection = ({ task, currentUserEmail }) => {
       for (let d = start; d.isBefore(end) || d.isSame(end, "day"); d = d.add(1, "day")) {
         const dayName = d.format("dddd");
         const isHoliday = dayName === "Friday" || dayName === "Saturday";
+        // console.log(task.attendance, Array.isArray(task.attendance));
+        const existing = Array.isArray(task.attendance)
+          ? task.attendance.find((a) => a.date === d.format("YYYY-MM-DD"))
+          : null;;
         dates.push({
           date: d.format("YYYY-MM-DD"),
-          status: isHoliday ? "Holiday" : "Pending",
+          status: existing?.status || (isHoliday ? "Holiday" : "Pending"),
         });
       }
-// kjnkn
+      // kjnkn
       setAttendance(dates);
     }
   }, [task]);
 
-  const handleAttendance = (index) => {
+  // Handle attendance button click
+  const handleAttendance = async (index) => {
     const today = dayjs().format("YYYY-MM-DD");
-    setAttendance((prev) =>
-      prev.map((item, i) => {
-        if (i !== index) return item;
+    const item = attendance[index];
+    if (item.date !== today || !task.assigneeTo?.includes(currentUserEmail)) return;
+    const now = dayjs();
+    // const status = now.isAfter(dayjs().hour(10).minute(0)? "Late" : "Present");
+    const tenAM = dayjs().hour(10).minute(0).second(0);
+    const status = now.isAfter(tenAM) ? "Late" : "Present";
 
-        // শুধুমাত্র আজকের তারিখের জন্য change হবে
-        if (item.date !== today) return item;
 
-        const now = dayjs();
-        const tenAM = dayjs().hour(10).minute(0).second(0);
-        if (item.status === "Pending")
-          return { ...item, status: now.isAfter(tenAM) ? "Late" : "Present" };
-        return item;
-      })
-    );
+    // optimistic UI update
+    const newAttendance = [...attendance];
+    newAttendance[index].status = status;
+    setAttendance(newAttendance);
+
+    try {
+      // Call backend PATCH API
+      await fetch("/api/tasks/attendance", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskId: task._id, date: today, status }),
+
+      });
+      Swal.fire({
+        icon: "success",
+        title: "Attendance updated!",
+        text: `Marked as ${status}`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error("backend patch related error", err);
+      newAttendance[index].status = item.status;
+      setAttendance(newAttendance);
+      Swal.fire({
+        icon: "error",
+        title: "Failed!",
+        text: "Could not update attendance",
+      });
+    }
+
+
+
+    // setAttendance((prev) =>
+    //   prev.map((item, i) => {
+    //     if (i !== index) return item;
+
+    //     // শুধুমাত্র আজকের তারিখের জন্য change হবে
+    //     if (item.date !== today) return item;
+
+    //     const now = dayjs();
+    //     const tenAM = dayjs().hour(10).minute(0).second(0);
+    //     if (item.status === "Pending")
+    //       return { ...item, status: now.isAfter(tenAM) ? "Late" : "Present" };
+    //     return item;
+    //   })
+    // );
   };
 
   const getStatusColor = (status) => {

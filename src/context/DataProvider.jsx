@@ -5,13 +5,10 @@ import { useSession } from "next-auth/react";
 import useAxiosSecure from "../lib/useAxiosSecure";
 
 const DataProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
     const { data: session, status } = useSession();
-    const loading = status === "loading";
-    const userEmail = session?.user?.email;
     const axiosSecure = useAxiosSecure();
-    // 🧩 selectedProject state
     const [selectedProject, setSelectedProject] = useState(null);
+    const manager = selectedProject?.manager?.email;
 
     // 🔹 Load from localStorage when app loads
     useEffect(() => {
@@ -32,22 +29,13 @@ const DataProvider = ({ children }) => {
             localStorage.removeItem("selectedProject");
         }
     }, [selectedProject]);
-    // user fine by email 
-    useEffect(() => {
-        if (!loading && userEmail) {
-            axiosSecure
-                .get(`/api/users?email=${userEmail}`)
-                .then((res) => setUser(res.data))
-                .catch((err) => console.error(err));
-        }
-    }, [userEmail]);
 
     const value = {
         session,
         axiosSecure,
         selectedProject,
         setSelectedProject,
-        user,
+        manager,
     };
 return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 };

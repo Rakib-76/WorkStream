@@ -27,15 +27,17 @@ export default function Todo() {
   const axiosSecure = useAxiosSecure();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { selectedProject } = useContext(DataContext);
-
+  const { selectedProject, manager } = useContext(DataContext);
   const { data: session } = useSession();
   const userName = session?.user?.name || "Unknown User";
   const userEmail = session?.user?.email || "Unknown Email";
   const userImage = session?.user?.image || "/def-profile.jpeg";
-  
   const [attendance, setAttendance] = useState("");
-
+  if (manager === userEmail) {
+    console.log('ok');
+  } else {
+    console.log('not')
+  }
   // 🟢 Fetch all tasks from API
   useEffect(() => {
     if (!selectedProject?._id) return;
@@ -78,7 +80,7 @@ export default function Todo() {
       if (res.data?.insertedId) {
         // ✅ Task added successfully
         taskWithColumn._id = res.data.insertedId;
-taskWithColumn.createdAt = new Date().toISOString();
+        taskWithColumn.createdAt = new Date().toISOString();
         const newColumns = columns.map((col) =>
           col.id === currentColumnId
             ? { ...col, tasks: [...col.tasks, taskWithColumn] }
@@ -215,14 +217,7 @@ taskWithColumn.createdAt = new Date().toISOString();
 
                 {/* Column Menu */}
                 <div className="relative">
-                  <button
-                    onClick={() =>
-                      setMenuOpen(menuOpen === col.id ? null : col.id)
-                    }
-                    className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
-                  >
-                    <MoreVertical size={18} />
-                  </button>
+
 
                   <AnimatePresence>
                     {menuOpen === col.id && (
@@ -407,7 +402,7 @@ taskWithColumn.createdAt = new Date().toISOString();
 
       {/* Task Detail Modal */}
       <TaskDetailModal
-      currentUserEmail={session?.user?.email} 
+        currentUserEmail={session?.user?.email}
         setAttendance={setAttendance}
         isOpen={detailOpen}
         onClose={() => setDetailOpen(false)}
