@@ -28,7 +28,7 @@ export default function AttendancePage({ projectId }) {
   if (loading) return <p className="p-6">Loading...</p>;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className=" space-y-6">
       <div>
         <h1 className="text-3xl font-bold mb-2">Attendance</h1>
         <p className="text-gray-500">Track team attendance and working hours</p>

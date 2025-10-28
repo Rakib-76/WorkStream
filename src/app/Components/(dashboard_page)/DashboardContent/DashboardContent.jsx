@@ -32,20 +32,20 @@ export default function DashboardContent({ activeItem }) {
     switch (activeItem) {
       case "overview":
         return (
-          <div className="">
+          <div className="md:pt-12 pt-6 lg:pt-0">
             <Overview projectId={projectId}/>
           </div>
         );
 
       case "tasks":
         return (
-          <div className="">
+          <div className="md:pt-12 pt-12 lg:pt-0">
             <Tasks projectId={projectId}></Tasks>
           </div>
         );
       case "attendence":
         return (
-          <div className="">
+          <div className="md:pt-12 pt-12 lg:pt-0">
             <Attendence projectId={projectId}></Attendence>
             {/* <Attendence></Attendence> */}
           </div>
@@ -53,52 +53,52 @@ export default function DashboardContent({ activeItem }) {
 
       case "calendar":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl shadow ">
+          <div className="md:pt-14 lg:pt-0 pt-14   ">
             <CalendarSection projectId={projectId} />
           </div>
         );
 
       case "todo":
         return (
-          <div className="">
+          <div className="md:pt-14 pt-14 lg:pt-0 ">
             <Todo></Todo>
           </div>
         );
 
       case "chat":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl shadow ">
+          <div className="md:pt-14 pt-14 lg:pt-0  ">
             <ChatSection />
           </div>
         );
 
       case "callmeet":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl shadow ">
+          <div className="md:pt-14 pt-14 lg:pt-0 ">
             <Videoconference></Videoconference>
           </div>
         );
 
       case "team":
         return (
-          <div className="">
+          <div className="lg:0 md:pt-12 pt-12">
             <Team projectId={projectId}></Team>
           </div>
         );
 
-      case "notes":
-        return (
-          <div className="p-6 bg-card border border-border rounded-xl shadow ">
-            <h3 className="text-lg font-bold">📝 Notes</h3>
-            <p className="text-muted-foreground mt-2">
-              Save your important notes here.
-            </p>
-          </div>
-        );
+      // case "notes":
+      //   return (
+      //     <div className="md:pt-12 p-6 bg-card border border-border rounded-xl shadow ">
+      //       <h3 className="text-lg font-bold">📝 Notes</h3>
+      //       <p className="text-muted-foreground mt-2">
+      //         Save your important notes here.
+      //       </p>
+      //     </div>
+      //   );
 
       case "reports":
         return (
-          <div className="p-6 bg-card border border-border rounded-xl  shadow ">
+          <div className="md:pt-14 pt-14 lg:pt-0    ">
             <Reports projectId={projectId}></Reports>
           </div>
         );
