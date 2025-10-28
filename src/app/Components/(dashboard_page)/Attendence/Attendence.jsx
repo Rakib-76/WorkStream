@@ -45,7 +45,7 @@ export default function AttendancePage({ projectId }) {
               <thead>
                 <tr className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 uppercase tracking-wide text-xs md:text-sm">
                   <th className="p-3 text-left">Task Title</th>
-                  <th className="p-3 text-left">Creator Email</th>
+                  <th className="p-3 text-left">Assigned Email</th>
                   <th className="p-3 text-left">Start Date</th>
                   <th className="p-3 text-left">Attendance</th>
                 </tr>
@@ -64,9 +64,11 @@ export default function AttendancePage({ projectId }) {
                       {item.title}
                     </td>
 
-                    <td className="p-3 text-gray-700 dark:text-gray-300">
-                      {item.creatorEmail}
-                    </td>
+                    <td className="p-3">
+                    {item?.assigneeTo?.length > 0
+                      ? item.assigneeTo.join(" , ")
+                      : "No Assignee"}
+                  </td>
 
                     <td className="p-3 text-gray-700 dark:text-gray-300">
                       {item.startDate}

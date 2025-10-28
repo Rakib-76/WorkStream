@@ -26,7 +26,7 @@ export async function GET (req) {
         .project({
             title:1,
             startDate: 1,
-            creatorEmail: 1,
+            assigneeTo: 1,
             attendance:1,
         })
         .sort({createdAt : -1})

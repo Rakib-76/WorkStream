@@ -21,9 +21,11 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
   const [endTime, setEndTime] = useState("");
   const { selectedProject } = useContext(DataContext);
   const [loading, setLoading] = useState(false);
+ 
 
   // ===== Cloudinary Upload =====
   const handleFileUpload = async (e) => {
+   setLoading(true);
     const selectedFiles = Array.from(e.target.files);
 
     const uploadedFiles = await Promise.all(
@@ -45,6 +47,8 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
     );
 
     setFiles((prev) => [...prev, ...uploadedFiles]);
+    setLoading(false);
+   
   };
 
   const removeFile = (file) => setFiles(files.filter((f) => f !== file));
@@ -229,13 +233,15 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                     </div>
                   ))}
                   <label className="flex items-center gap-2 cursor-pointer px-3 py-2 border rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+                   
                     <Upload size={16} />
-                    Upload File
+                   {loading ? "Uploading please wait..." : "Upload File"}
                     <input
                       type="file"
                       multiple
                       onChange={handleFileUpload}
                       className="hidden"
+                    
                     />
                   </label>
                 </div>
