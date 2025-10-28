@@ -1,22 +1,22 @@
 "use client";
 import React, { useContext } from "react";
-import { Facebook, Twitter, Linkedin, Dribbble, Globe, X } from "lucide-react";
 import { DataContext } from "../../../../context/DataContext";
+import { X, Facebook, Twitter, Linkedin, Dribbble, Globe } from "lucide-react";
 
-const ProfileModal = ({ isOpen, onClose }) => {
+const ProfileModal = () => {
     const { userData } = useContext(DataContext);
-    if (!isOpen) return null;
+    console.log(userData);
 
     const profileData = {
-        name: userData?.displayName || "Alex Anderson",
-        email: userData?.email || "alex@example.com",
-        title: "UI/UX Designer",
-        bio: "Creative designer crafting clean, modern, and user-centered digital experiences. Passionate about blending aesthetics and usability.",
+        name: userData?.name || "Unknown Person",
+        email: userData?.email || "no@email.com",
+        title: "",
+        bio: userData?.bio || "This user hasn't added a bio yet.",
         followers: 1200,
         following: 850,
-        bannerUrl: "https://placehold.co/800x250/1E40AF/ffffff?text=Blue+Wave+Design",
-        avatarUrl:
-            userData?.photoURL ||
+        bannerUrl: "./profileBanner.jpg",
+        image:
+            userData?.image ||
             "https://placehold.co/128x128/374151/ffffff?text=AA",
         socialLinks: [
             { name: "Facebook", url: "#" },
@@ -50,30 +50,41 @@ const ProfileModal = ({ isOpen, onClose }) => {
         email,
         title,
         bio,
-        followers,
-        following,
         bannerUrl,
-        avatarUrl,
+        image,
         socialLinks,
     } = profileData;
 
     return (
-        <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-            onClick={onClose} // 🔹 Click on backdrop closes modal
-        >
-            {/* Modal content */}
-            <div
-                className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl overflow-hidden transform transition-all duration-300 scale-100"
-                onClick={(e) => e.stopPropagation()} // 🔹 Prevent closing when clicking inside modal
-            >
+        <dialog id="profile_modal" className="modal">
+            <div className="modal-box max-w-lg bg-white rounded-xl shadow-2xl p-0 overflow-hidden">
                 {/* Close button */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-3 right-3 text-gray-600 hover:text-red-500 transition"
-                >
-                    <X size={22} />
-                </button>
+                <form method="dialog" className="absolute flex flex-col gap-3 right-3 top-3 z-50">
+                    <button className="btn btn-sm btn-circle btn-ghost text-black bg-white/70 hover:bg-white">
+                        <X size={18} />
+                    </button>
+                    {/* Edit Button */}
+                    <button
+                        className="btn btn-sm btn-circle btn-ghost text-blue-600 bg-white/70 hover:bg-white"
+                        onClick={() => console.log("Edit clicked")}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.232 5.232l3.536 3.536M4 20h4l10.607-10.607a1.5 1.5 0 00-2.121-2.121L6 17.879V20z"
+                            />
+                        </svg>
+                    </button>
+                </form>
+
 
                 {/* Banner */}
                 <div className="relative">
@@ -85,7 +96,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                     <div className="absolute top-full left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <div className="p-1 bg-white rounded-full shadow-lg">
                             <img
-                                src={avatarUrl}
+                                src={image}
                                 alt="Avatar"
                                 className="w-28 h-28 object-cover rounded-full border-4 border-white"
                             />
@@ -111,29 +122,9 @@ const ProfileModal = ({ isOpen, onClose }) => {
                             ) : null;
                         })}
                     </div>
-
-                    <div className="flex justify-center space-x-8">
-                        <div>
-                            <span className="text-xl font-extrabold text-gray-800">
-                                {followers}
-                            </span>
-                            <span className="block text-xs font-semibold uppercase text-gray-500 tracking-wider">
-                                Followers
-                            </span>
-                        </div>
-                        <div>
-                            <span className="text-xl font-extrabold text-gray-800">
-                                {following}
-                            </span>
-                            <span className="block text-xs font-semibold uppercase text-gray-500 tracking-wider">
-                                Following
-                            </span>
-                        </div>
-                    </div>
                 </div>
             </div>
-        </div>
-
+        </dialog>
     );
 };
 
