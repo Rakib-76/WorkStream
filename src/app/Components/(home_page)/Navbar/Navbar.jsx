@@ -438,7 +438,8 @@ export default function Navbar() {
                           </div>
 
                           <ul className="p-2 text-gray-700 dark:text-gray-200">
-                            <li onClick={() => handleProfileBtn()} className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                            <li 
+                            onClick={() => handleProfileBtn()} className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                               <User size={18} /> Profile
                             </li>
                             <li
