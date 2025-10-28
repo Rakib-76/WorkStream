@@ -22,11 +22,11 @@ export default function Tasks({ projectId }) {
   const axiosSecure = useAxiosSecure();
   const userEmail = session?.user?.email;
   const [isCreatedByUser, setIsCreatedByUser] = useState(false);
-   const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
 
   // Fetch all tasks
-  const { data: tasksData = [], refetch , isLoading} = useQuery({
+  const { data: tasksData = [], refetch, isLoading } = useQuery({
     queryKey: ["tasks", projectId],
     queryFn: async () => {
       if (!projectId) {
@@ -60,8 +60,8 @@ export default function Tasks({ projectId }) {
   };
 
   // only creator see task my task fetch
-  if(isLoading){
-    return <LoadingSpinner/>
+  if (isLoading) {
+    return <LoadingSpinner />
   }
 
   const displayedTasks =
@@ -111,7 +111,7 @@ function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
         <table className="w-full border-collapse min-w-[700px]">
           <thead className="bg-gray-100 dark:bg-gray-800">
             <tr>
-              {["Task Title", "Priority", "Status", "Assigned To", "Deadline", "Actions"].map((th) => (
+              {["Task Title", "Assigned To", "Deadline", "Priority", "Status",].map((th) => (
                 <th
                   key={th}
                   className="text-left p-3 text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wider"
@@ -135,6 +135,13 @@ function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
                   className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition"
                 >
                   <td className="p-3 font-medium">{task.title}</td>
+
+                  <td className="p-3">
+                    {task?.assigneeTo?.length > 0
+                      ? task.assigneeTo.join(" , ")
+                      : "No Assignee"}
+                  </td>
+                  <td className="p-3">{task.endDate}</td>
                   <td>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-semibold ${getPriorityColor(
@@ -153,14 +160,7 @@ function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
                       {task.status}
                     </span>
                   </td>
-                  <td className="p-3">
-                    {task?.assigneeTo?.length > 0
-                      ? task.assigneeTo.join(" , ")
-                      : "No Assignee"}
-                  </td>
-
-                  <td className="p-3">{task.endDate}</td>
-                  <td className="p-3 text-right">
+                  {/* <td className="p-3 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition">
@@ -182,7 +182,7 @@ function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </td>
+                  </td> */}
                 </tr>
               ))
             )}
