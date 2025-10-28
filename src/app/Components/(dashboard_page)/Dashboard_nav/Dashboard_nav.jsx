@@ -28,6 +28,7 @@ import { Controller, useForm } from "react-hook-form";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import { DataContext } from "../../../../context/DataContext";
 import NotificationBell from "../NotificationBell/NotificationBell";
+import ProfileModal from "../../(home_page)/ProfileModal/ProfileModal";
 
 export default function DashboardNavbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -227,6 +228,11 @@ export default function DashboardNavbar() {
     project.projectName.toLowerCase().includes(searchText.toLowerCase()) ||
     (project.projectTags && project.projectTags.some(tag => tag.toLowerCase().includes(searchText.toLowerCase())))
   );
+
+  const handleProfileBtn = () => {
+    const modal = document.getElementById("profile_modal");
+    if (modal) modal.showModal();
+  }
 
 
   return (
@@ -488,10 +494,14 @@ export default function DashboardNavbar() {
                   </div>
 
                   <ul className="p-2 text-gray-700 dark:text-gray-200">
-                    <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                    <li
+                      onClick={() => handleProfileBtn()}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                       <User size={18} /> Profile
                     </li>
-                    <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                    <li
+                      onClick={() => (window.location.href = "/Dashboard/profileSetting")}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                       <Settings size={18} /> Account settings
                     </li>
                     <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
@@ -658,6 +668,7 @@ export default function DashboardNavbar() {
           </div>
         </div>
       )}
+      <ProfileModal />
     </>
   );
 }
