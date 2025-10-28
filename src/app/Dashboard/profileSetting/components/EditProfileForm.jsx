@@ -52,56 +52,76 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                     </div>
                 </div>
 
-                {/* Input fields */}
+                {/* Input Fields */}
                 <div className="grid gap-4 md:grid-cols-2">
-                    <InputField
-                        label="Full Name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                    />
-                    <InputField
-                        label="Email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        disabled
-                    />
-                    <InputField
-                        label="Location"
-                        name="location"
-                        value={formData.location}
-                        onChange={handleChange}
-                    />
-                    <InputField
-                        label="Phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                    />
-                    <InputField
-                        label="Website"
-                        name="website"
-                        value={formData.website}
-                        onChange={handleChange}
-                        className="md:col-span-2"
-                    />
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Full Name</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            disabled
+                            className="w-full border rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Location</label>
+                        <input
+                            type="text"
+                            name="location"
+                            value={formData.location}
+                            onChange={handleChange}
+                            className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Phone</label>
+                        <input
+                            type="text"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
+                        />
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium mb-1">Website</label>
+                        <input
+                            type="text"
+                            name="website"
+                            value={formData.website}
+                            onChange={handleChange}
+                            className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
+                        />
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium mb-1">Bio</label>
+                        <textarea
+                            name="bio"
+                            value={formData.bio}
+                            onChange={handleChange}
+                            rows={4}
+                            className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
+                        />
+                    </div>
                 </div>
 
-                {/* Bio */}
-                <div>
-                    <label className="block text-sm font-medium mb-1">Bio</label>
-                    <textarea
-                        name="bio"
-                        value={formData.bio}
-                        onChange={handleChange}
-                        rows={4}
-                        className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
-                    />
-                </div>
-
-                {/* Buttons */}
                 <div className="flex justify-end gap-3">
                     <button
                         type="button"
@@ -121,18 +141,3 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
         </div>
     );
 }
-
-// ✅ Correct PascalCase component
-const InputField = ({ label, name, value, onChange, className = "", ...props }) => (
-    <div className={className}>
-        <label className="block text-sm font-medium mb-1">{label}</label>
-        <input
-            type="text"
-            name={name}
-            value={value}
-            onChange={onChange}
-            className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
-            {...props}
-        />
-    </div>
-);
