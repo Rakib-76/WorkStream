@@ -2,10 +2,11 @@
 import React, { useState } from 'react'
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, EyeOff, Eye } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
+
 
 
 export default function LoginForm() {
@@ -14,6 +15,7 @@ export default function LoginForm() {
     const callbackUrl = searchParams.get("callbackUrl") || "/Dashboard";
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const googleSignIn = () => {
         signIn("google", { callbackUrl: "/" })
@@ -48,7 +50,7 @@ export default function LoginForm() {
                 icon: 'error',
                 confirmButtonText: 'Try Again'
             });
-              setLoading(false);
+            setLoading(false);
         }
     };
 
@@ -76,26 +78,35 @@ export default function LoginForm() {
                     )}
 
                     <label className="label">Password</label>
-                    <input
-                        type="password"
-                        autoComplete="new-password"
-                        {...register('password', {
-                            required: true,
-                            minLength: 6
-                        })}
-                        className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#438af7]"
-                        placeholder="Password"
-                    />
-                    {errors.password?.type === "minLength" && (
-                        <p role='alert' className='text-red-600'>
-                            Password must be at least 6 characters
-                        </p>
-                    )}
-                    {errors.password?.type === "required" && (
-                        <p role='alert' className='text-red-600'>
-                            Password is required
-                        </p>
-                    )}
+                    <div className='relative'>
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            autoComplete="new-password"
+                            {...register('password', {
+                                required: true,
+                                minLength: 6
+                            })}
+                            className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#438af7]"
+                            placeholder="Password"
+                        />
+                        <button
+                            type='button'
+                            onClick={() => setShowPassword(!showPassword)}
+                            className='absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 z-10'
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                        {errors.password?.type === "minLength" && (
+                            <p role='alert' className='text-red-600'>
+                                Password must be at least 6 characters
+                            </p>
+                        )}
+                        {errors.password?.type === "required" && (
+                            <p role='alert' className='text-red-600'>
+                                Password is required
+                            </p>
+                        )}
+                    </div>
 
                     <div><a href="/forgot-password" className="link link-hover flex justify-end">Forgot password?</a></div>
 

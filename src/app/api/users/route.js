@@ -34,3 +34,46 @@ export async function GET(request) {
         );
     }
 }
+
+export async function PUT(request) {
+    try {
+        const userCollection = await dbConnect(collectionNameObj.userCollection);
+        const { searchParams } = new URL(request.url);
+        const email = searchParams.get("email");
+
+        if (!email) {
+            return Response.json({ success: false, message: "Email is required" }, { status: 400 });
+        }
+
+        const body = await request.json();
+        const { name, phone, website, bio, location, image } = body;
+
+        const updateDoc = {
+            $set: {
+                name,
+                phone,
+                website,
+                bio,
+                location,
+                image,
+                updatedAt: new Date(),
+            },
+        };
+
+        const result = await userCollection.updateOne({ email }, updateDoc);
+
+        if (result.matchedCount === 0) {
+            return Response.json({ success: false, message: "User not found" }, { status: 404 });
+        }
+
+        const updatedUser = await userCollection.findOne({ email });
+
+        return Response.json({ success: true, updatedUser }, { status: 200 });
+    } catch (error) {
+        console.error("Error updating user:", error);
+        return Response.json(
+            { success: false, message: "Failed to update user", error: error.message },
+            { status: 500 }
+        );
+    }
+}

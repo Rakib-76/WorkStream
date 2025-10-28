@@ -13,6 +13,9 @@ import { Settings } from "lucide-react";
 import { SwitchCamera } from "lucide-react";
 import { LogOut } from "lucide-react";
 import { LayoutDashboard } from "lucide-react";
+import { useContext } from "react";
+import { DataContext } from "../../../../context/DataContext";
+import ProfileModal from "../ProfileModal/ProfileModal";
 
 export default function Navbar() {
 
@@ -25,6 +28,8 @@ export default function Navbar() {
   const [mobileProductOpen, setMobileProductOpen] = useState(false);
   const [mobileCompanyOpen, setMobileCompanyOpen] = useState(false);
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
+  const { userData } = useContext(DataContext);
+  const [open, setOpen] = useState(false);
 
   // Scroll effect
   useEffect(() => {
@@ -235,6 +240,11 @@ export default function Navbar() {
     },
   ];
 
+  const handleProfileBtn = () => {
+    const modal = document.getElementById("profile_modal");
+    if (modal) modal.showModal();
+  }
+
   // handle logout functionality
   const handleLogout = async () => {
     Swal.fire({
@@ -428,7 +438,8 @@ export default function Navbar() {
                           </div>
 
                           <ul className="p-2 text-gray-700 dark:text-gray-200">
-                            <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                            <li 
+                            onClick={() => handleProfileBtn()} className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                               <User size={18} /> Profile
                             </li>
                             <li
@@ -437,7 +448,9 @@ export default function Navbar() {
                             >
                               <LayoutDashboard size={18} /> Dashboard
                             </li>
-                            <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                            <li
+                            onClick={()=> (window.location.href = "/Dashboard/profileSetting")}
+                             className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                               <Settings size={18} /> Account settings
                             </li>
                             <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
@@ -739,7 +752,7 @@ export default function Navbar() {
                               </div>
 
                               <ul className="p-2 text-gray-700 dark:text-gray-200">
-                                <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                                <li onClick={() => handleProfileBtn()} className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                                   <User size={18} /> Profile
                                 </li>
                                 <li
@@ -788,10 +801,12 @@ export default function Navbar() {
             </div>
           )}
         </div>
-      </nav>
+        <ProfileModal />
+
+      </nav >
 
       {/* Enhanced Custom CSS for perfect theme integration */}
-      <style jsx global>{`
+      < style jsx global > {`
         .ant-dropdown.navbar-dropdown-enhanced .ant-dropdown-menu {
           background: var(--card) !important;
           border: 1px solid var(--border) !important;
@@ -830,7 +845,7 @@ export default function Navbar() {
           box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3),
             0 10px 10px -5px rgb(0 0 0 / 0.2) !important;
         }
-      `}</style>
+      `}</style >
     </>
   );
 }
