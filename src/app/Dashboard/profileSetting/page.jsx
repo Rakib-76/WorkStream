@@ -1,57 +1,73 @@
 "use client";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Pencil, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import EditProfileForm from "./components/EditProfileForm";
 import ProfileInfo from "./components/ProfileInfo";
 import ProfileHeader from "./components/ProfileHeader";
 import { DataContext } from "../../../context/DataContext";
+import toast, { Toaster } from "react-hot-toast";
+import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner"
 
 export default function ProfileSetting() {
     const [isEditing, setIsEditing] = useState(false);
-    const [profileData, setProfileData] = useState(null);
     const { userData } = useContext(DataContext);
+    const [profileData, setProfileData] = useState(null);
 
-    // ✅ Fetch user data
     useEffect(() => {
-        if (!userData?.email) return;
-        const fetchUser = async () => {
-            const res = await fetch(`/api/user?email=${userData.email}`);
-            const data = await res.json();
-            setProfileData(data);
-        };
-        fetchUser();
+        if (userData) {
+            setProfileData({
+                name: userData?.name || "Unknown User",
+                email: userData?.email || "no@email.com",
+                image: userData?.image || "",
+                bannerUrl: userData?.bannerUrl || "./profileBanner.jpg",
+                location: userData?.location || "",
+                website: userData?.website || "",
+                phone: userData?.phone || "",
+                bio: userData?.bio || "This user hasn’t added a bio yet.",
+                joinedDate: new Date(userData?.createdAt).toLocaleDateString(),
+                role: userData?.membership || "Basic Member",
+            });
+        }
     }, [userData]);
 
-    // ✅ Update handler
     const handleSave = async (data) => {
-        const res = await fetch("/api/user", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...data, email: userData.email }),
-        });
+        try {
+            const res = await fetch(`/api/update-profile`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ...data, email: userData.email }),
+            });
 
-        const result = await res.json();
-        if (res.ok) {
-            setProfileData(data);
-            setIsEditing(false);
-            alert("✅ Profile updated successfully!");
-        } else {
-            alert(`❌ ${result.error || "Failed to update"}`);
+            const result = await res.json();
+            if (result.success) {
+                setProfileData(result.updatedUser);
+                toast.success("Profile updated successfully!");
+                setIsEditing(false);
+            } else {
+                toast.error(result.message || "Failed to update profile.");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Server error occurred.");
         }
     };
 
-    if (!profileData) {
-        return <div className="text-center py-10">Loading profile...</div>;
-    }
+    if (!profileData)
+        return (
+            <div className="flex justify-center items-center min-h-screen text-gray-500">
+                <LoadingSpinner />
+            </div>
+        );
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
+            <Toaster position="top-center" />
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <div className="mb-6">
                     <Link
                         href="/"
-                        className="border px-4 py-2 inline-flex items-center rounded-lg bg-gradient-to-r from-blue-600 to-blue-400 text-white"
+                        className=" px-4 py-2 inline-flex items-center rounded-lg bg-gradient-to-r from-blue-600 to-blue-400 text-white"
                     >
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         Back to Home

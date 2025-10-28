@@ -34,3 +34,51 @@ export async function GET(request) {
         );
     }
 }
+
+// ✅ PUT route (for updating user info)
+export async function PUT(request) {
+    try {
+        const userCollection = await dbConnect(collectionNameObj.userCollection);
+        const body = await request.json();
+        const { email, name, phone, website, bio, location, image } = body;
+
+        if (!email) {
+            return Response.json(
+                { message: "Email is required for updating user" },
+                { status: 400 }
+            );
+        }
+
+        const updateDoc = {
+            $set: {
+                name,
+                phone,
+                website,
+                bio,
+                location,
+                image,
+                updatedAt: new Date(),
+            },
+        };
+
+        const result = await userCollection.updateOne({ email }, updateDoc);
+
+        if (result.matchedCount === 0) {
+            return Response.json(
+                { message: "User not found" },
+                { status: 404 }
+            );
+        }
+
+        return Response.json(
+            { message: "Profile updated successfully", result },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error("Error updating user:", error);
+        return Response.json(
+            { message: "Failed to update user", error: error.message },
+            { status: 500 }
+        );
+    }
+}

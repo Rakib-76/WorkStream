@@ -55,7 +55,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                 {/* Input Fields */}
                 <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label className="block text-sm font-medium mb-1">Full Name</label>
+                        <label className="block text-black text-sm font-medium mb-1">Full Name</label>
                         <input
                             type="text"
                             name="name"
@@ -67,7 +67,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">Email</label>
+                        <label className="block text-black text-sm font-medium mb-1">Email</label>
                         <input
                             type="email"
                             name="email"
@@ -78,7 +78,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">Location</label>
+                        <label className="block text-black text-sm font-medium mb-1">Location</label>
                         <input
                             type="text"
                             name="location"
@@ -89,7 +89,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">Phone</label>
+                        <label className="block text-black text-sm font-medium mb-1">Phone</label>
                         <input
                             type="text"
                             name="phone"
@@ -100,7 +100,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                     </div>
 
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium mb-1">Website</label>
+                        <label className="block text-black text-sm font-medium mb-1">Website</label>
                         <input
                             type="text"
                             name="website"
@@ -111,7 +111,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                     </div>
 
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium mb-1">Bio</label>
+                        <label className="block text-sm text-black font-medium mb-1">Bio</label>
                         <textarea
                             name="bio"
                             value={formData.bio}
@@ -126,7 +126,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="px-4 py-2 border rounded-lg hover:bg-gray-100"
+                        className="px-4 py-2 x border rounded-lg hover:bg-gray-100"
                     >
                         Cancel
                     </button>
