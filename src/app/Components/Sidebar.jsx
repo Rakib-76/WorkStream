@@ -119,7 +119,7 @@ export default function Sidebar({ isOpen, onClose }) {
             </div>
           )}
 
-          {activeTab === "notes" && (
+          {/* {activeTab === "notes" && (
             <div className="space-y-3">
               <textarea
                 placeholder="Add meeting notes..."
@@ -127,7 +127,7 @@ export default function Sidebar({ isOpen, onClose }) {
               />
               <Button_meet className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg">Save Notes</Button_meet>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Chat Input */}

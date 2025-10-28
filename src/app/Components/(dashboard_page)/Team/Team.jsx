@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 // ----------------------------------------------------------------------
 // --- 1. Notification Component ---
 // ----------------------------------------------------------------------
+
 const Notification = ({ notification, onClose }) => {
   if (!notification) return null;
 
@@ -211,6 +212,7 @@ export default function Team({ projectId }) {
   const { manager } = useContext(DataContext);
   const { data: session } = useSession();
   const userEmail = session?.user?.email || "Unknown Email";
+const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   // --- Fetch tasks & map to team (wrapped in useCallback) ---
   const fetchTasks = useCallback(async () => {
@@ -310,50 +312,46 @@ export default function Team({ projectId }) {
         <div className="overflow-x-auto rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700">
           <table className="w-full border-collapse overflow-hidden">
             <thead className="bg-gray-100 dark:bg-gray-700 text-sm uppercase tracking-wider">
-              <tr>
-                <th className="p-3 text-left min-w-[150px]">Member</th>
-                <th className="p-3 text-left min-w-[200px]">Email</th>
-                <th className="p-3 text-left min-w-[150px]">Tasks</th>
-                <th className="p-3 text-left min-w-[150px]">Department</th>
-                <th className="p-3 text-left min-w-[100px]">Gender</th>
-                <th className="p-3 text-left min-w-[100px]">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {team.map((t, i) => (
-                <tr
-                  key={i}
-                  className="bg-white dark:bg-[#1E1E2E] border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition duration-150"
-                >
-                  <td className="p-3 flex items-center gap-2">
-                    <img
-                      src={t.img}
-                      className="w-8 h-8 rounded-full object-cover ring-2 ring-pink-500/50"
-                      onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/40x40/94A3B8/FFFFFF?text=?"; }}
-                    />
-                    <span className="font-medium">{t.name}</span>
-                    {t.role === "Leader" && <span className="ml-1 text-yellow-500">⭐</span>}
-                  </td>
-                  <td className="p-3 text-sm text-gray-600 dark:text-gray-400">{t.email}</td>
-                  <td className="p-3 text-sm text-gray-600 dark:text-gray-400">
-                    {t.tasks.map((task, idx) => (
-                      <div key={idx}>
-                        <span className="font-semibold">{task.title}</span>
-                      </div>
-                    ))}
-                  </td>
-                  <td className="p-0">
-                    <DepartmentCell member={t} handleUpdateField={handleUpdateField} />
-                  </td>
-                  <GenderBadgeSelector member={t} handleUpdateField={handleUpdateField} />
-                  <td className="p-3 text-sm text-gray-600 dark:text-gray-400">
-                    {t.tasks.map((task, idx) => (
-                      <div key={idx}>{task.status}</div>
-                    ))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  <tr>
+    <th className="p-3 text-left min-w-[150px]">Member</th>
+    <th className="p-3 text-left min-w-[200px]">Email</th>
+    <th className="p-3 text-left min-w-[150px] hidden md:table-cell">Tasks</th>
+    <th className="p-3 text-left min-w-[100px] hidden md:table-cell">Status</th>
+  </tr>
+</thead>
+<tbody>
+  {team.map((t, i) => (
+    <tr
+      key={i}
+      className="bg-white dark:bg-[#1E1E2E] border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition duration-150"
+    >
+      <td className="p-3 flex items-center gap-2">
+  <img
+    src={t.img}
+    className="w-8 h-8 hidden md:block lg:block rounded-full object-cover ring-2 ring-pink-500/50"
+    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/40x40/94A3B8/FFFFFF?text=?"; }}
+  />
+  <span className="lg:font-medium">{capitalize(t.name)}</span>
+  {t.role === "Leader" && <span className="ml-1 text-yellow-500" title="Manager">⭐</span>}
+</td>
+
+      <td className="p-3 lg:text-sm text-gray-600 dark:text-gray-400">{t.email}</td>
+      <td className="p-3 text-sm text-gray-600 dark:text-gray-400 hidden md:table-cell">
+        {t.tasks.map((task, idx) => (
+          <div key={idx}>
+            <span className="font-semibold">{task.title}</span>
+          </div>
+        ))}
+      </td>
+      <td className="p-3 text-sm text-gray-600 dark:text-gray-400 hidden md:table-cell">
+        {t.tasks.map((task, idx) => (
+          <div key={idx}>{task.status}</div>
+        ))}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
           </table>
         </div>
       )}

@@ -43,72 +43,63 @@ export default function AttendancePage({ projectId }) {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm border-collapse">
               <thead>
-                <tr className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 uppercase tracking-wide text-xs md:text-sm">
-                  <th className="p-3 text-left">Task Title</th>
-                  <th className="p-3 text-left">Assigned Email</th>
-                  <th className="p-3 text-left">Start Date</th>
-                  <th className="p-3 text-left">Attendance</th>
-                </tr>
-              </thead>
+  <tr className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 uppercase tracking-wide text-xs md:text-sm">
+    <th className="p-3 text-left">Task Title</th>
+    <th className="p-3 text-left hidden md:table-cell">Assigned Email</th>
+    <th className="p-3 text-left hidden md:table-cell">Start Date</th>
+    <th className="p-3 text-left">Attendance</th>
+  </tr>
+</thead>
 
-              <tbody>
-                {records.map((item, idx) => (
-                  <tr
-                    key={item._id}
-                    className={`transition-all duration-200 ${idx % 2 === 0
-                        ? "bg-white dark:bg-gray-900"
-                        : "bg-gray-50 dark:bg-gray-800"
-                      } hover:bg-blue-50 dark:hover:bg-blue-900`}
-                  >
-                    <td className="p-3 font-medium text-gray-900 dark:text-gray-100">
-                      {item.title}
-                    </td>
+<tbody>
+  {records.map((item, idx) => (
+    <tr
+      key={item._id}
+      className={`transition-all duration-200 ${idx % 2 === 0
+          ? "bg-white dark:bg-gray-900"
+          : "bg-gray-50 dark:bg-gray-800"
+        } hover:bg-blue-50 dark:hover:bg-blue-900`}
+    >
+      <td className="p-3 font-medium text-gray-900 dark:text-gray-100">
+        {item.title}
+      </td>
 
-                    <td className="p-3">
-                    {item?.assigneeTo?.length > 0
-                      ? item.assigneeTo.join(" , ")
-                      : "No Assignee"}
-                  </td>
+      <td className="p-3 hidden md:table-cell">
+        {item?.assigneeTo?.length > 0
+          ? item.assigneeTo.join(" , ")
+          : "No Assignee"}
+      </td>
 
-                    <td className="p-3 text-gray-700 dark:text-gray-300">
-                      {item.startDate}
-                    </td>
+      <td className="p-3 text-gray-700 dark:text-gray-300 hidden md:table-cell">
+        {item.startDate}
+      </td>
 
-                    <td className="p-3 space-y-1">
-                      {Array.isArray(item.attendance) && item.attendance.length > 0 ? (
-                        item.attendance.map((a, i) => (
-                          <span
-                            key={i}
-                            className={`block w-fit px-2 py-1 rounded text-xs ${a.status === "present"
-                                ? "bg-green-500 text-white"
-                                : a.status === "absent"
-                                  ? "bg-red-500 text-white"
-                                  : "bg-yellow-500 text-white"
-                              }`}
-                          >
-                            {a.status}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="bg-gray-400 text-white px-2 py-1 rounded text-xs">
-                          Pending
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+      <td className="p-3 space-y-1">
+        {Array.isArray(item.attendance) && item.attendance.length > 0 ? (
+          item.attendance.map((a, i) => (
+            <span
+              key={i}
+              className={`block w-fit px-2 py-1 rounded text-xs ${
+                a.status === "present"
+                  ? "bg-green-500 text-white"
+                  : a.status === "absent"
+                  ? "bg-red-500 text-white"
+                  : "bg-yellow-500 text-white"
+              }`}
+            >
+              {a.status}
+            </span>
+          ))
+        ) : (
+          <span className="bg-gray-400 text-white px-2 py-1 rounded text-xs">
+            Pending
+          </span>
+        )}
+      </td>
+    </tr>
+  ))}
+</tbody>
 
-                {records.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={4}
-                      className="p-4 text-center text-gray-500 dark:text-gray-400"
-                    >
-                      No attendance records found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
             </table>
           </div>
         </CardContent>

@@ -152,7 +152,7 @@ const [collapsed, setCollapsed] = useState(false);
     { name: "chat", label: "Chat" },
     { name: "callmeet", label: "Call/Meet" },
     { name: "team", label: "Team" },
-    { name: "notes", label: "Notes" },
+    // { name: "notes", label: "Notes" },
     { name: "reports", label: "Reports" },
   ];
 
