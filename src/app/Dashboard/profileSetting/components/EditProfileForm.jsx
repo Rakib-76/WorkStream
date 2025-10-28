@@ -61,7 +61,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
+                            className="w-full border text-gray-700 rounded-lg px-3 py-2 focus:outline-blue-500"
                             required
                         />
                     </div>
@@ -73,7 +73,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                             name="email"
                             value={formData.email}
                             disabled
-                            className="w-full border rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed"
+                            className="w-full border text-gray-700 rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed"
                         />
                     </div>
 
@@ -84,8 +84,9 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                             name="location"
                             value={formData.location}
                             onChange={handleChange}
-                            className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
+                            className="w-full border text-gray-700 rounded-lg px-3 py-2 focus:outline-blue-500"
                         />
+
                     </div>
 
                     <div>
@@ -95,7 +96,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
-                            className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
+                            className="w-full border text-gray-700 rounded-lg px-3 py-2 focus:outline-blue-500"
                         />
                     </div>
 
@@ -106,7 +107,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                             name="website"
                             value={formData.website}
                             onChange={handleChange}
-                            className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
+                            className="w-full border text-gray-700 rounded-lg px-3 py-2 focus:outline-blue-500"
                         />
                     </div>
 
@@ -117,7 +118,7 @@ export default function EditProfileForm({ initialData, onSave, onCancel }) {
                             value={formData.bio}
                             onChange={handleChange}
                             rows={4}
-                            className="w-full border rounded-lg px-3 py-2 focus:outline-blue-500"
+                            className="w-full border text-gray-700 rounded-lg px-3 py-2 focus:outline-blue-500"
                         />
                     </div>
                 </div>

@@ -8,11 +8,13 @@ import ProfileHeader from "./components/ProfileHeader";
 import { DataContext } from "../../../context/DataContext";
 import toast, { Toaster } from "react-hot-toast";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner"
+import useAxiosSecure from "../../../lib/useAxiosSecure";
 
 export default function ProfileSetting() {
     const [isEditing, setIsEditing] = useState(false);
     const { userData } = useContext(DataContext);
     const [profileData, setProfileData] = useState(null);
+const axiosSecure = useAxiosSecure();
 
     useEffect(() => {
         if (userData) {
@@ -33,19 +35,17 @@ export default function ProfileSetting() {
 
     const handleSave = async (data) => {
         try {
-            const res = await fetch(`/api/update-profile`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...data, email: userData.email }),
-            });
+            const res = await axiosSecure.put(
+                `/api/users?email=${userData.email}`,
+                data
+            );
 
-            const result = await res.json();
-            if (result.success) {
-                setProfileData(result.updatedUser);
+            if (res.data.success) {
+                setProfileData(res.data.updatedUser);
                 toast.success("Profile updated successfully!");
                 setIsEditing(false);
             } else {
-                toast.error(result.message || "Failed to update profile.");
+                toast.error(res.data.message || "Failed to update profile.");
             }
         } catch (error) {
             console.error(error);

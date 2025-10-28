@@ -491,7 +491,9 @@ export default function DashboardNavbar() {
                     <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                       <User size={18} /> Profile
                     </li>
-                    <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                    <li
+                      onClick={() => (window.location.href = "/Dashboard/profileSetting")}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                       <Settings size={18} /> Account settings
                     </li>
                     <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
