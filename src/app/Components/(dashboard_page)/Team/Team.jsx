@@ -5,6 +5,7 @@ import axios from "axios";
 import { DataContext } from "../../../../context/DataContext";
 import { useContext } from "react";
 import { useSession } from "next-auth/react";
+import useAxiosSecure from "../../../../lib/useAxiosSecure";
 
 // ----------------------------------------------------------------------
 // --- 1. Notification Component ---
@@ -125,11 +126,43 @@ const GenderBadgeSelector = ({ member, handleUpdateField }) => {
 };
 
 // ----------------------------------------------------------------------
-// --- 4. Add Member Modal Component (NEW) ---
+// --- 4. Add Member Modal Component (UPDATED with email search) ---
 // ----------------------------------------------------------------------
 const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]); // ✅ user list
+  const [filteredUsers, setFilteredUsers] = useState([]); // ✅ filtered emails for suggestion
+  const axiosSecure = useAxiosSecure();
+  const { selectedProject } = useContext(DataContext);
+
+  useEffect(() => {
+    axiosSecure
+      .get("/api/users")
+      .then((res) => setUsers(res.data))
+      .catch((err) => console.log(err));
+  }, [axiosSecure]);
+
+  // ✅ Filter suggestion dynamically
+  useEffect(() => {
+    if (!email.trim()) {
+      setFilteredUsers([]);
+      return;
+    }
+
+    const filtered = users.filter(
+      (u) =>
+        u?.email && u.email.toLowerCase().includes(email.toLowerCase())
+    );
+
+    setFilteredUsers(filtered.slice(0, 5)); // limit suggestions to 5
+  }, [email, users]);
+
+  const handleSelect = (selectedEmail) => {
+    setEmail(selectedEmail);
+    setFilteredUsers([]);
+    console.log("Selected Email:", selectedEmail);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -138,33 +171,36 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
 
     setLoading(true);
 
-    // NOTE: এই API কলটি ব্যাকএন্ডে গিয়ে নতুন মেম্বারকে প্রজেক্টে যোগ করার জন্য
-    // একটি নতুন টাস্ক বা কেবল মেম্বারশিপ ডকুমেন্ট তৈরি করবে।
     try {
-      // এই API endpoint এবং payload আপনার ব্যাকএন্ডের সাথে মানানসই হতে হবে।
-      const response = await axios.post("/api/members/add-member", {
-        projectId,
+      // PUT/PATCH request to update teamMembers array in backend
+      const response = await axiosSecure.put(`/api/add-member`, {
         memberEmail,
       });
 
-      if (response.status === 200 || response.status === 201) {
-        setNotification({ type: "success", message: `Member ${memberEmail.split("@")[0]} added to project.` });
-        onMemberAdded(); // টিম লিস্ট রিফ্রেশ করা
-        onClose();
-      } else {
-        throw new Error(response.data.message || "Failed to add member.");
+      if (response.status === 200) {
+        console.log("Added member:", memberEmail);
+
+        // ✅ Local UI update
+        // Update context or local state if needed
+        // Example: assuming selectedProject is from context
+        selectedProject.teamMembers.push(memberEmail);
+
+        setNotification({ type: "success", message: `${memberEmail} added to project.` });
+        setEmail(""); // clear input
+        setFilteredUsers([]);
       }
     } catch (err) {
-      console.error("Add Member Error:", err);
-      setNotification({ type: "error", message: err.response?.data?.message || "Failed to add member. Check console." });
+      console.error(err);
+      setNotification({ type: "error", message: "Failed to add member." });
     } finally {
       setLoading(false);
     }
   };
 
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-center p-4">
-      <div className="bg-white dark:bg-[#1E1E2E] rounded-xl p-6 w-full max-w-md shadow-2xl">
+      <div className="bg-white dark:bg-[#1E1E2E] rounded-xl p-6 w-full max-w-md shadow-2xl relative">
         <div className="flex justify-between items-center mb-4 border-b pb-3 dark:border-gray-700">
           <h3 className="text-xl font-bold dark:text-gray-200">Add New Member</h3>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -173,7 +209,7 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label htmlFor="member-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Member Email Address
             </label>
@@ -185,7 +221,22 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
               required
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-gray-200"
               placeholder="member@example.com"
+              autoComplete="off"
             />
+            {/* ✅ Suggestion Dropdown */}
+            {filteredUsers.length > 0 && (
+              <ul className="absolute z-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 w-full max-h-40 overflow-y-auto shadow-lg">
+                {filteredUsers.map((user) => (
+                  <li
+                    key={user._id}
+                    onClick={() => handleSelect(user.email)}
+                    className="px-3 py-2 cursor-pointer hover:bg-pink-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-gray-200"
+                  >
+                    {user.email}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <button
             type="submit"
@@ -199,6 +250,8 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
     </div>
   );
 };
+
+
 
 // ----------------------------------------------------------------------
 // --- 5. Main Team Component ---
