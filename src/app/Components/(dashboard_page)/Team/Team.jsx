@@ -1,39 +1,22 @@
 "use client";
-import { useState, useCallback, useEffect, useRef, useContext } from "react";
+import { useState, useCallback, useEffect, useContext } from "react";
 import { X, Loader2, Plus } from "lucide-react";
 import axios from "axios";
 import { DataContext } from "../../../../context/DataContext";
 import { useSession } from "next-auth/react";
 
-// ----------------------------------------------------------------------
-// --- 1. Notification Component ---
-// ----------------------------------------------------------------------
+// -------------------- Notification --------------------
 const Notification = ({ notification, onClose }) => {
   if (!notification) return null;
   const colorClass =
     notification.type === "success"
       ? "bg-green-500"
-      : notification.type === "info"
-      ? "bg-blue-500"
-      : "bg-yellow-500";
+      : notification.type === "error"
+      ? "bg-red-500"
+      : "bg-blue-500";
 
   return (
-    <div
-      className={`fixed top-4 right-4 z-[100] p-4 rounded-lg shadow-2xl text-white flex items-center space-x-3 transform transition-all duration-300 ${colorClass}`}
-      style={{ animation: "slideIn 0.3s ease-out" }}
-    >
-      <style jsx global>{`
-        @keyframes slideIn {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-      `}</style>
+    <div className={`fixed top-4 right-4 z-[100] p-4 rounded-lg shadow-lg text-white flex items-center space-x-3 ${colorClass}`}>
       <span className="font-medium">{notification.message}</span>
       <button onClick={onClose} className="p-1 rounded-full hover:bg-white/20">
         <X size={16} />
@@ -42,56 +25,61 @@ const Notification = ({ notification, onClose }) => {
   );
 };
 
-// ----------------------------------------------------------------------
-// --- 2. Add Member Modal ---
-// ----------------------------------------------------------------------
+// -------------------- Add Member Modal --------------------
 const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
 
-  // --- Fetch all users for suggestions ---
+  // Fetch all users for autocomplete
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("/api/users"); // assumes you have /api/users route
-        setSuggestions(res.data?.data || []);
+        const res = await axios.get("/api/users");
+        setAllUsers(res.data?.data || []);
       } catch (err) {
-        console.error("Failed to fetch user suggestions:", err);
+        console.error("Failed to fetch users", err);
       }
     };
     fetchUsers();
   }, []);
 
-  const filteredSuggestions = suggestions.filter((u) =>
+  const filteredSuggestions = allUsers.filter((u) =>
     u.email.toLowerCase().includes(email.toLowerCase())
   );
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email.trim()) return;
+  const handleAddMember = async (e) => {
+  e.preventDefault();
+  if (!email.trim()) return;
 
-    setLoading(true);
-    try {
-      const res = await axios.post("/api/members/add-member", {
-        projectId,
-        memberEmail: email,
-      });
+  // Prevent adding already existing team member
+  if (team.some((t) => t.email === email)) {
+    setNotification({ type: "error", message: "User is already a team member" });
+    return;
+  }
 
-      if (res.data.success) {
-        setNotification({ type: "success", message: res.data.message });
-        onMemberAdded(); // refresh Team table
-        onClose();
-      } else {
-        setNotification({ type: "error", message: res.data.message });
-      }
-    } catch (err) {
-      console.error("Add member failed:", err);
-      setNotification({ type: "error", message: "Server error adding member" });
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const res = await axios.post("/api/members/add-member", {
+      projectId,
+      memberEmail: email,
+    });
+
+    if (res.data.success) {
+      setNotification({ type: "success", message: res.data.message });
+      onMemberAdded(); // Refresh team
+      onClose();
+    } else {
+      setNotification({ type: "error", message: res.data.message });
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setNotification({ type: "error", message: "Server error while adding member" });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-center p-4">
@@ -103,22 +91,22 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleAddMember}>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Member Email Address
+            Member Email
           </label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-gray-200"
             placeholder="member@example.com"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-gray-200"
           />
 
-          {/* Email Suggestions */}
+          {/* Autocomplete suggestions */}
           {email && filteredSuggestions.length > 0 && (
-            <div className="border mt-1 rounded-md bg-white dark:bg-gray-800 max-h-32 overflow-y-auto shadow-lg">
+            <div className="border mt-1 rounded-md bg-white dark:bg-gray-800 max-h-36 overflow-y-auto shadow-lg">
               {filteredSuggestions.map((user) => (
                 <div
                   key={user.email}
@@ -144,30 +132,24 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
   );
 };
 
-
-// ----------------------------------------------------------------------
-// --- 3. Main Team Component ---
-// ----------------------------------------------------------------------
+// -------------------- Team Component --------------------
 export default function Team({ projectId }) {
   const [team, setTeam] = useState([]);
   const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const { manager } = useContext(DataContext);
   const { data: session } = useSession();
-  const userEmail = session?.user?.email || "Unknown Email";
+  const userEmail = session?.user?.email || "";
 
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
-  // Fetch tasks and map team
+  // Fetch tasks to map team members
   const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
       const res = await axios.get(`/api/tasks?projectId=${projectId}`);
-      if (!res?.data?.success) {
-        setLoading(false);
-        return;
-      }
+      if (!res?.data?.success) return;
 
       const tasks = res.data.data;
       const assigneesMap = {};
@@ -181,7 +163,7 @@ export default function Team({ projectId }) {
           if (!assigneesMap[safeEmail]) {
             assigneesMap[safeEmail] = {
               email: safeEmail,
-              name: safeEmail.split("@")[0] || "Unknown",
+              name: safeEmail.split("@")[0],
               role: creatorEmail === safeEmail ? "Leader" : "Member",
               img: `https://placehold.co/40x40/94A3B8/FFFFFF?text=${safeEmail[0]?.toUpperCase() || "?"}`,
               tasks: [],
@@ -193,7 +175,7 @@ export default function Team({ projectId }) {
 
       setTeam(Object.values(assigneesMap));
     } catch (err) {
-      console.error("Failed to fetch tasks", err);
+      console.error(err);
       setNotification({ type: "error", message: "Failed to load team data." });
     } finally {
       setLoading(false);
@@ -204,34 +186,26 @@ export default function Team({ projectId }) {
     fetchTasks();
   }, [fetchTasks]);
 
-  const handleCloseNotification = () => setNotification(null);
-
   return (
     <section className="text-gray-800 dark:text-gray-200">
-      <Notification notification={notification} onClose={handleCloseNotification} />
+      <Notification notification={notification} onClose={() => setNotification(null)} />
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-bold">Project Team ({team.length} Members)</h2>
 
-        {/* Add Member Button */}
-        {
-  manager === userEmail && (
-    <button
-      onClick={() => setIsAddMemberModalOpen(true)} // <-- missing before
-      className="p-2 rounded-full bg-pink-500 text-white hover:bg-pink-600 transition-colors shadow-lg"
-      title="Add New Team Member"
-    >
-      <Plus size={24} />
-    </button>
-  )
-}
-
+        {manager === userEmail && (
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="p-2 rounded-full bg-pink-500 text-white hover:bg-pink-600 transition-colors shadow-lg"
+          >
+            <Plus size={24} />
+          </button>
+        )}
       </div>
 
-      {/* Add Member Modal */}
-      {isAddMemberModalOpen && (
+      {isAddModalOpen && (
         <AddMemberModal
-          onClose={() => setIsAddMemberModalOpen(false)}
+          onClose={() => setIsAddModalOpen(false)}
           projectId={projectId}
           onMemberAdded={fetchTasks}
           setNotification={setNotification}
@@ -262,20 +236,16 @@ export default function Team({ projectId }) {
                   <td className="p-3 flex items-center gap-2">
                     <img
                       src={t.img}
-                      className="w-8 h-8 hidden md:block lg:block rounded-full object-cover ring-2 ring-pink-500/50"
+                      className="w-8 h-8 rounded-full object-cover ring-2 ring-pink-500/50"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = "https://placehold.co/40x40/94A3B8/FFFFFF?text=?";
                       }}
                     />
-                    <span className="lg:font-medium">{capitalize(t.name)}</span>
-                    {t.role === "Leader" && (
-                      <span className="ml-1 text-yellow-500" title="Manager">
-                        ⭐
-                      </span>
-                    )}
+                    <span className="font-medium">{capitalize(t.name)}</span>
+                    {t.role === "Leader" && <span className="ml-1 text-yellow-500">⭐</span>}
                   </td>
-                  <td className="p-3 lg:text-sm text-gray-600 dark:text-gray-400">{t.email}</td>
+                  <td className="p-3 text-gray-600 dark:text-gray-400">{t.email}</td>
                   <td className="p-3 text-sm text-gray-600 dark:text-gray-400 hidden md:table-cell">
                     {t.tasks.map((task, idx) => (
                       <div key={idx}>
