@@ -116,15 +116,6 @@ export default function Reports({ projectId }) {
             Get a visual overview of your team's performance and workload.
           </p>
         </div>
-
-        <div className="flex flex-wrap gap-2 justify-center md:justify-end w-full">
-          <button className="flex items-center gap-2 px-2 sm:px-3 md:px-4 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition text-xs sm:text-sm font-medium">
-            <Download size={16} /> Export
-          </button>
-          <button className="flex items-center gap-2 px-2 sm:px-3 md:px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition text-xs sm:text-sm font-medium">
-            <Filter size={16} /> Filter
-          </button>
-        </div>
       </div>
 
       {/* Top Charts */}
@@ -195,56 +186,6 @@ export default function Reports({ projectId }) {
           </CardContent>
         </Card>
       </div>
-
-      {/* Workload Distribution */}
-      <Card className="rounded-2xl border border-gray-200 dark:border-gray-700 shadow-xl 
-        bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6">
-        <CardHeader>
-          <CardTitle className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-gray-200">
-            Team Workload Distribution
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" minHeight={220} height={300}>
-            <BarChart data={workloadData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis dataKey="name" stroke="#6B7280" tick={{ fontSize: 10 }} interval={0} height={60} />
-              <YAxis stroke="#6B7280" tick={{ fontSize: 11 }} />
-              <Tooltip contentStyle={{ backgroundColor: "#1F2937", color: "#fff", borderRadius: "8px" }} />
-              <Legend />
-              <Bar dataKey="total" fill="#6366F1" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="completed" fill="#10B981" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Project Performance */}
-      <Card className="rounded-2xl border border-gray-200 dark:border-gray-700 shadow-xl 
-        bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6">
-        <CardHeader>
-          <CardTitle className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-gray-200">
-            Project Performance Report
-          </CardTitle>
-        </CardHeader>
-       
-        <CardContent className="space-y-4">
-          {projectProgress.map((p, i) => (
-            <div key={i}>
-              <div className="flex justify-between text-xs sm:text-sm md:text-base font-medium mb-1 text-gray-700 dark:text-gray-300">
-                <span>{p.name}</span>
-                <span>{p.progress}%</span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 sm:h-3">
-                <div
-                  className="h-2 sm:h-3 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500"
-                  style={{ width: `${p.progress}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
     </div>
   );
 }

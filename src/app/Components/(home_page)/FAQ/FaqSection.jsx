@@ -74,14 +74,11 @@ export default function FAQ() {
                 <ChevronDown className="h-5 w-5" />
               )}
             </button>
-            <div
-              className={`overflow-hidden transition-all duration-500 px-4 text-muted-foreground
-                 ${openIndex === index ? "max-h-40 opacity-100 pb-4" : "max-h-0 opacity-0 pb-0"}
-                          `}
-              >
-              {faq.answer}
-            </div>
-
+            {openIndex === index && (
+              <div className="px-4 pb-4 text-muted-foreground">
+                {faq.answer}
+              </div>
+            )}
           </div>
         ))}
       </div>
