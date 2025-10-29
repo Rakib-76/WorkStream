@@ -30,7 +30,6 @@ export default function Navbar() {
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const { userData } = useContext(DataContext);
   const [open, setOpen] = useState(false);
-
   // Scroll effect
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -429,7 +428,7 @@ export default function Navbar() {
                             </div>
                             <div className="flex-1">
                               <h4 className="font-semibold text-gray-900 dark:text-white">
-                                {session?.user?.name || "Unknown User"}
+                                {userData?.name || "Unknown User"}
                               </h4>
                               <p className="text-sm text-gray-500 dark:text-gray-400">
                                 {session?.user?.email || "No email"}
@@ -743,7 +742,7 @@ export default function Navbar() {
                                 </div>
                                 <div className="flex-1">
                                   <h4 className="font-semibold text-gray-900 dark:text-white">
-                                    {session?.user?.name || "Unknown User"}
+                                    {userData?.name || "Unknown User"}
                                   </h4>
                                   <p className="text-sm text-gray-500 dark:text-gray-400">
                                     {session?.user?.email || "No email"}
