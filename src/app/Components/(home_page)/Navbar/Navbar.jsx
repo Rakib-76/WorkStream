@@ -284,22 +284,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="group">
-              {/* <div className="flex items-center space-x-3">
-                <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md">
-                  <Waves className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <span className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
-                  WorkStream
-                </span>
-              </div> */}
               <div className="flex gap-2 items-center"> <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden group-hover:scale-105 transition-transform duration-300 shadow-md bg-white">
-                {/* <Image
-    src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
-    alt="WorkStream Logo"
-    width={40}
-    height={40}
-    className="object-contain"
-  /> */}
                 <img
                   src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
                   alt="Uploaded Preview"
