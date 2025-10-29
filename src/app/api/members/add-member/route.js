@@ -1,45 +1,51 @@
-// // pages/api/members/add-member.js
+import { NextResponse } from "next/server";
+import dbConnect, { collectionNameObj } from "../../../../lib/dbConnect";
 
-// // প্রয়োজনীয় মডিউল ইম্পোর্ট করুন
-// import dbConnect from '../../../../lib/dbConnect'; // আপনার ডাটাবেস কানেকশন ইউটিলিটি
-// import Project from '../../../models/Project'; // আপনার Project Mongoose Model
+export async function POST(req) {
+  try {
+    const { projectId, memberEmail } = await req.json();
 
-// export default async function handler(req, res) {
-//   // ১. মেথড চেক
-//   if (req.method !== 'POST') {
-//     return res.status(405).json({ success: false, message: 'Method Not Allowed' });
-//   }
+    if (!projectId || !memberEmail) {
+      return NextResponse.json(
+        { success: false, message: "Missing projectId or memberEmail" },
+        { status: 400 }
+      );
+    }
 
-//   // ২. ডাটাবেস কানেকশন
-//   await dbConnect();
+    const projectCollection = dbConnect(collectionNameObj.projectCollection);
+    const userCollection = dbConnect(collectionNameObj.userCollection);
 
-//   const { projectId, memberEmail } = req.body;
-  
-//   // ইনপুট ভ্যালিডেশন
-//   if (!projectId || !memberEmail) {
-//     return res.status(400).json({ success: false, message: 'Missing projectId or memberEmail' });
-//   }
+    // Check if user exists
+    const user = await userCollection.findOne({ email: memberEmail });
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "User not found in system" },
+        { status: 404 }
+      );
+    }
 
-//   try {
-//     // ৩. মেম্বারকে Project-এর members Array তে যোগ করুন
-//     // $addToSet ব্যবহার করা হয়েছে, যাতে একই memberEmail দুইবার যোগ না হয়।
-//     const result = await Project.findByIdAndUpdate(
-//       projectId,
-//       { $addToSet: { members: memberEmail } },
-//       { new: true, runValidators: true } // new: true আপডেটেড ডকুমেন্ট রিটার্ন করে
-//     );
+    // Update project document
+    const result = await projectCollection.updateOne(
+      { _id: projectId },
+      { $addToSet: { teamMembers: memberEmail } }
+    );
 
-//     if (!result) {
-//       // যদি projectId ভুল হয় বা Project খুঁজে না পাওয়া যায়
-//       return res.status(404).json({ success: false, message: 'Project not found with the given ID.' });
-//     }
+    if (result.modifiedCount === 0) {
+      return NextResponse.json(
+        { success: false, message: "User already a member or update failed" },
+        { status: 400 }
+      );
+    }
 
-//     // ৪. সফল রেসপন্স
-//     res.status(200).json({ success: true, message: `Member ${memberEmail} added successfully to project ${projectId}.` });
-
-//   } catch (error) {
-//     console.error("MEMBER ADDITION ERROR:", error);
-//     // সার্ভার ত্রুটির ক্ষেত্রে 500 রেসপন্স
-//     res.status(500).json({ success: false, message: 'Server error: Could not add member.', error: error.message });
-//   }
-// }
+    return NextResponse.json({
+      success: true,
+      message: "Member added successfully",
+    });
+  } catch (err) {
+    console.error("Error adding member:", err);
+    return NextResponse.json(
+      { success: false, message: "Server error while adding member" },
+      { status: 500 }
+    );
+  }
+}

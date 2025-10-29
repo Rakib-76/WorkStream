@@ -102,7 +102,7 @@ export default function Reports({ projectId }) {
   }, [projectId]);
 
   return (
-    <div className="space-y-10 px-2 sm:px-4 md:px-6 lg:px-8 py-6 overflow-x-hidden">
+    <div className="space-y-10 px-2 sm:px-4 md:px-6 lg:px-8 py-6 overflow-x-hidden bg-card border border-border rounded-xl  shadow">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="text-center md:text-left">

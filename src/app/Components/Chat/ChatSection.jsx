@@ -80,7 +80,7 @@ export default function ChatSection({
   };
 
   return (
-    <div className="flex flex-col h-full max-w-xl sm:max-w-lg md:max-w-xl mx-auto border rounded shadow bg-background dark:bg-gray-900 transition-colors duration-300">
+    <div className="flex flex-col bg-card border border-border rounded-xl shadow h-full max-w-xl sm:max-w-lg md:max-w-xl mx-auto   transition-colors duration-300">
       
       {/* Header (sticky) */}
       <div className="sticky top-0 z-10 px-4 py-3 border-b font-bold text-lg bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100">
