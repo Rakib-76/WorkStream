@@ -9,11 +9,28 @@ import { Carousel } from "react-responsive-carousel";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+import Modal from "../Modal/Modal";
+import Swal from "sweetalert2";
+import emailjs from "@emailjs/browser";
 
 
 export function Hero() {
   const { data: session } = useSession();
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  // const formRef = useRef();
+
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    company: "",
+    teamSize: "",
+    dateTime: "",
+    message: "",
+  });
 
   // Handle getstarted button protect dashboard protect
   const handleGetStarted = () => {
@@ -36,6 +53,62 @@ export function Hero() {
     "ByteMasters",
     "CodeCrafters",
   ];
+
+
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  // Modal button handle 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSending(true);
+
+
+    // EmailJS submit handler
+    emailjs.send(
+      "service_wd97pr7",
+      "template_2cboo3d",
+      // formRef.current, 
+       {
+        name: formData.name,
+        email: formData.email,
+        company: formData.company,
+        teamSize: formData.teamSize,
+        dateTime: formData.dateTime,
+        message: formData.message,
+      },
+     "Psn6q2BKvm8M_0pAh"
+    )
+      .then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Message Sent!",
+          text: "Your demo request has been delivered successfully.",
+          confirmButtonColor: "#4f46e5",
+        });
+        // form.current.reset();
+        setFormData({
+          name: "",
+          email: "",
+          company: "",
+          teamSize: "",
+          dateTime: "",
+          message: "",
+        });
+        setIsModalOpen(false);
+        setIsSending(false);
+      })
+      .catch((error) => {
+        console.error("EmailJS Error:", error.text || error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Failed to send message. Please try again!",
+          confirmButtonColor: "#ef4444",
+        });
+        setIsSending(false);
+      });
+  };
+
 
 
   // Dashboard button secure
@@ -106,6 +179,7 @@ export function Hero() {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 {/* Book a Demo button */}
                 <Button
+                  onClick={() => setIsModalOpen(true)}
                   variant="outline"
                   size="lg"
                   className="border-2 border-primary text-primary lg:px-8 lg:py-6 md:px-8 md:py-6 text-lg flex items-center justify-center px-6 py-3"
@@ -115,6 +189,66 @@ export function Hero() {
                 </Button>
               </motion.div>
             </motion.div>
+
+            {/* Modal for book a demo */}
+
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Book a Demo">
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 text-black"
+                  required
+                />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 text-black"
+                  required
+                />
+                <input
+                  type="text"
+                  name="company"
+                  placeholder="Company Name"
+                  value={formData.company}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 text-black"
+                />
+                <input
+                  type="number"
+                  name="teamSize"
+                  placeholder="Team Size"
+                  value={formData.teamSize}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 text-black"
+                />
+                <input
+                  type="datetime-local"
+                  name="dateTime"
+                  placeholder="Preferred Date & Time"
+                  value={formData.dateTime}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 text-black"
+                />
+                <textarea
+                  name="message"
+                  placeholder="Message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 text-black"
+                  rows={3}
+                ></textarea>
+                <Button type="submit" className="w-full bg-primary text-white py-2 rounded">
+                  {isSending ? "Sending..." : "Submit"}
+                </Button>
+              </form>
+            </Modal>
 
             {/* Marquee / Trust Companies */}
             <motion.div

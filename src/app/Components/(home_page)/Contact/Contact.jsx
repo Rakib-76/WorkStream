@@ -105,7 +105,7 @@ const Contact = () => {
                 <div className="p-3 bg-secondary/20 text-secondary rounded-xl">
                   <FaPhoneVolume size={22} />
                 </div>
-                <p className="text-lg">+88016403433786</p>
+                <p className="text-lg">+8801640343376</p>
               </div>
 
               {/* Location */}
