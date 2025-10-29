@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
-import dbConnect from "../../../lib/dbConnect"; // tomer MongoDB client import
+import dbConnect, { collectionNameObj } from "../../../lib/dbConnect"; // tomer MongoDB client import
 
 export async function POST(req) {
     try {
-        const { collectionName, projectData } = await req.json();
+        const { projectData } = await req.json();
 
-        if (!collectionName || !projectData) {
+        if (!projectData) {
             return NextResponse.json({ error: "Missing collection name or project data" }, { status: 400 });
         }
 
         // const db = await dbConnect();
-        const collection = await dbConnect(collectionName);// dynamic collection
+        const collection = await dbConnect(collectionNameObj.projectsCollection);// dynamic collection
         const result = await collection.insertOne(projectData);
 
         return NextResponse.json({ success: true, data: result }, { status: 200 });

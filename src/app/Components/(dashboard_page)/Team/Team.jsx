@@ -1,12 +1,13 @@
 "use client";
 import { useState, useCallback, useEffect, useRef } from "react";
-import { X, Loader2, Plus } from "lucide-react"; // Plus icon যোগ করা হয়েছে
+import { X, Loader2, Plus, CheckCircle2, AlertCircle } from "lucide-react"; // Plus icon যোগ করা হয়েছে
 import axios from "axios";
 import { DataContext } from "../../../../context/DataContext";
 import { useContext } from "react";
 import { useSession } from "next-auth/react";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
-
+import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 // ----------------------------------------------------------------------
 // --- 1. Notification Component ---
 // ----------------------------------------------------------------------
@@ -128,14 +129,18 @@ const GenderBadgeSelector = ({ member, handleUpdateField }) => {
 // ----------------------------------------------------------------------
 // --- 4. Add Member Modal Component (UPDATED with email search) ---
 // ----------------------------------------------------------------------
-const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) => {
+
+
+const AddMemberModal = ({ onClose, setNotification }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState([]); // ✅ user list
-  const [filteredUsers, setFilteredUsers] = useState([]); // ✅ filtered emails for suggestion
+  const [success, setSuccess] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const axiosSecure = useAxiosSecure();
   const { selectedProject } = useContext(DataContext);
 
+  // ✅ Load user list for email suggestions
   useEffect(() => {
     axiosSecure
       .get("/api/users")
@@ -143,7 +148,7 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
       .catch((err) => console.log(err));
   }, [axiosSecure]);
 
-  // ✅ Filter suggestion dynamically
+  // ✅ Filter suggestions dynamically
   useEffect(() => {
     if (!email.trim()) {
       setFilteredUsers([]);
@@ -151,17 +156,15 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
     }
 
     const filtered = users.filter(
-      (u) =>
-        u?.email && u.email.toLowerCase().includes(email.toLowerCase())
+      (u) => u?.email && u.email.toLowerCase().includes(email.toLowerCase())
     );
 
-    setFilteredUsers(filtered.slice(0, 5)); // limit suggestions to 5
+    setFilteredUsers(filtered.slice(0, 5));
   }, [email, users]);
 
   const handleSelect = (selectedEmail) => {
     setEmail(selectedEmail);
     setFilteredUsers([]);
-    console.log("Selected Email:", selectedEmail);
   };
 
   const handleSubmit = async (e) => {
@@ -172,45 +175,68 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
     setLoading(true);
 
     try {
-      // PUT/PATCH request to update teamMembers array in backend
       const response = await axiosSecure.put(`/api/add-member`, {
+        projectId: selectedProject._id,
         memberEmail,
       });
 
       if (response.status === 200) {
-        console.log("Added member:", memberEmail);
+        setSuccess(true);
+        toast.success(`${memberEmail} successfully added to the team.`);
+        // setNotification({
+        //   type: "success",
+        //   message: `${memberEmail} successfully added to the team.`,
+        // });
 
-        // ✅ Local UI update
-        // Update context or local state if needed
-        // Example: assuming selectedProject is from context
+        // ✅ Optional: update context/local state
         selectedProject.teamMembers.push(memberEmail);
 
-        setNotification({ type: "success", message: `${memberEmail} added to project.` });
-        setEmail(""); // clear input
-        setFilteredUsers([]);
+        // reset after short delay
+        setTimeout(() => {
+          setSuccess(false);
+          setEmail("");
+          onClose();
+        }, 1500);
       }
     } catch (err) {
-      console.error(err);
-      setNotification({ type: "error", message: "Failed to add member." });
+      if (err.response.status == 409) {
+        toast.error('Already this member added')
+      }
+      // setNotification({
+      //   type: "error",
+      //   message:
+      //     err.response?.data?.message ||
+      //     "Failed to add member. Please try again.",
+      // });
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-center p-4">
-      <div className="bg-white dark:bg-[#1E1E2E] rounded-xl p-6 w-full max-w-md shadow-2xl relative">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="bg-white dark:bg-[#1E1E2E] rounded-2xl p-6 w-full max-w-md shadow-2xl relative"
+      >
         <div className="flex justify-between items-center mb-4 border-b pb-3 dark:border-gray-700">
           <h3 className="text-xl font-bold dark:text-gray-200">Add New Member</h3>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
             <X size={20} className="dark:text-gray-400" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4 relative">
-            <label htmlFor="member-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label
+              htmlFor="member-email"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
               Member Email Address
             </label>
             <input
@@ -222,7 +248,9 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-gray-200"
               placeholder="member@example.com"
               autoComplete="off"
+              disabled={loading || success}
             />
+
             {/* ✅ Suggestion Dropdown */}
             {filteredUsers.length > 0 && (
               <ul className="absolute z-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 w-full max-h-40 overflow-y-auto shadow-lg">
@@ -238,15 +266,41 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
               </ul>
             )}
           </div>
+
           <button
             type="submit"
-            disabled={loading || !email.trim()}
-            className="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 transition-colors"
+            disabled={loading || !email.trim() || success}
+            className="w-full flex justify-center items-center gap-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 transition-colors"
           >
-            {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "Add Member"}
+            {loading ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" /> Adding...
+              </>
+            ) : success ? (
+              <>
+                <CheckCircle2 className="h-5 w-5 text-white" /> Added!
+              </>
+            ) : (
+              "Add Member"
+            )}
           </button>
         </form>
-      </div>
+
+        {/* ✅ Optional Toast inside modal (for instant feedback) */}
+        <AnimatePresence>
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="mt-4 flex items-center gap-2 text-green-600 text-sm font-medium"
+            >
+              <CheckCircle2 size={18} />
+              Member added successfully!
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 };

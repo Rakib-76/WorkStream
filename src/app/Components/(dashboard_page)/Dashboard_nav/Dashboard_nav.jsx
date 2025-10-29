@@ -198,7 +198,6 @@ export default function DashboardNavbar() {
       };
 
       const response = await axiosSecure.post("/api/createProject", {
-        collectionName: "projects",
         projectData: payload,
       });
 

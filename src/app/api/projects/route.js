@@ -1,13 +1,13 @@
 // src/app/api/projects/route.js
 import { NextResponse } from "next/server";
-import dbConnect from "../../../lib/dbConnect";
+import dbConnect, { collectionNameObj } from "../../../lib/dbConnect";
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email");
 
-    const db = await dbConnect("projects");
+    const db = await dbConnect(collectionNameObj.projectsCollection);
 
     let query = {};
     if (email) {
