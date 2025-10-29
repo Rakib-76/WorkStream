@@ -93,7 +93,7 @@ const Contact = () => {
                 <div className="p-3 bg-primary/20 text-primary rounded-xl">
                   <MdEmail size={22} />
                 </div>
-                <p className="text-lg">hello@workstream.com</p>
+                <p className="text-lg">workStream2200@gmail.com</p>
               </div>
 
               {/* Phone */}
@@ -105,7 +105,7 @@ const Contact = () => {
                 <div className="p-3 bg-secondary/20 text-secondary rounded-xl">
                   <FaPhoneVolume size={22} />
                 </div>
-                <p className="text-lg">+1 (307) 393-8955</p>
+                <p className="text-lg">+88016403433786</p>
               </div>
 
               {/* Location */}
