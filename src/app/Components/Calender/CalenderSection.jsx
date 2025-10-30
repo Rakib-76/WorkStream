@@ -7,6 +7,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import axios from "axios";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 
 export default function CalendarSection({ projectId }) {
@@ -130,7 +131,7 @@ export default function CalendarSection({ projectId }) {
             </div>
 
             {loading ? (
-                <div>Loading...</div>
+                <LoadingSpinner />
             ) : (
                 <FullCalendar
                     ref={calendarRef}

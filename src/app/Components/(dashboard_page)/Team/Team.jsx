@@ -92,40 +92,6 @@ const DepartmentCell = ({ member, handleUpdateField }) => {
   );
 };
 
-// ----------------------------------------------------------------------
-// --- 3. Gender Badge Selector ---
-// ----------------------------------------------------------------------
-const GenderBadgeSelector = ({ member, handleUpdateField }) => {
-  const options = ["Male", "Female"];
-  const getBadgeStyle = (gender) => {
-    switch (gender) {
-      case "Male":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-      case "Female":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-    }
-  };
-
-  return (
-    <td className="p-3 min-w-[150px] flex flex-wrap gap-2">
-      {options.map((gender) => (
-        <span
-          key={gender}
-          onClick={() => handleUpdateField(member.email, "gender", gender)}
-          className={`cursor-pointer px-3 py-1 rounded-full text-sm font-semibold transition-all ${member.gender === gender
-            ? "scale-105 shadow-lg border-2 border-pink-500"
-            : "hover:scale-105 hover:bg-gray-200 dark:hover:bg-gray-700"
-            } ${getBadgeStyle(gender)}`}
-        >
-          {gender}
-        </span>
-      ))}
-    </td>
-  );
-};
-
 // --- 4. Add Member Modal Component (UPDATED with email search) ---
 // ----------------------------------------------------------------------
 
@@ -413,7 +379,6 @@ export default function Team({ projectId }) {
                 <th className="p-3 text-left min-w-[200px]">Email</th>
                 <th className="p-3 text-left min-w-[150px]">Tasks</th>
                 <th className="p-3 text-left min-w-[150px]">Department</th>
-                <th className="p-3 text-left min-w-[100px]">Gender</th>
                 <th className="p-3 text-left min-w-[100px]">Status</th>
               </tr>
             </thead>
@@ -443,7 +408,6 @@ export default function Team({ projectId }) {
                   <td className="p-0">
                     <DepartmentCell member={t} handleUpdateField={handleUpdateField} />
                   </td>
-                  <GenderBadgeSelector member={t} handleUpdateField={handleUpdateField} />
                   <td className="p-3 text-sm text-gray-600 dark:text-gray-400">
                     {t.tasks.map((task, idx) => (
                       <div key={idx}>{task.status}</div>
