@@ -85,14 +85,6 @@ export function ReadyToTransform() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.6 }}
           >
-            <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(255,255,255,0.3)" }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-white flex items-center lg:h-18 h-18 px-3 rounded text-black hover:bg-white/90 lg:px-8 lg:py-6 text-lg font-semibold group shadow-lg"
-            >
-              Start Free Trial
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
 
             <motion.button
               whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(255,255,255,0.3)" }}
