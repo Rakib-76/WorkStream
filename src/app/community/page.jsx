@@ -121,7 +121,7 @@ export default function CommunityFeedbackForm() {
     <section className="max-w-7xl mx-auto py-20 px-4 relative">
       <Link
         href="/"
-        className="absolute top-6 right-6 text-primary hover:text-primary/80 transition"
+        className="absolute top-6 left-6 text-primary hover:text-primary/80 transition"
       >
         <ArrowLeft className="w-7 h-7" />
       </Link>

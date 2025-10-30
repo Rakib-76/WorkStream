@@ -5,6 +5,7 @@ import { Rocket, Building2, User, GraduationCap } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 // Utility function (clsx + tailwind-merge)
 function cn(...inputs) {
@@ -186,14 +187,18 @@ export default function UseCases() {
                         Ready to see how WorkStream can transform your workflow?
                     </motion.p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                     
+                    <Link href="/contact">
+                            <motion.button
                        
-                        <motion.button
+    
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className="px-6 py-3 border-2 border-primary text-primary rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors"
                         >
-                            Schedule Demo
+                            Book a Demo
                         </motion.button>
+                    </Link>
                     </div>
                 </div>
             </div>

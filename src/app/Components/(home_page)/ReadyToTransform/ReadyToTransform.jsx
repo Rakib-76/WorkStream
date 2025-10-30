@@ -3,6 +3,7 @@
 import { ArrowRight, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import Button from "../UI/Button";
+import Link from "next/link";
 
 export function ReadyToTransform() {
   const trustItems = [
@@ -86,14 +87,16 @@ export function ReadyToTransform() {
             transition={{ duration: 1.6 }}
           >
 
-            <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(255,255,255,0.3)" }}
-              whileTap={{ scale: 0.95 }}
-              className="border border-white flex items-center lg:h-18 h-18 px-3 rounded text-white lg:px-8 lg:py-6 text-lg font-semibold group shadow-lg"
-            >
-              Schedule Demo
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
+            <Link href="/contact">
+              <motion.button
+                whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(255,255,255,0.3)" }}
+                whileTap={{ scale: 0.95 }}
+                className="border border-white flex items-center lg:h-18 h-18 px-3 rounded text-white lg:px-8 lg:py-6 text-lg font-semibold group shadow-lg"
+              >
+                Book a Demo
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+            </Link>
           </motion.div>
 
           {/* Trust Elements */}
