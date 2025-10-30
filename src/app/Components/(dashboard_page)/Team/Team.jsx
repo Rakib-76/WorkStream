@@ -202,12 +202,7 @@ const AddMemberModal = ({ onClose, setNotification }) => {
       if (err.response.status == 409) {
         toast.error('Already this member added')
       }
-      // setNotification({
-      //   type: "error",
-      //   message:
-      //     err.response?.data?.message ||
-      //     "Failed to add member. Please try again.",
-      // });
+
     } finally {
       setLoading(false);
     }
