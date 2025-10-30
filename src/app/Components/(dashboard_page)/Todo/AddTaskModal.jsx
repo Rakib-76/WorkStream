@@ -21,35 +21,49 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
   const [endTime, setEndTime] = useState("");
   const { selectedProject } = useContext(DataContext);
   const [loading, setLoading] = useState(false);
- 
+
 
   // ===== Cloudinary Upload =====
   const handleFileUpload = async (e) => {
-   setLoading(true);
+    let isMounted = true; // ✅ ট্র্যাক রাখো কম্পোনেন্ট মাউন্ট আছে কিনা
+    setLoading(true);
+
     const selectedFiles = Array.from(e.target.files);
 
-    const uploadedFiles = await Promise.all(
-      selectedFiles.map(async (file) => {
-        const formData = new FormData();
-        formData.append("file", file);
+    try {
+      const uploadedFiles = await Promise.all(
+        selectedFiles.map(async (file) => {
+          const formData = new FormData();
+          formData.append("file", file);
 
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
-        return {
-          name: file.name,
-          url: data.url,         // Cloudinary file URL
-          public_id: data.public_id, // optional for delete
-        };
-      })
-    );
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+          return {
+            name: file.name,
+            url: data.url,
+            public_id: data.public_id,
+          };
+        })
+      );
 
-    setFiles((prev) => [...prev, ...uploadedFiles]);
-    setLoading(false);
-   
+      if (isMounted) {
+        setFiles((prev) => [...prev, ...uploadedFiles]);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error(err);
+      if (isMounted) setLoading(false);
+    }
+
+    // ✅ Cleanup function
+    return () => {
+      isMounted = false;
+    };
   };
+
 
   const removeFile = (file) => setFiles(files.filter((f) => f !== file));
 
@@ -70,13 +84,13 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
       // attendance: "present",
       comments: comment
         ? [
-            {
-              id: Date.now(),
-              text: comment,
-              author: "You",
-              time: new Date().toLocaleString(),
-            },
-          ]
+          {
+            id: Date.now(),
+            text: comment,
+            author: "You",
+            time: new Date().toLocaleString(),
+          },
+        ]
         : [],
       status: "Pending",
     };
@@ -149,13 +163,12 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                       className="accent-purple-500"
                     />
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        p === "Low"
+                      className={`px-2 py-1 rounded-full text-xs ${p === "Low"
                           ? "bg-green-100 text-green-600"
                           : p === "Medium"
-                          ? "bg-yellow-100 text-yellow-600"
-                          : "bg-red-100 text-red-600"
-                      }`}
+                            ? "bg-yellow-100 text-yellow-600"
+                            : "bg-red-100 text-red-600"
+                        }`}
                     >
                       {p}
                     </span>
@@ -187,7 +200,7 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                       onChange={(e) => setStartDate(e.target.value)}
                       className="border px-2 py-1 rounded w-full"
                     />
-                    
+
                   </div>
                   <div className="flex gap-2 items-center">
                     <Calendar size={18} />
@@ -197,7 +210,7 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                       onChange={(e) => setEndDate(e.target.value)}
                       className="border px-2 py-1 rounded w-full"
                     />
-                    
+
                   </div>
                 </div>
               </div>
@@ -221,15 +234,15 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                     </div>
                   ))}
                   <label className="flex items-center gap-2 cursor-pointer px-3 py-2 border rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-                   
+
                     <Upload size={16} />
-                   {loading ? "Uploading please wait..." : "Upload File"}
+                    {loading ? "Uploading please wait..." : "Upload File"}
                     <input
                       type="file"
                       multiple
                       onChange={handleFileUpload}
                       className="hidden"
-                    
+
                     />
                   </label>
                 </div>

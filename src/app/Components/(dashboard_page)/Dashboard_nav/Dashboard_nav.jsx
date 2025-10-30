@@ -57,7 +57,7 @@ export default function DashboardNavbar() {
   const [searchText, setSearchText] = useState("");
 
   // data from Context
-  const { setSelectedProject, selectedProject, userData } = useContext(DataContext);
+  const { setSelectedProject, selectedProject, userData, refetchUser } = useContext(DataContext);
   const selectedProjectId = selectedProject?._id;
 
 
@@ -463,7 +463,10 @@ export default function DashboardNavbar() {
             <div className="relative">
               <div
                 className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary cursor-pointer"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                onClick={() => {
+                  refetchUser(); 
+                  setIsDropdownOpen(!isDropdownOpen); 
+                }}
               >
                 <Image
                   src={session?.user?.image || "/def-profile.png"}

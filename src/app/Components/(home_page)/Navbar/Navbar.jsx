@@ -28,7 +28,7 @@ export default function Navbar() {
   const [mobileProductOpen, setMobileProductOpen] = useState(false);
   const [mobileCompanyOpen, setMobileCompanyOpen] = useState(false);
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
-  const { userData } = useContext(DataContext);
+  const { userData, refetchUser } = useContext(DataContext);
   const [open, setOpen] = useState(false);
   // Scroll effect
   useEffect(() => {
@@ -388,8 +388,10 @@ export default function Navbar() {
                     <div className="relative">
                       <div
                         className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary cursor-pointer"
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      >
+                        onClick={() => {
+                          refetchUser(); 
+                          setIsDropdownOpen(!isDropdownOpen); 
+                        }}                      >
                         <Image
                           src={session?.user?.image || "/def-profile.png"}
                           alt="Profile"
@@ -422,8 +424,8 @@ export default function Navbar() {
                           </div>
 
                           <ul className="p-2 text-gray-700 dark:text-gray-200">
-                            <li 
-                            onClick={() => handleProfileBtn()} className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                            <li
+                              onClick={() => handleProfileBtn()} className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                               <User size={18} /> Profile
                             </li>
                             <li
@@ -433,8 +435,8 @@ export default function Navbar() {
                               <LayoutDashboard size={18} /> Dashboard
                             </li>
                             <li
-                            onClick={()=> (window.location.href = "/Dashboard/profileSetting")}
-                             className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                              onClick={() => (window.location.href = "/Dashboard/profileSetting")}
+                              className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                               <Settings size={18} /> Account settings
                             </li>
                             <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
@@ -702,8 +704,10 @@ export default function Navbar() {
                         <div className="relative">
                           <div
                             className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary cursor-pointer"
-                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                          >
+                            onClick={() => {
+                              refetchUser();
+                              setIsDropdownOpen(!isDropdownOpen);
+                            }}                          >
                             <Image
                               src={session?.user?.image || "/def-profile.png"}
                               alt="Profile"

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { DataContext } from "./DataContext";
 import { useSession } from "next-auth/react";
 import useAxiosSecure from "../lib/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
 
 const DataProvider = ({ children }) => {
     const { data: session, status } = useSession();
@@ -10,7 +11,6 @@ const DataProvider = ({ children }) => {
     const [selectedProject, setSelectedProject] = useState(null);
     const manager = selectedProject?.manager?.email;
     const userEmail = session?.user?.email;
-    const [userData, setUserData] = useState(null)
     // 🔹 Load from localStorage when app loads
     useEffect(() => {
         const saved = localStorage.getItem("selectedProject");
@@ -30,29 +30,30 @@ const DataProvider = ({ children }) => {
             localStorage.removeItem("selectedProject");
         }
     }, [selectedProject]);
-    useEffect(() => {
-if (userEmail && status === "authenticated") {
-            const fetchUserData = async () => {
-                try {
-                    const res = await axiosSecure.get(`/api/users?email=${userEmail}`);
-                    setUserData(res.data);
-                } catch (error) {
-                    console.error("Failed to fetch user:", error);
-                }
-            }
-            fetchUserData();
-        };
-
-    }, [userEmail, axiosSecure]);
+    // query by email (React Query)
+    const {
+        data: userData,
+        isLoading: isUserLoading,
+        isError,
+        refetch: refetchUser,
+    } = useQuery({
+        queryKey: ["userData", userEmail],
+        queryFn: async () => {
+            const res = await axiosSecure.get(`/api/users?email=${userEmail}`);
+            return res.data;
+        },
+        enabled: !!userEmail && status === "authenticated", // only run when email ready
+    });
 
     const value = {
         session,
         axiosSecure,
         selectedProject,
         setSelectedProject,
-        manager,
         userData,
-        setUserData,
+        manager,
+        refetchUser,
+        isUserLoading,
     };
     return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 };
