@@ -126,12 +126,7 @@ export default function TaskDetailModal({
                 <div className="flex items-center gap-2">
                   <Calendar size={16} /> End: {task.endDate || "-"}
                 </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={16} /> Start Time: {task.startTime || "-"}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={16} /> End Time: {task.endTime || "-"}
-                </div>
+                
               </section>
 
               {/* ASSIGNEES */}
@@ -223,12 +218,7 @@ export default function TaskDetailModal({
 
             {/* FOOTER */}
             <div className="flex justify-between items-center p-4 border-t dark:border-gray-700 bg-white dark:bg-gray-900 sticky bottom-0">
-              <button
-                onClick={() => onEdit(task)}
-                className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-2"
-              >
-                <Edit3 size={16} /> Edit Task
-              </button>
+              
               <div className="flex gap-2">
                 <button
                   onClick={markPending}

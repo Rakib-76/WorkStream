@@ -187,13 +187,7 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                       onChange={(e) => setStartDate(e.target.value)}
                       className="border px-2 py-1 rounded w-full"
                     />
-                    <Clock size={18} />
-                    <input
-                      type="time"
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                      className="border px-2 py-1 rounded w-full"
-                    />
+                    
                   </div>
                   <div className="flex gap-2 items-center">
                     <Calendar size={18} />
@@ -203,13 +197,7 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit }) {
                       onChange={(e) => setEndDate(e.target.value)}
                       className="border px-2 py-1 rounded w-full"
                     />
-                    <Clock size={18} />
-                    <input
-                      type="time"
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                      className="border px-2 py-1 rounded w-full"
-                    />
+                    
                   </div>
                 </div>
               </div>
