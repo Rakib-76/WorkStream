@@ -126,11 +126,7 @@ export default function CalendarSection({ projectId }) {
         <div className="bg-card  rounded-xl  p-4 glass-card shadow-lg border ">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">📅 Project Calendar</h3>
-                <div>
-                    <button className="btn btn-sm">
-                        Refresh
-                    </button>
-                </div>
+                
             </div>
 
             {loading ? (

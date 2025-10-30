@@ -386,16 +386,7 @@ export default function DashboardNavbar() {
                                 <h3 className="font-medium text-gray-800 dark:text-gray-100 text-sm">
                                   {project.projectName}
                                 </h3>
-                                <span
-                                  className={`text-xs px-2 py-0.5 rounded-full ${project.priority === "High"
-                                    ? "bg-red-100 text-red-700 dark:bg-red-800/40 dark:text-red-300"
-                                    : project.priority === "Medium"
-                                      ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800/40 dark:text-yellow-300"
-                                      : "bg-green-100 text-green-700 dark:bg-green-800/40 dark:text-green-300"
-                                    }`}
-                                >
-                                  {project.priority}
-                                </span>
+                                
                               </div>
 
                               {/* Company + Manager */}

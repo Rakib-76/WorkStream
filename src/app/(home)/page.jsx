@@ -9,7 +9,8 @@ import { Testimonials } from "../Components/(home_page)/Testimonials/Testimonial
 import ScrollToTopButton from "../Components/(home_page)/ScrollBottomToTop/ScrollToTopButton";
 import Contact from "../Components/(home_page)/Contact/Contact";
 import SecuritySection from "./security/page";
-import FaqSection from "../Components/(home_page)/FAQ/FaqSection";
+// import FaqSection from "../Components/(home_page)/FAQ/FaqSection";
+import FaqSection from "../Components/(home_page)/FAQ/FAQSection";
 import TeamMap from "./TeamMap/TeamMap";
 
 // here we'll have the content of the home page

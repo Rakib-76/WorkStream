@@ -40,6 +40,8 @@
         "emoji-picker-react": "^4.13.3",
         "express": "^5.1.0",
         "framer-motion": "^12.23.18",
+        "html2canvas": "^1.4.1",
+        "jspdf": "^3.0.3",
         "lottie-react": "^2.4.1",
         "lucide-react": "^0.544.0",
         "moment": "^2.30.1",

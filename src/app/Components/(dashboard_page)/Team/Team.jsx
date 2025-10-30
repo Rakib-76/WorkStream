@@ -167,42 +167,45 @@ const AddMemberModal = ({ onClose, setNotification }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const memberEmail = email.trim();
-    if (!memberEmail) return;
+  e.preventDefault();
+  const memberEmail = email.trim();
+  if (!memberEmail) return;
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const response = await axiosSecure.put(`/api/add-member`, {
-        projectId: selectedProject._id,
-        memberEmail,
-      });
+  try {
+    const response = await axiosSecure.put(`/api/add-member`, {
+      projectId: selectedProject._id,
+      memberEmail,
+    });
 
-      if (response.status === 200) {
-        setSuccess(true);
-        toast.success(`${memberEmail} successfully added to the team.`);
+    if (response.status === 200) {
+      setSuccess(true);
+      toast.success(`${memberEmail} successfully added to the team.`);
 
+      // Optional: update context/local state
+      selectedProject.teamMembers.push(memberEmail);
 
-        // ✅ Optional: update context/local state
-        selectedProject.teamMembers.push(memberEmail);
-
-        // reset after short delay
-        setTimeout(() => {
-          setSuccess(false);
-          setEmail("");
-          onClose();
-        }, 1500);
-      }
-    } catch (err) {
-      if (err.response.status == 409) {
-        toast.error('Already this member added')
-      }
-
-    } finally {
-      setLoading(false);
+      // reset after short delay
+      setTimeout(() => {
+        setSuccess(false);
+        setEmail("");
+        onClose();
+      }, 1500);
     }
-  };
+  } catch (err) {
+    if (err.response?.status === 409) {
+      toast.error("Already this member added");
+    } else {
+      console.error(err);
+      setNotification({ type: "error", message: "Server error while adding member" });
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-center p-4">
@@ -308,17 +311,14 @@ export default function Team({ projectId }) {
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false); // New state for Modal
   const { manager } = useContext(DataContext);
   const { data: session } = useSession();
-  const userEmail = session?.user?.email || "Unknown Email";
+  const userEmail = session?.user?.email || "";
 
   // --- Fetch tasks & map to team (wrapped in useCallback) ---
   const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
       const res = await axios.get(`/api/tasks?projectId=${projectId}`);
-      if (!res?.data?.success) {
-        setLoading(false);
-        return;
-      }
+      if (!res?.data?.success) return;
 
       const tasks = res.data.data;
       const assigneesMap = {};
@@ -333,7 +333,7 @@ export default function Team({ projectId }) {
           if (!assigneesMap[safeEmail]) {
             assigneesMap[safeEmail] = {
               email: safeEmail,
-              name: safeEmail.split("@")[0] || "Unknown",
+              name: safeEmail.split("@")[0],
               role: creatorEmail === safeEmail ? "Leader" : "Member",
               img: `https://placehold.co/40x40/94A3B8/FFFFFF?text=${safeEmail[0]?.toUpperCase() || "?"}`,
               department: "N/A",
@@ -347,7 +347,7 @@ export default function Team({ projectId }) {
 
       setTeam(Object.values(assigneesMap));
     } catch (err) {
-      console.error("Failed to fetch tasks", err);
+      console.error(err);
       setNotification({ type: "error", message: "Failed to load team data." });
     } finally {
       setLoading(false);
@@ -370,7 +370,7 @@ export default function Team({ projectId }) {
 
   return (
     <section className="text-gray-800 dark:text-gray-200">
-      <Notification notification={notification} onClose={handleCloseNotification} />
+      <Notification notification={notification} onClose={() => setNotification(null)} />
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-bold">Project Team ({team.length} Members)</h2>
@@ -393,11 +393,11 @@ export default function Team({ projectId }) {
       {/* Add Member Modal RENDER */}
       {isAddMemberModalOpen && (
         <AddMemberModal
-          onClose={() => setIsAddMemberModalOpen(false)}
-          projectId={projectId}
-          onMemberAdded={fetchTasks}
-          setNotification={setNotification}
-        />
+    onClose={() => setIsAddMemberModalOpen(false)} // ✅ Fixed
+    projectId={projectId}
+    onMemberAdded={fetchTasks}
+    setNotification={setNotification}
+  />
       )}
 
       {loading ? (
