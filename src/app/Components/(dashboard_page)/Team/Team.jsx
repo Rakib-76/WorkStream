@@ -1,40 +1,22 @@
 "use client";
-<<<<<<< HEAD
-import { useState, useCallback, useEffect, useContext } from "react";
-import { X, Loader2, Plus } from "lucide-react";
-=======
 import { useState, useCallback, useEffect, useRef } from "react";
 import { X, Loader2, Plus, CheckCircle2, AlertCircle } from "lucide-react"; // Plus icon যোগ করা হয়েছে
->>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
 import axios from "axios";
 import { DataContext } from "../../../../context/DataContext";
 import { useContext } from "react";
 import { useSession } from "next-auth/react";
-<<<<<<< HEAD
-
-// -------------------- Notification --------------------
-=======
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 // ----------------------------------------------------------------------
 // --- 1. Notification Feature function ---
 // ----------------------------------------------------------------------
->>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
 const Notification = ({ notification, onClose }) => {
   if (!notification) return null;
 
   const colorClass =
     notification.type === "success"
       ? "bg-green-500"
-<<<<<<< HEAD
-      : notification.type === "error"
-      ? "bg-red-500"
-      : "bg-blue-500";
-
-  return (
-    <div className={`fixed top-4 right-4 z-[100] p-4 rounded-lg shadow-lg text-white flex items-center space-x-3 ${colorClass}`}>
-=======
       : notification.type === "info"
         ? "bg-blue-500"
         : "bg-yellow-500";
@@ -49,7 +31,6 @@ from { transform: translateX(100%); opacity: 0; }
 to { transform: translateX(0); opacity: 1; }
 }
 `}</style>
->>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
       <span className="font-medium">{notification.message}</span>
       <button onClick={onClose} className="p-1 rounded-full hover:bg-white/20">
         <X size={16} />
@@ -58,54 +39,6 @@ to { transform: translateX(0); opacity: 1; }
   );
 };
 
-<<<<<<< HEAD
-// -------------------- Add Member Modal --------------------
-const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) => {
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [allUsers, setAllUsers] = useState([]);
-
-  // Fetch all users for autocomplete
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await axios.get("/api/users");
-        setAllUsers(res.data?.data || []);
-      } catch (err) {
-        console.error("Failed to fetch users", err);
-      }
-    };
-    fetchUsers();
-  }, []);
-
-  const filteredSuggestions = allUsers.filter((u) =>
-    u.email.toLowerCase().includes(email.toLowerCase())
-  );
-
-  const handleAddMember = async (e) => {
-  e.preventDefault();
-  if (!email.trim()) return;
-
-  // Prevent adding already existing team member
-  if (team.some((t) => t.email === email)) {
-    setNotification({ type: "error", message: "User is already a team member" });
-    return;
-  }
-
-  setLoading(true);
-  try {
-    const res = await axios.post("/api/members/add-member", {
-      projectId,
-      memberEmail: email,
-    });
-
-    if (res.data.success) {
-      setNotification({ type: "success", message: res.data.message });
-      onMemberAdded(); // Refresh team
-      onClose();
-    } else {
-      setNotification({ type: "error", message: res.data.message });
-=======
 // ----------------------------------------------------------------------
 // --- 2. Inline Editable Department Cell ---
 // ----------------------------------------------------------------------
@@ -234,49 +167,44 @@ const AddMemberModal = ({ onClose, setNotification }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const memberEmail = email.trim();
-    if (!memberEmail) return;
+  e.preventDefault();
+  const memberEmail = email.trim();
+  if (!memberEmail) return;
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const response = await axiosSecure.put(`/api/add-member`, {
-        projectId: selectedProject._id,
-        memberEmail,
-      });
+  try {
+    const response = await axiosSecure.put(`/api/add-member`, {
+      projectId: selectedProject._id,
+      memberEmail,
+    });
 
-      if (response.status === 200) {
-        setSuccess(true);
-        toast.success(`${memberEmail} successfully added to the team.`);
+    if (response.status === 200) {
+      setSuccess(true);
+      toast.success(`${memberEmail} successfully added to the team.`);
 
+      // Optional: update context/local state
+      selectedProject.teamMembers.push(memberEmail);
 
-        // ✅ Optional: update context/local state
-        selectedProject.teamMembers.push(memberEmail);
-
-        // reset after short delay
-        setTimeout(() => {
-          setSuccess(false);
-          setEmail("");
-          onClose();
-        }, 1500);
-      }
-    } catch (err) {
-      if (err.response.status == 409) {
-        toast.error('Already this member added')
-      }
-
-    } finally {
-      setLoading(false);
->>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
+      // reset after short delay
+      setTimeout(() => {
+        setSuccess(false);
+        setEmail("");
+        onClose();
+      }, 1500);
     }
   } catch (err) {
-    console.error(err);
-    setNotification({ type: "error", message: "Server error while adding member" });
+    if (err.response?.status === 409) {
+      toast.error("Already this member added");
+    } else {
+      console.error(err);
+      setNotification({ type: "error", message: "Server error while adding member" });
+    }
   } finally {
     setLoading(false);
   }
 };
+
 
 
   return (
@@ -297,35 +225,6 @@ const AddMemberModal = ({ onClose, setNotification }) => {
           </button>
         </div>
 
-<<<<<<< HEAD
-        <form onSubmit={handleAddMember}>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Member Email
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="member@example.com"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-gray-200"
-          />
-
-          {/* Autocomplete suggestions */}
-          {email && filteredSuggestions.length > 0 && (
-            <div className="border mt-1 rounded-md bg-white dark:bg-gray-800 max-h-36 overflow-y-auto shadow-lg">
-              {filteredSuggestions.map((user) => (
-                <div
-                  key={user.email}
-                  className="px-3 py-2 hover:bg-pink-100 dark:hover:bg-gray-700 cursor-pointer"
-                  onClick={() => setEmail(user.email)}
-                >
-                  {user.email}
-                </div>
-              ))}
-            </div>
-          )}
-=======
         <form onSubmit={handleSubmit}>
           <div className="mb-4 relative">
             <label
@@ -361,7 +260,6 @@ const AddMemberModal = ({ onClose, setNotification }) => {
               </ul>
             )}
           </div>
->>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
 
           <button
             type="submit"
@@ -401,35 +299,21 @@ const AddMemberModal = ({ onClose, setNotification }) => {
   );
 };
 
-<<<<<<< HEAD
-// -------------------- Team Component --------------------
-=======
 
 
 // ----------------------------------------------------------------------
 // --- 5. Main Team Component ---
 // ----------------------------------------------------------------------
->>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
 export default function Team({ projectId }) {
   const [team, setTeam] = useState([]);
   const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(true);
-<<<<<<< HEAD
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-=======
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false); // New state for Modal
->>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
   const { manager } = useContext(DataContext);
   const { data: session } = useSession();
   const userEmail = session?.user?.email || "";
 
-<<<<<<< HEAD
-  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-
-  // Fetch tasks to map team members
-=======
   // --- Fetch tasks & map to team (wrapped in useCallback) ---
->>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
   const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
@@ -475,8 +359,6 @@ export default function Team({ projectId }) {
     fetchTasks();
   }, [fetchTasks]);
 
-<<<<<<< HEAD
-=======
   // --- Update inline fields ---
   const handleUpdateField = useCallback((email, field, value) => {
     setTeam((prev) => prev.map((m) => (m.email === email ? { ...m, [field]: value } : m)));
@@ -486,27 +368,12 @@ export default function Team({ projectId }) {
 
   const handleCloseNotification = () => setNotification(null);
 
->>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
   return (
     <section className="text-gray-800 dark:text-gray-200">
       <Notification notification={notification} onClose={() => setNotification(null)} />
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-bold">Project Team ({team.length} Members)</h2>
-<<<<<<< HEAD
-
-        {manager === userEmail && (
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="p-2 rounded-full bg-pink-500 text-white hover:bg-pink-600 transition-colors shadow-lg"
-          >
-            <Plus size={24} />
-          </button>
-        )}
-      </div>
-
-      {isAddModalOpen && (
-=======
         {/* Add Member Button */}
         {
           manager === userEmail &&
@@ -525,13 +392,12 @@ export default function Team({ projectId }) {
 
       {/* Add Member Modal RENDER */}
       {isAddMemberModalOpen && (
->>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
         <AddMemberModal
-          onClose={() => setIsAddModalOpen(false)}
-          projectId={projectId}
-          onMemberAdded={fetchTasks}
-          setNotification={setNotification}
-        />
+    onClose={() => setIsAddMemberModalOpen(false)} // ✅ Fixed
+    projectId={projectId}
+    onMemberAdded={fetchTasks}
+    setNotification={setNotification}
+  />
       )}
 
       {loading ? (
@@ -561,18 +427,6 @@ export default function Team({ projectId }) {
                     <img
                       src={t.img}
                       className="w-8 h-8 rounded-full object-cover ring-2 ring-pink-500/50"
-<<<<<<< HEAD
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "https://placehold.co/40x40/94A3B8/FFFFFF?text=?";
-                      }}
-                    />
-                    <span className="font-medium">{capitalize(t.name)}</span>
-                    {t.role === "Leader" && <span className="ml-1 text-yellow-500">⭐</span>}
-                  </td>
-                  <td className="p-3 text-gray-600 dark:text-gray-400">{t.email}</td>
-                  <td className="p-3 text-sm text-gray-600 dark:text-gray-400 hidden md:table-cell">
-=======
                       onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/40x40/94A3B8/FFFFFF?text=?"; }}
                     />
                     <span className="font-medium">{t.name}</span>
@@ -580,7 +434,6 @@ export default function Team({ projectId }) {
                   </td>
                   <td className="p-3 text-sm text-gray-600 dark:text-gray-400">{t.email}</td>
                   <td className="p-3 text-sm text-gray-600 dark:text-gray-400">
->>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
                     {t.tasks.map((task, idx) => (
                       <div key={idx}>
                         <span className="font-semibold">{task.title}</span>
