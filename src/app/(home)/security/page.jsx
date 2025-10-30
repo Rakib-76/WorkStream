@@ -181,20 +181,6 @@ export default async function handler(req, res) {
 `}
                             </pre>
 
-                            <div className="mt-4 flex gap-3">
-                                <a
-                                    href="#"
-                                    className="inline-flex items-center px-4 py-2 rounded-md bg-primary text-white font-medium shadow-sm hover:opacity-95"
-                                >
-                                    View Security Docs
-                                </a>
-                                <a
-                                    href="#"
-                                    className="inline-flex items-center px-4 py-2 rounded-md border border-border bg-card text-sm text-foreground hover:bg-muted/5"
-                                >
-                                    Request Compliance Pack
-                                </a>
-                            </div>
                         </div>
                     </motion.div>
                 </div>

@@ -186,13 +186,7 @@ export default function UseCases() {
                         Ready to see how WorkStream can transform your workflow?
                     </motion.p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                        >
-                            Start Free Trial
-                        </motion.button>
+                       
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
