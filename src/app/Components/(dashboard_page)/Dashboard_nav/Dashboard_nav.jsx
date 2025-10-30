@@ -197,7 +197,7 @@ export default function DashboardNavbar() {
         createdAt: new Date().toISOString(),
       };
 
-      const response = await axiosSecure.post("/api/createProject", {
+      const response = await axiosSecure.post("/api/projects", {
         projectData: payload,
       });
 
@@ -209,9 +209,21 @@ export default function DashboardNavbar() {
           timer: 2000,
           showConfirmButton: false,
         });
+
+        // ✅ New line: add the newly created project to local state immediately
+        const newProject = response.data.data; // ধরে নিচ্ছি তোমার API নতুন project data ফেরত দেয়
+        setUserProjects((prev) => [newProject, ...prev]); // নতুন project উপরে যোগ করো
+
+        // Modal বন্ধ করো
         setIsModalOpen(false);
-        // Optionally refetch projects after creation
-        // fetchUserProjects(); 
+
+        // Optional: clear selected image & emoji
+        setSelectedImage(null);
+        setSelectedEmoji(null);
+
+        // Optional: নতুন project কে selectedProject করতেও পারো
+        setSelectedProject(newProject);
+
       } else {
         Swal.fire("Error", response?.data?.error || "Failed to create project", "error");
       }
@@ -220,6 +232,7 @@ export default function DashboardNavbar() {
       Swal.fire("Error", "Something went wrong", "error");
     }
   };
+
 
   // Project Filtering Logic
   const filteredProjects = userProjects.filter((project) =>
@@ -386,7 +399,7 @@ export default function DashboardNavbar() {
                                 <h3 className="font-medium text-gray-800 dark:text-gray-100 text-sm">
                                   {project.projectName}
                                 </h3>
-                                
+
                               </div>
 
                               {/* Company + Manager */}
@@ -474,7 +487,7 @@ export default function DashboardNavbar() {
                     </div>
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-900 dark:text-white">
-                        {userData ?.name || "Unknown User"}
+                        {userData?.name || "Unknown User"}
                       </h4>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {session?.user?.email || "No email"}
