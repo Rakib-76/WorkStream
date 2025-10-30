@@ -9,7 +9,7 @@ import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 // ----------------------------------------------------------------------
-// --- 1. Notification Component ---
+// --- 1. Notification Feature function ---
 // ----------------------------------------------------------------------
 const Notification = ({ notification, onClose }) => {
   if (!notification) return null;
