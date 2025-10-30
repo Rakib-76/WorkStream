@@ -190,7 +190,6 @@ const AddMemberModal = ({ onClose, setNotification }) => {
             <X size={20} className="dark:text-gray-400" />
           </button>
         </div>
-
         <form onSubmit={handleSubmit}>
           <div className="mb-4 relative">
             <label
