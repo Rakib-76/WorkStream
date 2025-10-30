@@ -126,7 +126,6 @@ const GenderBadgeSelector = ({ member, handleUpdateField }) => {
   );
 };
 
-// ----------------------------------------------------------------------
 // --- 4. Add Member Modal Component (UPDATED with email search) ---
 // ----------------------------------------------------------------------
 
