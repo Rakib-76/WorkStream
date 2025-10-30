@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../(home_page)/UI/card";
+import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
 
 export default function AttendancePage({ projectId }) {
   const [records, setRecords] = useState([]);
@@ -25,7 +26,7 @@ export default function AttendancePage({ projectId }) {
     if (projectId) load();
   }, [projectId]);
 
-  if (loading) return <p className="p-6">Loading...</p>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className=" space-y-6">
