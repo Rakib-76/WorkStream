@@ -32,7 +32,7 @@ export default function LandingPage() {
       />
     )
   }
-
+// hhh
   return (
     <main className="bg-card border border-border rounded-xl shadow bg-gradient-to-br from-purple-900 via-purple-800 to-blue-900 flex flex-col items-center justify-center px-4 py-8">
       {/* Background gradient overlay */}
