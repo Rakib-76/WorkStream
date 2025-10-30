@@ -183,10 +183,7 @@ const AddMemberModal = ({ onClose, setNotification }) => {
       if (response.status === 200) {
         setSuccess(true);
         toast.success(`${memberEmail} successfully added to the team.`);
-        // setNotification({
-        //   type: "success",
-        //   message: `${memberEmail} successfully added to the team.`,
-        // });
+
 
         // ✅ Optional: update context/local state
         selectedProject.teamMembers.push(memberEmail);
