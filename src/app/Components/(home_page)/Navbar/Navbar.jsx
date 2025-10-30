@@ -23,7 +23,6 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   // Mobile dropdown states (kept for mobile accordion style)
   const [mobileProductOpen, setMobileProductOpen] = useState(false);
   const [mobileCompanyOpen, setMobileCompanyOpen] = useState(false);
