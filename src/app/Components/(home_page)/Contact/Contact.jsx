@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useRef, useState } from "react";
 import Lottie from "lottie-react";
 import contactAnimation from "../../../../assets/contact.json";
 import { MdEmail, MdLocationOn } from "react-icons/md";
@@ -8,23 +8,44 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import Aos from "aos";
 import "aos/dist/aos.css";
+import emailjs from "@emailjs/browser";
+import Swal from "sweetalert2";
 
 const Contact = () => {
-  useEffect(() => {
-    Aos.init({ duration: 1000, once: false });
-  }, []);
+  const form = useRef();
+  const { register, reset } = useForm();
+  const [isSending, setIsSending] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm();
-
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    toast.success("Your inquiry has been sent!");
-    reset();
+  const sendEmail = (e) => {
+    e.preventDefault();
+    setIsSending(true);
+    emailjs.sendForm(
+      "service_wd97pr7",
+      "template_2cboo3d",
+      form.current,
+      "Psn6q2BKvm8M_0pAh"
+    ).then(() => {
+      Swal.fire({
+        icon: "success",
+        title: "Message Sent!",
+        text: "Your message has been delivered successfully.",
+        confirmButtonColor: "#4f46e5",
+      });
+      reset();
+      setIsSending(false);
+    },
+      (error) => {
+        toast.success("Failed to send message.");
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Failed to send message. Please try again!",
+          confirmButtonColor: "#ef4444",
+        });
+        console.log(error);
+        setIsSending(false);
+      }
+    );
   };
 
   return (
@@ -72,7 +93,7 @@ const Contact = () => {
                 <div className="p-3 bg-primary/20 text-primary rounded-xl">
                   <MdEmail size={22} />
                 </div>
-                <p className="text-lg">hello@workstream.com</p>
+                <p className="text-lg">workStream2200@gmail.com</p>
               </div>
 
               {/* Phone */}
@@ -84,7 +105,7 @@ const Contact = () => {
                 <div className="p-3 bg-secondary/20 text-secondary rounded-xl">
                   <FaPhoneVolume size={22} />
                 </div>
-                <p className="text-lg">+1 (307) 393-8955</p>
+                <p className="text-lg">+8801640343376</p>
               </div>
 
               {/* Location */}
@@ -114,7 +135,7 @@ const Contact = () => {
               the right place.
             </p>
 
-            <form className="space-y-2" onSubmit={handleSubmit(onSubmit)}>
+            <form ref={form} className="space-y-2" onSubmit={sendEmail}>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-muted-foreground block mb-2">
@@ -122,7 +143,7 @@ const Contact = () => {
                   </label>
                   <input
                     {...register("firstName", { required: true })}
-                    placeholder="Max Doe"
+                    placeholder="your name"
                     className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                 </div>
@@ -132,7 +153,7 @@ const Contact = () => {
                   </label>
                   <input
                     {...register("email", { required: true })}
-                    placeholder="you@example.com"
+                    placeholder="your email"
                     className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                 </div>
@@ -173,10 +194,11 @@ const Contact = () => {
               </div>
 
               <button
+                disabled={isSending}
                 type="submit"
                 className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground py-3 px-8 hover:bg-primary/80 transition-colors"
               >
-                Send Inquiry
+                {isSending ? "Sending..." : "Send Inquiry"}
               </button>
             </form>
           </div>

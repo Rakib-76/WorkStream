@@ -48,9 +48,14 @@ export function Footer() {
           {/* Logo and Description */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
+              {/* <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
                 <Waves className="w-5 h-5 text-white" />
-              </div>
+              </div> */}
+               <img
+                  src="https://i.ibb.co/gMhqDtMp/workstream-logo.png"
+                  alt="Uploaded Preview"
+                  className="w-8 h-8  object-contain rounded-lg"
+                />
               <span className="text-xl font-semibold text-foreground">
                 WorkStream
               </span>

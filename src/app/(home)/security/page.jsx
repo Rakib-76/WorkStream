@@ -51,7 +51,7 @@ export default function SecuritySection() {
     ];
 
     return (
-        <section className=" bg-background text-foreground">
+        <section className=" bg-background text-foreground py-20">
             <div className="max-w-7xl mx-auto px-6">
                 {/* Section Header */}
                 <motion.div

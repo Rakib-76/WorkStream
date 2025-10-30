@@ -34,7 +34,7 @@ export default function LandingPage() {
   }
 
   return (
-    <main className=" bg-gradient-to-br from-purple-900 via-purple-800 to-blue-900 flex flex-col items-center justify-center px-4 py-8">
+    <main className="bg-card border border-border rounded-xl shadow bg-gradient-to-br from-purple-900 via-purple-800 to-blue-900 flex flex-col items-center justify-center px-4 py-8">
       {/* Background gradient overlay */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
@@ -47,7 +47,7 @@ export default function LandingPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Video className="w-8 h-8 text-purple-400" />
-            <span className="text-sm font-semibold text-purple-300 uppercase tracking-wider">Video Conferencing</span>
+            <span className="text-sm md:text-xl font-semibold text-purple-300 uppercase tracking-wider">Video Conferencing</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">

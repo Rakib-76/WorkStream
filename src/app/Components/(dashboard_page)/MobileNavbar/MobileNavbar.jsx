@@ -152,14 +152,14 @@ const [collapsed, setCollapsed] = useState(false);
     { name: "chat", label: "Chat" },
     { name: "callmeet", label: "Call/Meet" },
     { name: "team", label: "Team" },
-    { name: "notes", label: "Notes" },
+    // { name: "notes", label: "Notes" },
     { name: "reports", label: "Reports" },
   ];
 
   return (
     <>
       {/* Mobile Header */}
-      <header className="md:hidden fixed top-0 left-0 right-0 bg-card border-b border-border flex items-center justify-between px-4 py-3 z-50">
+      <header className="lg:hidden fixed top-0 left-0 right-0 bg-card border-b border-border flex items-center justify-between px-4 py-3 z-50">
         {/* <Link href="/" className="group">
           <div className="flex items-center space-x-3">
             <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-primary to-secondary rounded-xl shadow-md">
@@ -183,7 +183,7 @@ const [collapsed, setCollapsed] = useState(false);
 
       {/* Drawer Menu */}
       <div
-        className={`absolute md:hidden top-[66px] left-0 w-full bg-background shadow-lg  transition-all duration-500 ease-in-out overflow-hidden z-[9999] ${
+        className={`absolute lg:hidden top-[66px] left-0 w-full bg-background shadow-lg  transition-all duration-500 ease-in-out overflow-hidden z-[9999] ${
   isOpen ? "max-h-[calc(100vh-52px)]" : "max-h-0"
 }`}
 

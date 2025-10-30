@@ -123,7 +123,7 @@ export default function CalendarSection({ projectId }) {
 
 
     return (
-        <div className="p-4 glass-card shadow-lg border border-gray-200 dark:border-gray-700 rounded-2xl">
+        <div className="bg-card  rounded-xl  p-4 glass-card shadow-lg border ">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">📅 Project Calendar</h3>
                 <div>

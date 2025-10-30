@@ -53,7 +53,7 @@ export default function Sidebar({ activeItem, setActiveItem }) {
         { name: "chat", label: "Chat", icon: <MessageCircle size={18} /> },
         { name: "callmeet", label: "Call/Meet", icon: <PhoneCall size={18} /> },
         { name: "team", label: "Team", icon: <Users size={18} /> },
-        { name: "notes", label: "Notes", icon: <StickyNote size={18} /> },
+        // { name: "notes", label: "Notes", icon: <StickyNote size={18} /> },
         { name: "reports", label: "Reports", icon: <Share2 size={18} /> },
       ],
     },

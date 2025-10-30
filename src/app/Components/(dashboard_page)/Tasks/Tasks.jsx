@@ -108,85 +108,66 @@ function TaskTable({ tasks, getPriorityColor, getStatusColor }) {
     <Card className="glass-card shadow-lg border border-gray-200 dark:border-gray-700">
 
       <CardContent className="p-0 overflow-x-auto">
-        <table className="w-full border-collapse min-w-[700px]">
+        <table className="w-full border-collapse md:min-w-[700px]">
           <thead className="bg-gray-100 dark:bg-gray-800">
-            <tr>
-              {["Task Title", "Assigned To", "Deadline", "Priority", "Status",].map((th) => (
-                <th
-                  key={th}
-                  className="text-left p-3 text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wider"
-                >
-                  {th}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.length === 0 ? (
-              <tr >
-                <td colSpan={6} className="p-4 text-center text-gray-500">
-                  No tasks found
-                </td>
-              </tr>
-            ) : (
-              tasks.map((task) => (
-                <tr
-                  key={task._id}
-                  className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition"
-                >
-                  <td className="p-3 font-medium">{task.title}</td>
+  <tr>
+    <th className="text-left p-3 text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wider">
+      Task Title
+    </th>
+    <th className="text-left p-3 text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wider hidden md:table-cell">
+      Assigned To
+    </th>
+    <th className="text-left p-3 text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wider hidden md:table-cell">
+      Deadline
+    </th>
+    <th className="text-left p-3 text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wider">
+      Priority
+    </th>
+    <th className="text-left p-3 text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wider hidden md:table-cell">
+      Status
+    </th>
+  </tr>
+</thead>
 
-                  <td className="p-3">
-                    {task?.assigneeTo?.length > 0
-                      ? task.assigneeTo.join(" , ")
-                      : "No Assignee"}
-                  </td>
-                  <td className="p-3">{task.endDate}</td>
-                  <td>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${getPriorityColor(
-                        task.priority
-                      )}`}
-                    >
-                      {task.priority}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                        task.status
-                      )}`}
-                    >
-                      {task.status}
-                    </span>
-                  </td>
-                  {/* <td className="p-3 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="shadow-xl border rounded-lg">
-                        <DropdownMenuItem
-                          onClick={() => toast("Edit clicked")}
-                          className="flex items-center gap-2"
-                        >
-                          <Edit className="w-4 h-4" /> Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => toast("Delete clicked")}
-                          className="flex items-center gap-2 text-red-500"
-                        >
-                          <Trash2 className="w-4 h-4" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td> */}
-                </tr>
-              ))
-            )}
-          </tbody>
+<tbody>
+  {tasks.map((task) => (
+    <tr
+      key={task._id}
+      className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition"
+    >
+      <td className="p-3 font-medium">{task.title}</td>
+
+      <td className="p-3 hidden md:table-cell">
+        {task?.assigneeTo?.length > 0
+          ? task.assigneeTo.join(" , ")
+          : "No Assignee"}
+      </td>
+
+      <td className="p-3 hidden md:table-cell">{task.endDate}</td>
+
+      <td>
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-semibold ${getPriorityColor(
+            task.priority
+          )}`}
+        >
+          {task.priority}
+        </span>
+      </td>
+
+      <td className="hidden md:table-cell">
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+            task.status
+          )}`}
+        >
+          {task.status}
+        </span>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
         </table>
       </CardContent>
     </Card>

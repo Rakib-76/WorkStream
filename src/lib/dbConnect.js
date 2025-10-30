@@ -10,6 +10,7 @@ const collectionNameObj =
   blogCollection: "blogs",
   fileCollection: "projectFiles",
   notificationsCollection:"notifications",
+   projectsCollection: "projects",
 }
 
 export default function dbConnect(collectionName) {

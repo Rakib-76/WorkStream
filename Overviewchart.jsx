@@ -575,7 +575,7 @@ export default function Overviewchart() {
       </div>
 
       {/* --- Second Row: Projects & Tasks Section (2 Columns on desktop) --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ProjectsTable />
         <TasksStatisticsChart />
       </div>

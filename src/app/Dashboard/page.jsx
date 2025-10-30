@@ -36,7 +36,7 @@ export default function DashboardLayout({ children }) {
     <div className="flex min-h-screen bg-background text-foreground">
   {/* Sidebar (visible only on md and up) */}
   <div
-    className="hidden md:flex fixed top-0 left-0 h-screen w-[260px]
+    className="hidden lg:flex fixed top-0 left-0 h-screen w-[260px]
        bg-gradient-to-b from-[var(--sidebar)]/70 to-[var(--card)]/60
        dark:from-[var(--sidebar)]/80 dark:to-[var(--card)]/70
        backdrop-blur-xl border-r border-[var(--sidebar-border)]
@@ -67,7 +67,7 @@ export default function DashboardLayout({ children }) {
   </div>
 
   {/* ✅ Main content with margin-left so it doesn’t hide under sidebar */}
-  <div className="flex-1 flex  flex-col md:ml-[260px]">
+  <div className="flex-1 flex  flex-col lg:ml-[260px]">
     {/* Mobile Navbar */}
     <MobileNavbar activeItem={activeItem} setActiveItem={setActiveItem} />
 

@@ -188,10 +188,12 @@ export default function Todo() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 px-6 py-8">
+    <div>
       <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
         Kanban Board
       </h1>
+<div className="min-h-screen rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 px-6 py-8">
+      
 
       {loading ? (
         <LoadingSpinner />
@@ -483,5 +485,7 @@ export default function Todo() {
         onEdit={(task) => console.log("Edit clicked", task)}
       />
     </div>
+    </div>
+    
   );
 }

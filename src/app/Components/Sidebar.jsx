@@ -23,18 +23,18 @@ export default function Sidebar({ isOpen, onClose }) {
   return (
     <>
       {/* Overlay */}
-      {isOpen && <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={onClose}></div>}
+      {isOpen && <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={onClose}></div>}
 
       {/* Sidebar */}
       <div
         className={`fixed right-0 top-0 h-full w-80 bg-gradient-to-b from-purple-900/95 to-blue-900/95 border-l border-purple-500/30 backdrop-blur-sm z-40 transform transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
-        } lg:translate-x-0 lg:relative lg:w-80 lg:h-screen`}
+        } md:translate-x-0 md:relative md:w-80 md:h-screen`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-purple-500/20">
           <h2 className="text-white font-semibold">Meeting Details</h2>
-          <Button_meet onClick={onClose} variant="ghost" size="sm" className="lg:hidden text-gray-300 hover:text-white">
+          <Button_meet onClick={onClose} variant="ghost" size="sm" className="md:hidden text-gray-300 hover:text-white">
             <X className="w-5 h-5" />
           </Button_meet>
         </div>
@@ -119,7 +119,7 @@ export default function Sidebar({ isOpen, onClose }) {
             </div>
           )}
 
-          {activeTab === "notes" && (
+          {/* {activeTab === "notes" && (
             <div className="space-y-3">
               <textarea
                 placeholder="Add meeting notes..."
@@ -127,7 +127,7 @@ export default function Sidebar({ isOpen, onClose }) {
               />
               <Button_meet className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg">Save Notes</Button_meet>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Chat Input */}
