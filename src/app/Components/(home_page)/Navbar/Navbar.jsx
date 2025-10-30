@@ -366,7 +366,7 @@ export default function Navbar() {
                 </button>
               </Dropdown>
 
-              {/* Resources Dropdown */}
+              {/* Resources Dropdown menu bar */}
               <Dropdown
                 menu={{ items: resourcesMenuItems }}
                 trigger={["hover", "click"]}
