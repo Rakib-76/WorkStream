@@ -1,22 +1,55 @@
 "use client";
+<<<<<<< HEAD
 import { useState, useCallback, useEffect, useContext } from "react";
 import { X, Loader2, Plus } from "lucide-react";
+=======
+import { useState, useCallback, useEffect, useRef } from "react";
+import { X, Loader2, Plus, CheckCircle2, AlertCircle } from "lucide-react"; // Plus icon যোগ করা হয়েছে
+>>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
 import axios from "axios";
 import { DataContext } from "../../../../context/DataContext";
+import { useContext } from "react";
 import { useSession } from "next-auth/react";
+<<<<<<< HEAD
 
 // -------------------- Notification --------------------
+=======
+import useAxiosSecure from "../../../../lib/useAxiosSecure";
+import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
+// ----------------------------------------------------------------------
+// --- 1. Notification Feature function ---
+// ----------------------------------------------------------------------
+>>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
 const Notification = ({ notification, onClose }) => {
   if (!notification) return null;
+
   const colorClass =
     notification.type === "success"
       ? "bg-green-500"
+<<<<<<< HEAD
       : notification.type === "error"
       ? "bg-red-500"
       : "bg-blue-500";
 
   return (
     <div className={`fixed top-4 right-4 z-[100] p-4 rounded-lg shadow-lg text-white flex items-center space-x-3 ${colorClass}`}>
+=======
+      : notification.type === "info"
+        ? "bg-blue-500"
+        : "bg-yellow-500";
+
+  return (
+    <div
+      className={`fixed top-4 right-4 z-[100] p-4 rounded-lg shadow-2xl text-white flex items-center space-x-3 transform transition-all duration-300 ${colorClass}`}
+      style={{ animation: "slideIn 0.3s ease-out" }}
+    >
+      <style jsx global>{` @keyframes slideIn {
+from { transform: translateX(100%); opacity: 0; }
+to { transform: translateX(0); opacity: 1; }
+}
+`}</style>
+>>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
       <span className="font-medium">{notification.message}</span>
       <button onClick={onClose} className="p-1 rounded-full hover:bg-white/20">
         <X size={16} />
@@ -25,6 +58,7 @@ const Notification = ({ notification, onClose }) => {
   );
 };
 
+<<<<<<< HEAD
 // -------------------- Add Member Modal --------------------
 const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) => {
   const [email, setEmail] = useState("");
@@ -71,6 +105,170 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
       onClose();
     } else {
       setNotification({ type: "error", message: res.data.message });
+=======
+// ----------------------------------------------------------------------
+// --- 2. Inline Editable Department Cell ---
+// ----------------------------------------------------------------------
+const DepartmentCell = ({ member, handleUpdateField }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempValue, setTempValue] = useState(member.department || "N/A");
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) inputRef.current.focus();
+  }, [isEditing]);
+
+  const handleSave = () => {
+    const trimmedValue = tempValue.trim() || "N/A";
+    handleUpdateField(member.email, "department", trimmedValue);
+    setTempValue(trimmedValue);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSave();
+    if (e.key === "Escape") {
+      setTempValue(member.department);
+      setIsEditing(false);
+    }
+  };
+
+  return (
+    <div className="p-3">
+      {isEditing ? (
+        <input
+          ref={inputRef}
+          type="text"
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+          onBlur={handleSave}
+          onKeyDown={handleKeyDown}
+          className="w-full bg-gray-100 dark:bg-gray-700 rounded-md px-2 py-1 text-sm border-2 border-pink-500 focus:outline-none"
+          placeholder="Enter Department"
+        />
+      ) : (
+        <span
+          onClick={() => setIsEditing(true)}
+          className="cursor-pointer hover:text-pink-500 transition duration-150 p-1 block min-w-[100px]"
+          title="Click to edit department"
+        >
+          {member.department || "N/A"}
+        </span>
+      )}
+    </div>
+  );
+};
+
+// ----------------------------------------------------------------------
+// --- 3. Gender Badge Selector ---
+// ----------------------------------------------------------------------
+const GenderBadgeSelector = ({ member, handleUpdateField }) => {
+  const options = ["Male", "Female"];
+  const getBadgeStyle = (gender) => {
+    switch (gender) {
+      case "Male":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
+      case "Female":
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+    }
+  };
+
+  return (
+    <td className="p-3 min-w-[150px] flex flex-wrap gap-2">
+      {options.map((gender) => (
+        <span
+          key={gender}
+          onClick={() => handleUpdateField(member.email, "gender", gender)}
+          className={`cursor-pointer px-3 py-1 rounded-full text-sm font-semibold transition-all ${member.gender === gender
+            ? "scale-105 shadow-lg border-2 border-pink-500"
+            : "hover:scale-105 hover:bg-gray-200 dark:hover:bg-gray-700"
+            } ${getBadgeStyle(gender)}`}
+        >
+          {gender}
+        </span>
+      ))}
+    </td>
+  );
+};
+
+// --- 4. Add Member Modal Component (UPDATED with email search) ---
+// ----------------------------------------------------------------------
+
+
+const AddMemberModal = ({ onClose, setNotification }) => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const axiosSecure = useAxiosSecure();
+  const { selectedProject } = useContext(DataContext);
+
+  // ✅ Load user list for email suggestions
+  useEffect(() => {
+    axiosSecure
+      .get("/api/users")
+      .then((res) => setUsers(res.data))
+      .catch((err) => console.log(err));
+  }, [axiosSecure]);
+
+  // ✅ Filter suggestions dynamically
+  useEffect(() => {
+    if (!email.trim()) {
+      setFilteredUsers([]);
+      return;
+    }
+
+    const filtered = users.filter(
+      (u) => u?.email && u.email.toLowerCase().includes(email.toLowerCase())
+    );
+
+    setFilteredUsers(filtered.slice(0, 5));
+  }, [email, users]);
+
+  const handleSelect = (selectedEmail) => {
+    setEmail(selectedEmail);
+    setFilteredUsers([]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const memberEmail = email.trim();
+    if (!memberEmail) return;
+
+    setLoading(true);
+
+    try {
+      const response = await axiosSecure.put(`/api/add-member`, {
+        projectId: selectedProject._id,
+        memberEmail,
+      });
+
+      if (response.status === 200) {
+        setSuccess(true);
+        toast.success(`${memberEmail} successfully added to the team.`);
+
+
+        // ✅ Optional: update context/local state
+        selectedProject.teamMembers.push(memberEmail);
+
+        // reset after short delay
+        setTimeout(() => {
+          setSuccess(false);
+          setEmail("");
+          onClose();
+        }, 1500);
+      }
+    } catch (err) {
+      if (err.response.status == 409) {
+        toast.error('Already this member added')
+      }
+
+    } finally {
+      setLoading(false);
+>>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
     }
   } catch (err) {
     console.error(err);
@@ -83,14 +281,23 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-center p-4">
-      <div className="bg-white dark:bg-[#1E1E2E] rounded-xl p-6 w-full max-w-md shadow-2xl">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="bg-white dark:bg-[#1E1E2E] rounded-2xl p-6 w-full max-w-md shadow-2xl relative"
+      >
         <div className="flex justify-between items-center mb-4 border-b pb-3 dark:border-gray-700">
           <h3 className="text-xl font-bold dark:text-gray-200">Add New Member</h3>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
             <X size={20} className="dark:text-gray-400" />
           </button>
         </div>
 
+<<<<<<< HEAD
         <form onSubmit={handleAddMember}>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Member Email
@@ -118,33 +325,111 @@ const AddMemberModal = ({ onClose, projectId, onMemberAdded, setNotification }) 
               ))}
             </div>
           )}
+=======
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4 relative">
+            <label
+              htmlFor="member-email"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Member Email Address
+            </label>
+            <input
+              type="email"
+              id="member-email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-gray-200"
+              placeholder="member@example.com"
+              autoComplete="off"
+              disabled={loading || success}
+            />
+
+            {/* ✅ Suggestion Dropdown */}
+            {filteredUsers.length > 0 && (
+              <ul className="absolute z-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 w-full max-h-40 overflow-y-auto shadow-lg">
+                {filteredUsers.map((user) => (
+                  <li
+                    key={user._id}
+                    onClick={() => handleSelect(user.email)}
+                    className="px-3 py-2 cursor-pointer hover:bg-pink-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-gray-200"
+                  >
+                    {user.email}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+>>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
 
           <button
             type="submit"
-            disabled={loading || !email.trim()}
-            className="mt-4 w-full flex justify-center items-center px-4 py-2 rounded-md text-base font-medium text-white bg-pink-600 hover:bg-pink-700 focus:ring-2 focus:ring-pink-500 disabled:opacity-50"
+            disabled={loading || !email.trim() || success}
+            className="w-full flex justify-center items-center gap-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 transition-colors"
           >
-            {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "Add Member"}
+            {loading ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" /> Adding...
+              </>
+            ) : success ? (
+              <>
+                <CheckCircle2 className="h-5 w-5 text-white" /> Added!
+              </>
+            ) : (
+              "Add Member"
+            )}
           </button>
         </form>
-      </div>
+
+        {/* ✅ Optional Toast inside modal (for instant feedback) */}
+        <AnimatePresence>
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="mt-4 flex items-center gap-2 text-green-600 text-sm font-medium"
+            >
+              <CheckCircle2 size={18} />
+              Member added successfully!
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 };
 
+<<<<<<< HEAD
 // -------------------- Team Component --------------------
+=======
+
+
+// ----------------------------------------------------------------------
+// --- 5. Main Team Component ---
+// ----------------------------------------------------------------------
+>>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
 export default function Team({ projectId }) {
   const [team, setTeam] = useState([]);
   const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(true);
+<<<<<<< HEAD
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+=======
+  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false); // New state for Modal
+>>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
   const { manager } = useContext(DataContext);
   const { data: session } = useSession();
   const userEmail = session?.user?.email || "";
 
+<<<<<<< HEAD
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   // Fetch tasks to map team members
+=======
+  // --- Fetch tasks & map to team (wrapped in useCallback) ---
+>>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
   const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
@@ -156,6 +441,7 @@ export default function Team({ projectId }) {
 
       tasks.forEach((task) => {
         const { assigneeTo, creatorEmail, title, status } = task;
+        // Assignee-to যদি না থাকে, creator-কে assignee ধরা হচ্ছে।
         const emails = assigneeTo?.length ? assigneeTo : [creatorEmail];
 
         emails.forEach((email) => {
@@ -166,6 +452,8 @@ export default function Team({ projectId }) {
               name: safeEmail.split("@")[0],
               role: creatorEmail === safeEmail ? "Leader" : "Member",
               img: `https://placehold.co/40x40/94A3B8/FFFFFF?text=${safeEmail[0]?.toUpperCase() || "?"}`,
+              department: "N/A",
+              gender: "N/A",
               tasks: [],
             };
           }
@@ -182,16 +470,30 @@ export default function Team({ projectId }) {
     }
   }, [projectId]);
 
+  // --- Initial data fetch ---
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
 
+<<<<<<< HEAD
+=======
+  // --- Update inline fields ---
+  const handleUpdateField = useCallback((email, field, value) => {
+    setTeam((prev) => prev.map((m) => (m.email === email ? { ...m, [field]: value } : m)));
+    setNotification({ type: "info", message: `${field} for ${email.split("@")[0]} updated locally!` });
+    setTimeout(() => setNotification(null), 3000);
+  }, []);
+
+  const handleCloseNotification = () => setNotification(null);
+
+>>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
   return (
     <section className="text-gray-800 dark:text-gray-200">
       <Notification notification={notification} onClose={() => setNotification(null)} />
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-bold">Project Team ({team.length} Members)</h2>
+<<<<<<< HEAD
 
         {manager === userEmail && (
           <button
@@ -204,6 +506,26 @@ export default function Team({ projectId }) {
       </div>
 
       {isAddModalOpen && (
+=======
+        {/* Add Member Button */}
+        {
+          manager === userEmail &&
+          (
+            <button
+              onClick={() => setIsAddMemberModalOpen(true)}
+              className="p-2 rounded-full bg-pink-500 text-white hover:bg-pink-600 transition-colors shadow-lg"
+              title="Add New Team Member"
+            >
+              <Plus size={24} />
+            </button>
+          )
+        }
+
+      </div>
+
+      {/* Add Member Modal RENDER */}
+      {isAddMemberModalOpen && (
+>>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
         <AddMemberModal
           onClose={() => setIsAddModalOpen(false)}
           projectId={projectId}
@@ -223,8 +545,10 @@ export default function Team({ projectId }) {
               <tr>
                 <th className="p-3 text-left min-w-[150px]">Member</th>
                 <th className="p-3 text-left min-w-[200px]">Email</th>
-                <th className="p-3 text-left min-w-[150px] hidden md:table-cell">Tasks</th>
-                <th className="p-3 text-left min-w-[100px] hidden md:table-cell">Status</th>
+                <th className="p-3 text-left min-w-[150px]">Tasks</th>
+                <th className="p-3 text-left min-w-[150px]">Department</th>
+                <th className="p-3 text-left min-w-[100px]">Gender</th>
+                <th className="p-3 text-left min-w-[100px]">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -237,6 +561,7 @@ export default function Team({ projectId }) {
                     <img
                       src={t.img}
                       className="w-8 h-8 rounded-full object-cover ring-2 ring-pink-500/50"
+<<<<<<< HEAD
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = "https://placehold.co/40x40/94A3B8/FFFFFF?text=?";
@@ -247,13 +572,26 @@ export default function Team({ projectId }) {
                   </td>
                   <td className="p-3 text-gray-600 dark:text-gray-400">{t.email}</td>
                   <td className="p-3 text-sm text-gray-600 dark:text-gray-400 hidden md:table-cell">
+=======
+                      onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/40x40/94A3B8/FFFFFF?text=?"; }}
+                    />
+                    <span className="font-medium">{t.name}</span>
+                    {t.role === "Leader" && <span className="ml-1 text-yellow-500">⭐</span>}
+                  </td>
+                  <td className="p-3 text-sm text-gray-600 dark:text-gray-400">{t.email}</td>
+                  <td className="p-3 text-sm text-gray-600 dark:text-gray-400">
+>>>>>>> ce75ec4a942281cfcbd0f3fcfcec4e00a147d4fc
                     {t.tasks.map((task, idx) => (
                       <div key={idx}>
                         <span className="font-semibold">{task.title}</span>
                       </div>
                     ))}
                   </td>
-                  <td className="p-3 text-sm text-gray-600 dark:text-gray-400 hidden md:table-cell">
+                  <td className="p-0">
+                    <DepartmentCell member={t} handleUpdateField={handleUpdateField} />
+                  </td>
+                  <GenderBadgeSelector member={t} handleUpdateField={handleUpdateField} />
+                  <td className="p-3 text-sm text-gray-600 dark:text-gray-400">
                     {t.tasks.map((task, idx) => (
                       <div key={idx}>{task.status}</div>
                     ))}

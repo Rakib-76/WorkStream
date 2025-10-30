@@ -47,7 +47,6 @@ export default function DashboardNavbar() {
   const { control, register, handleSubmit } = useForm();
   const [manager, setManager] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const { data: session } = useSession();
   const userName = session?.user?.name || "Unknown User";
   const userEmail = session?.user?.email || "Unknown Email";
@@ -58,7 +57,7 @@ export default function DashboardNavbar() {
   const [searchText, setSearchText] = useState("");
 
   // data from Context
-  const { setSelectedProject, selectedProject } = useContext(DataContext);
+  const { setSelectedProject, selectedProject, userData } = useContext(DataContext);
   const selectedProjectId = selectedProject?._id;
 
 
@@ -199,7 +198,6 @@ export default function DashboardNavbar() {
       };
 
       const response = await axiosSecure.post("/api/createProject", {
-        collectionName: "projects",
         projectData: payload,
       });
 
@@ -476,7 +474,7 @@ export default function DashboardNavbar() {
                     </div>
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-900 dark:text-white">
-                        {session?.user?.name || "Unknown User"}
+                        {userData ?.name || "Unknown User"}
                       </h4>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {session?.user?.email || "No email"}
