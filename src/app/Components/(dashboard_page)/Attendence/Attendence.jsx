@@ -18,7 +18,6 @@ export default function AttendancePage({ projectId }) {
           setRecords(json.data);
         }
       } catch (err) {
-        console.log("Error loading attendance:", err);
       } finally {
         setLoading(false);
       }

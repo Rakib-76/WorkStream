@@ -4,7 +4,6 @@ import { ObjectId } from "mongodb";
 
 // ✅ GET - Get all tasks (Filtered by projectId)
 export async function GET(req) {
-  console.log("GET request received at /api/tasks", req);
   try {
     const { searchParams } = new URL(req.url);
     const projectId = searchParams.get("projectId");

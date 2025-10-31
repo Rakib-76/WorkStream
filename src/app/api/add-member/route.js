@@ -6,9 +6,6 @@ export async function PUT(request) {
     const body = await request.json();
     const { projectId, memberEmail } = body;
 
-    console.log("🟢 Received PUT request!");
-    console.log("📦 Project ID:", projectId);
-    console.log("📧 Member Email:", memberEmail);
 
     if (!projectId || !memberEmail) {
       return Response.json(
@@ -43,7 +40,6 @@ export async function PUT(request) {
       { $push: { teamMembers: memberEmail } }
     );
 
-    console.log("✅ Member added successfully!");
 
     return Response.json(
       {

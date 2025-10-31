@@ -191,7 +191,6 @@ const ProjectsTable = () => {
 
   // Function to handle the calendar icon click (placeholder)
   const handleCalendarClick = () => {
-    console.log("Showing this week's projects");
   };
 
   return (
@@ -257,7 +256,6 @@ const TasksStatisticsChart = () => {
 
   // Function to handle the calendar icon click (placeholder)
   const handleCalendarClick = () => {
-    console.log("Showing this week's tasks");
   };
 
   return (

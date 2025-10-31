@@ -10,7 +10,6 @@ export default async function handler(req, res) {
     return;
   }
 
-  console.log("-> Initializing Socket.io server");
   const { db } = await dbConnect();
   const messagesCollection = db.collection("chat_messages"); // <-- collection name
 
@@ -24,12 +23,10 @@ export default async function handler(req, res) {
   res.socket.server.io = io;
 
   io.on("connection", (socket) => {
-    console.log("Socket connected:", socket.id);
 
     // optional: join a default room
     socket.on("join-room", (room = "global") => {
       socket.join(room);
-      console.log(`${socket.id} joined ${room}`);
     });
 
     // client emits 'send-message' with { room, senderId, senderName, text }
@@ -56,7 +53,6 @@ export default async function handler(req, res) {
     });
 
     socket.on("disconnect", () => {
-      console.log("Socket disconnected:", socket.id);
     });
   });
 

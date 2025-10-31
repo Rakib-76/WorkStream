@@ -19,7 +19,6 @@ export default function ControlBar({ currentUser, onToggleMute, onToggleCamera, 
         screenStreamRef.current = null
       }
       setIsScreenSharing(false)
-      console.log("[v0] Screen sharing stopped")
     } else {
       // Start screen sharing
       try {
@@ -33,14 +32,11 @@ export default function ControlBar({ currentUser, onToggleMute, onToggleCamera, 
         stream.getVideoTracks()[0].onended = () => {
           setIsScreenSharing(false)
           screenStreamRef.current = null
-          console.log("[v0] Screen sharing ended by user")
         }
 
         setIsScreenSharing(true)
-        console.log("[v0] Screen sharing started")
       } catch (error) {
         if (error.name !== "NotAllowedError") {
-          console.log("[v0] Screen share error:", error.message)
         }
       }
     }
@@ -50,7 +46,6 @@ export default function ControlBar({ currentUser, onToggleMute, onToggleCamera, 
     const elem = document.documentElement
     if (!document.fullscreenElement) {
       elem.requestFullscreen().catch((err) => {
-        console.log("[v0] Fullscreen error:", err.message)
       })
     } else {
       document.exitFullscreen()
@@ -68,12 +63,10 @@ export default function ControlBar({ currentUser, onToggleMute, onToggleCamera, 
   }
 
   const handleMicClick = () => {
-    console.log("[v0] Mic button clicked - Current state:", isMuted)
     onToggleMute()
   }
 
   const handleCameraClick = () => {
-    console.log("[v0] Camera button clicked - Current state:", isCameraOff)
     onToggleCamera()
   }
 

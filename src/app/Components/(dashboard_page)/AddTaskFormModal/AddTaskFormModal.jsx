@@ -21,7 +21,6 @@ export default function AddTaskFormModal({ isOpen, onClose, onTaskAdded }) {
             lastUpdated: new Date(),
             tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
         };
-        console.log("New Task Data:", newTask);
 
         try {
             await axiosSecure.post("/api/tasks", newTask);
