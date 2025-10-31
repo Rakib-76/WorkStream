@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import dbConnect, { collectionNameObj } from "../../../lib/dbConnect";
+import { ObjectId } from "mongodb";
 
 // ✅ GET - Get all tasks (Filtered by projectId)
 export async function GET(req) {
@@ -9,11 +10,31 @@ export async function GET(req) {
     const projectId = searchParams.get("projectId");
 
     const taskCollection = await dbConnect(collectionNameObj.taskCollection);
+    const projectCollection = await dbConnect(collectionNameObj.projectsCollection);
 
+
+// its for getting assigneeTo email
     const query = projectId ? { projectId } : {};
     const tasks = await taskCollection.find(query).sort({ createdAt: -1 }).toArray();
 
-    return NextResponse.json({ success: true, data: tasks }, { status: 200 });
+
+    // its for getting teamMembers email
+ // 🟢 add this at top
+const project = projectId
+  ? await projectCollection.findOne({ _id: new ObjectId(projectId) })
+  : null;
+
+
+    return NextResponse.json(
+      {
+         success: true,
+         data: {
+          tasks,
+          teamMembers:project?.teamMembers || [],
+          // manager: project?.manager || null,
+         }
+         }, { status: 200 }
+    );
   } catch (error) {
     console.error("Error fetching tasks:", error);
     return NextResponse.json(

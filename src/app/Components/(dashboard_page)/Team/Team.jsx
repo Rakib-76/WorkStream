@@ -149,6 +149,7 @@ const AddMemberModal = ({ onClose, setNotification }) => {
       setSuccess(true);
       toast.success(`${memberEmail} successfully added to the team.`);
 
+     
       // Optional: update context/local state
       selectedProject.teamMembers.push(memberEmail);
 
@@ -285,7 +286,7 @@ export default function Team({ projectId }) {
       const res = await axios.get(`/api/tasks?projectId=${projectId}`);
       if (!res?.data?.success) return;
 
-      const tasks = res.data.data;
+      const { tasks, teamMembers } = res?.data?.data;
       const assigneesMap = {};
 
       tasks.forEach((task) => {
@@ -309,6 +310,21 @@ export default function Team({ projectId }) {
           assigneesMap[safeEmail].tasks.push({ title, status });
         });
       });
+
+      teamMembers?.forEach((email) => {
+        if(!assigneesMap[email]){
+          assigneesMap[email] = {
+             email,
+          name: email.split("@")[0],
+          role: "Member",
+          img: `https://placehold.co/40x40/94A3B8/FFFFFF?text=${email[0]?.toUpperCase() || "?"}`,
+          department: "N/A",
+          gender: "N/A",
+          tasks: [],
+          };
+        }
+      });
+
 
       setTeam(Object.values(assigneesMap));
     } catch (err) {
