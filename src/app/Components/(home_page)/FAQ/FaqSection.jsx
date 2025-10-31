@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-const faqs = [
+const Faqs = [
   {
     question: "What is WorkStream?",
     answer:
@@ -58,7 +58,7 @@ export default function FAQ() {
         Frequently Asked Questions
       </h2>
       <div className="space-y-4">
-        {faqs.map((faq, index) => (
+        {Faqs.map((faq, index) => (
           <div
             key={index}
             className="border cursor-pointer border-gray-200 rounded-2xl shadow-sm"
