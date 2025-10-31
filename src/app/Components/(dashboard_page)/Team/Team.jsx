@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import useAxiosSecure from "../../../../lib/useAxiosSecure";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
 // ----------------------------------------------------------------------
 // --- 1. Notification Feature function ---
 // ----------------------------------------------------------------------
@@ -96,7 +97,7 @@ const DepartmentCell = ({ member, handleUpdateField }) => {
 // ----------------------------------------------------------------------
 
 
-const AddMemberModal = ({ onClose, setNotification }) => {
+const AddMemberModal = ({ onClose, setNotification, onMemberAdded }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -133,44 +134,44 @@ const AddMemberModal = ({ onClose, setNotification }) => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  const memberEmail = email.trim();
-  if (!memberEmail) return;
+    e.preventDefault();
+    const memberEmail = email.trim();
+    if (!memberEmail) return;
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const response = await axiosSecure.put(`/api/add-member`, {
-      projectId: selectedProject._id,
-      memberEmail,
-    });
+    try {
+      const response = await axiosSecure.put(`/api/add-member`, {
+        projectId: selectedProject._id,
+        memberEmail,
+      });
 
-    if (response.status === 200) {
-      setSuccess(true);
-      toast.success(`${memberEmail} successfully added to the team.`);
+      if (response.status === 200) {
+        setSuccess(true);
+        toast.success(`${memberEmail} successfully added to the team.`);
 
-     
-      // Optional: update context/local state
-      selectedProject.teamMembers.push(memberEmail);
+        // ✅ REFRESH team list BEFORE closing modal
+        await onMemberAdded();
 
-      // reset after short delay
-      setTimeout(() => {
-        setSuccess(false);
-        setEmail("");
-        onClose();
-      }, 1500);
+        // reset after short delay
+        setTimeout(() => {
+          setSuccess(false);
+          setEmail("");
+          onClose();
+        }, 1500);
+      }
+
+    } catch (err) {
+      if (err.response?.status === 409) {
+        toast.error("Already this member added");
+      } else {
+        console.error(err);
+        setNotification({ type: "error", message: "Server error while adding member" });
+      }
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    if (err.response?.status === 409) {
-      toast.error("Already this member added");
-    } else {
-      console.error(err);
-      setNotification({ type: "error", message: "Server error while adding member" });
-    }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
 
@@ -289,9 +290,9 @@ export default function Team({ projectId }) {
       const { tasks, teamMembers } = res?.data?.data;
       const assigneesMap = {};
 
+      // Map tasks to team members
       tasks.forEach((task) => {
         const { assigneeTo, creatorEmail, title, status } = task;
-        // Assignee-to যদি না থাকে, creator-কে assignee ধরা হচ্ছে।
         const emails = assigneeTo?.length ? assigneeTo : [creatorEmail];
 
         emails.forEach((email) => {
@@ -312,28 +313,28 @@ export default function Team({ projectId }) {
       });
 
       teamMembers?.forEach((email) => {
-        if(!assigneesMap[email]){
+        if (!assigneesMap[email]) {
           assigneesMap[email] = {
-             email,
-          name: email.split("@")[0],
-          role: "Member",
-          img: `https://placehold.co/40x40/94A3B8/FFFFFF?text=${email[0]?.toUpperCase() || "?"}`,
-          department: "N/A",
-          gender: "N/A",
-          tasks: [],
+            email,
+            name: email.split("@")[0],
+            role: "Member",
+            img: `https://placehold.co/40x40/94A3B8/FFFFFF?text=${email[0]?.toUpperCase() || "?"}`,
+            department: "N/A",
+            gender: "N/A",
+            tasks: [],
           };
         }
       });
 
-
       setTeam(Object.values(assigneesMap));
     } catch (err) {
       console.error(err);
-      setNotification({ type: "error", message: "Failed to load team data." });
+      toast.error("Failed to load team data");
     } finally {
       setLoading(false);
     }
   }, [projectId]);
+
 
   // --- Initial data fetch ---
   useEffect(() => {
@@ -374,17 +375,14 @@ export default function Team({ projectId }) {
       {/* Add Member Modal RENDER */}
       {isAddMemberModalOpen && (
         <AddMemberModal
-    onClose={() => setIsAddMemberModalOpen(false)} // ✅ Fixed
-    projectId={projectId}
-    onMemberAdded={fetchTasks}
-    setNotification={setNotification}
-  />
+          onClose={() => setIsAddMemberModalOpen(false)}
+          projectId={projectId}
+          onMemberAdded={fetchTasks} // ✅ REFRESH team AFTER add
+        />
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="animate-spin mr-2" /> Loading team...
-        </div>
+        <LoadingSpinner />
       ) : (
         <div className="overflow-x-auto rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700">
           <table className="w-full border-collapse overflow-hidden">
