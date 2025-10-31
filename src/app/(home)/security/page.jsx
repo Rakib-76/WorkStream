@@ -65,6 +65,7 @@ export default function SecuritySection() {
                     <p className="mt-3 text-muted-foreground max-w-2xl mx-auto">
                         Keep your projects and teams safe — built-in controls, strong encryption, and auditability.
                     </p>
+                    {/* hello */}
                 </motion.div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
