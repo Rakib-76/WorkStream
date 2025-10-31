@@ -6,7 +6,6 @@ import { ObjectId } from "mongodb";
 export async function PUT (req) {
     try{
         const {taskId, date, status } = await req.json();
-        console.log("PATCH request body:", { taskId, date, status });
         if(!taskId || !date || !status) {
             return NextResponse.json(
                 { success: false, message:"taskId, data & status required"},
@@ -17,7 +16,6 @@ export async function PUT (req) {
 
         // Find task first
         const task = await taskCollection.findOne({_id:new ObjectId(taskId)});
-        console.log("Fetched task:", task);
         if(!task) {
             return NextResponse.json(
                 { success: false, message:'Task not found'},
@@ -44,7 +42,6 @@ export async function PUT (req) {
             { $set:{ attendance:newAttendance, lastUpdated: new Date()}}
 
         );
-        console.log("Updated attendance:", newAttendance);
         return NextResponse.json({success:true, data: newAttendance});
 
     }catch(err){

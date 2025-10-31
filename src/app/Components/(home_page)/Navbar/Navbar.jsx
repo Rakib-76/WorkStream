@@ -388,8 +388,8 @@ export default function Navbar() {
                       <div
                         className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary cursor-pointer"
                         onClick={() => {
-                          refetchUser(); 
-                          setIsDropdownOpen(!isDropdownOpen); 
+                          refetchUser();
+                          setIsDropdownOpen(!isDropdownOpen);
                         }}                      >
                         <Image
                           src={session?.user?.image || "/def-profile.png"}
@@ -437,9 +437,6 @@ export default function Navbar() {
                               onClick={() => (window.location.href = "/Dashboard/profileSetting")}
                               className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                               <Settings size={18} /> Account settings
-                            </li>
-                            <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                              <SwitchCamera size={18} /> Switch account
                             </li>
                             <li
                               onClick={handleLogout}
@@ -750,9 +747,6 @@ export default function Navbar() {
                                 </li>
                                 <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                                   <Settings size={18} /> Account settings
-                                </li>
-                                <li className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                                  <SwitchCamera size={18} /> Switch account
                                 </li>
                                 <li
                                   onClick={handleLogout} t

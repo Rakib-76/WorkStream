@@ -36,7 +36,6 @@ export default function JoinScreen() {
 
   const startCamera = async () => {
     try {
-      console.log("[v0] Attempting to access camera...")
 
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         setCameraError("Your browser does not support camera access")
@@ -53,7 +52,6 @@ export default function JoinScreen() {
         audio: false,
       })
 
-      console.log("[v0] Camera access granted")
       setCameraError(null)
 
       if (videoRef.current) {

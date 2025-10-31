@@ -465,7 +465,6 @@ export default function Todo() {
             axiosSecure
               .patch(`/api/tasks/${taskId}`, { status, columnTitle, attendance })
               .then(async () => {
-                console.log("✅ Task updated!");
 
                 // ✅ Send notification
                 await axiosSecure.post("/api/notifications", {
@@ -480,7 +479,6 @@ export default function Todo() {
                   type: "task_status_change",
                 });
 
-                console.log("📩 Notification sent!");
               })
               .catch((err) => console.error("❌ Failed to update task:", err));
           }}

@@ -11,7 +11,6 @@ import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 
 export default function CalendarSection({ projectId }) {
-    console.log(projectId)
     const [events, setEvents] = useState([]);
     const calendarRef = useRef(null);
     const [loading, setLoading] = useState(false);

@@ -262,7 +262,6 @@ const AttendanceSection = ({ task, currentUserEmail }) => {
       for (let d = start; d.isBefore(end) || d.isSame(end, "day"); d = d.add(1, "day")) {
         const dayName = d.format("dddd");
         const isHoliday = dayName === "Friday" || dayName === "Saturday";
-        // console.log(task.attendance, Array.isArray(task.attendance));
         const existing = Array.isArray(task.attendance)
           ? task.attendance.find((a) => a.date === d.format("YYYY-MM-DD"))
           : null;;
